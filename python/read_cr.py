@@ -53,6 +53,6 @@ def read_coeff(fname):
     return data, T
 #
 
-data, T = read_coeff('../../Rates_H_H2.dat')
+data, T = read_coeff('Read/Rates_H_H2.dat')
 
 print 'done'
