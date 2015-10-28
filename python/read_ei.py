@@ -41,23 +41,43 @@ def read_einstein():
     file.close()
 
 
-    # # opening the original ascii file
-    #file = open('Read/j2j', 'r')
-    #read = file.readlines()
+    # opening the original ascii file
+    file = open('Read/j2j', 'r')
+    read = file.readlines()
 
-    #k = read[0].split()[0]
-    # ivmax = numpy.array(read[2].split(), dtype = 'i')
+    k = read[0].split()[0]
+    #ivmax = numpy.array(read[1].split(), dtype = 'i')
     #
-    # index = 3
-    # for j in range(2, jmax+1, 1):
-    #     ii = numpy.array(read[index].split(), dtype = 'i')
-    #     for ivi in range(0,ivmax[j]+1):
-    #         ji = int(read[index+ivi+1].split()[0])
-    #         vf = int(read[index+ivi+1].split()[1])
-    #         a = numpy.array(read[index+ivi+1].split()[2:])
-    #         print ji,vf, a
-    #     index = index + ivmax[j]+1+1
-    # file.close()
+    index = 1
+    for j in range(1, jmax+1, 1):
+         ii = numpy.array(read[index].split(), dtype = 'i')
+         for ivi in range(0,ivmax[j]):
+             ji = int(read[index+ivi+1].split()[0])
+             vf = int(read[index+ivi+1].split()[1])
+             a = numpy.array(read[index+ivi+1].split()[2:])
+             print ji,vf, a
+         index = index + ivmax[j]+1
+    file.close()
+
+    # opening the original ascii file
+    file = open('Read/j2jup', 'r')
+    read = file.readlines()
+
+    k = read[0].split()[0]
+    #ivmax = numpy.array(read[1].split(), dtype = 'i')
+    #
+    index = 1
+    for j in range(0, jmax-1, 1):
+         ii = numpy.array(read[index].split(), dtype = 'i')
+         for ivi in range(0,min(ivmax[j+2],ivmax[j]-1)+1):
+             print 'min(ivmax[j+2],ivmax[j]-1)+1',min(ivmax[j+2],ivmax[j]-1)+1
+             ji = int(read[index+ivi+1].split()[0])
+             vf = int(read[index+ivi+1].split()[1])
+             a = numpy.array(read[index+ivi+1].split()[2:])
+             print ji,vf, a
+         index = index + (min(ivmax[j+2],ivmax[j]-1)+1)+1
+         print index
+    file.close()
 
 #            A[k, vf, ivmax[j] - ivi, ji] = numpy.array(read[index+ivi+1].split()[2:])
 
