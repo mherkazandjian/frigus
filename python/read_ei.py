@@ -27,48 +27,67 @@ def read_einstein():
     # A[vi, ji, vf, jf]
     A = zeros((vmax+1, jmax+1, vmax+1, jmax+1), 'f8')
 
-    # opening the original ascii file
-    file = open('Read/j2jdown', 'r')
-    read = file.readlines()
+    def read_j2jdown(fname):
 
-    # tansition in j = k * |2| i.e  j'' = j' - 2
-    k = read[0].split()[0]
+        #initializing A. The indices are as follows:
+        # A[vi, ji, vf, jf]
+        Aj2j_down = zeros((vmax+1, jmax+1, vmax+1, jmax+1), 'f8')
 
-    # the maximum vibrational level for each rotational level
-    ivmax = numpy.array(read[2].split(), dtype = 'i')
+        # opening the original ascii file
+        f = open(fname, 'r')
+        read = f.readlines()
+        f.close()
 
-    # start reading the blocks (after the 3rd line)
-    # for each value of j one block (of v transitions) is read
-    index = 3
-    for j in range(2, jmax+1, 1):
-        # initial vibrational level for the columns of the block
-        # .. todo:: rename this to vis
-        ii = numpy.array(read[index].split(), dtype = 'i')
+        # tansition in j = k * |2| i.e  j'' = j' - 2
+        k = read[0].split()[0]
+        
+        # the maximum vibrational level for each rotational level
+        ivmax = numpy.array(read[2].split(), dtype = 'i')
 
-        # processing the block data one row at time
-        for row_num, ivi in enumerate(range(0, ivmax[j]+1)):
-            # the inital rotational level 
-            ji = int(read[index+ivi+1].split()[0])
+        # start reading the blocks (after the 3rd line)
+        # for each value of j one block (of v transitions) is read
+        index = 3
+        for j in range(2, jmax+1, 1):
+            # initial vibrational level for the columns of the block
+            # .. todo:: rename this to vis
+            ii = numpy.array(read[index].split(), dtype = 'i')
 
-            # the final vibrational level
-            vf = int(read[index+ivi+1].split()[1])
+            # processing the block data one row at time
+            for row_num, ivi in enumerate(range(0, ivmax[j]+1)):
+                # the inital rotational level 
+                ji = int(read[index+ivi+1].split()[0])
 
-            # the einstein coefficients for the whole row whose
-            # jf = ji -2
-            # vi = ii
-            es = numpy.array(read[index+ivi+1].replace('D', 'E').split()[2:])
+                # the final vibrational level
+                vf = int(read[index+ivi+1].split()[1])
 
-            # A[vi, ji, vf, jf]
-            for col_index, vi in enumerate(ii[0:(es.size-1)]):
-                A[vi, ji, vf, ji-2] = es[col_index] 
-            #print ji,vf, a
-            #Tracer()()
+                # the einstein coefficients for the whole row whose
+                # jf = ji -2
+                # vi = ii
+                es = numpy.array(read[index+ivi+1].replace('D', 'E').split()[2:])
 
-        # incrementing the index of the line to move it to the
-        # next block
-        index = index + ivmax[j]+1+1
-    file.close()
-    Tracer()()
+                # A[vi, ji, vf, jf]
+                for col_index, vi in enumerate(ii[0:(es.size-1)]):
+                    Aj2j_down[vi, ji, vf, ji-2] = es[col_index] 
+                #print ji,vf, a
+                #Tracer()()
+
+            # incrementing the index of the line to move it to the
+            # next block
+            index = index + ivmax[j]+1+1
+        #
+        
+        # read the saved array that has been quality checked and compare
+        # with what was read above
+        A_checked = numpy.load('A_j2jdown_checked.npy')
+        assert numpy.fabs(1.0 - Aj2j_down.sum() / A_checked.sum()) == 0.0
+
+        return Aj2j_down
+    #
+
+    Aj2j_down = read_j2jdown('Read/j2jdown')
+    # Aj2j = read_j2jdown('Read/j2jdown')
+    # Aj2j_up = read_j2jdown('Read/j2jdown')
+    # A = Aj2j_down + Aj2j + Aj2j_up
     
     # opening the original ascii file
     file = open('Read/j2j', 'r')
