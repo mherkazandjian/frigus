@@ -25,11 +25,17 @@ def read_einstein():
     file = open('Read/j2jdown', 'r')
     read = file.readlines()
 
+    # tansition in j = k * |2| i.e  j'' = j' - 2
     k = read[0].split()[0]
+
+    # the maximum vibrational level for each rotational level
     ivmax = numpy.array(read[2].split(), dtype = 'i')
 
+    # start reading the blocks (after the 3rd line)
+    # for each value of j one block (of v transitions) is read
     index = 3
     for j in range(2, jmax+1, 1):
+        # initial vibrational level for the columns of the block
         ii = numpy.array(read[index].split(), dtype = 'i')
         for ivi in range(0,ivmax[j]+1):
             ji = int(read[index+ivi+1].split()[0])
