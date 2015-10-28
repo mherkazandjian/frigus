@@ -22,8 +22,8 @@ def read_einstein():
     jmax = 31
 
     # opening the original ascii file
-    openfile = open('Read/j2jdown', 'r')
-    read = openfile.readlines()
+    file = open('Read/j2jdown', 'r')
+    read = file.readlines()
 
     k = read[0].split()[0]
     ivmax = numpy.array(read[2].split(), dtype = 'i')
@@ -37,6 +37,27 @@ def read_einstein():
             a = numpy.array(read[index+ivi+1].split()[2:])
             print ji,vf, a
         index = index + ivmax[j]+1+1
+
+    file.close()
+
+
+    # # opening the original ascii file
+    # file = open('Read/j2j', 'r')
+    # read = file.readlines()
+    #
+    # k = read[0].split()[0]
+    # ivmax = numpy.array(read[2].split(), dtype = 'i')
+    #
+    # index = 3
+    # for j in range(2, jmax+1, 1):
+    #     ii = numpy.array(read[index].split(), dtype = 'i')
+    #     for ivi in range(0,ivmax[j]+1):
+    #         ji = int(read[index+ivi+1].split()[0])
+    #         vf = int(read[index+ivi+1].split()[1])
+    #         a = numpy.array(read[index+ivi+1].split()[2:])
+    #         print ji,vf, a
+    #     index = index + ivmax[j]+1+1
+    # file.close()
 
 #            A[k, vf, ivmax[j] - ivi, ji] = numpy.array(read[index+ivi+1].split()[2:])
 
