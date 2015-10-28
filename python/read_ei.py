@@ -6,6 +6,8 @@ Created on Wed Jan 28 01:51:39 2015
 """
 
 import numpy
+from numpy import zeros
+from IPython.core.debugger import Tracer
 
 def read_einstein():
     '''parse the data by Simbotin:
@@ -15,11 +17,15 @@ def read_einstein():
      1    0   0.6094641D-13   0.1367911D-12   0.1860857D-12   0.1826816D-12   0.9029585D-13   0.8476571D-14   .....
     '''
 
-    #initializing A
-    A = []
-
-    #defining the greatest rotational number for H2, starting from j = 0 (tot. rotational numbers: 32)
+    # defining the greatest rotational number for H2, starting from j = 0 (tot. rotational numbers: 32)
     jmax = 31
+
+    # defining the greatest vibrational number for H2, starting from v = 0 (tot. vibrational numbers: 15)
+    vmax = 14
+
+    #initializing A. The indices are as follows:
+    # A[vi, ji, vf, jf]
+    A = zeros((vmax+1, jmax+1, vmax+1, jmax+1), 'f8')
 
     # opening the original ascii file
     file = open('Read/j2jdown', 'r')
@@ -36,17 +42,34 @@ def read_einstein():
     index = 3
     for j in range(2, jmax+1, 1):
         # initial vibrational level for the columns of the block
+        # .. todo:: rename this to vis
         ii = numpy.array(read[index].split(), dtype = 'i')
-        for ivi in range(0,ivmax[j]+1):
+
+        # processing the block data one row at time
+        for row_num, ivi in enumerate(range(0, ivmax[j]+1)):
+            # the inital rotational level 
             ji = int(read[index+ivi+1].split()[0])
+
+            # the final vibrational level
             vf = int(read[index+ivi+1].split()[1])
-            a = numpy.array(read[index+ivi+1].split()[2:])
-            print ji,vf, a
+
+            # the einstein coefficients for the whole row whose
+            # jf = ji -2
+            # vi = ii
+            es = numpy.array(read[index+ivi+1].replace('D', 'E').split()[2:])
+
+            # A[vi, ji, vf, jf]
+            for col_index, vi in enumerate(ii[0:(es.size-1)]):
+                A[vi, ji, vf, ji-2] = es[col_index] 
+            #print ji,vf, a
+            #Tracer()()
+
+        # incrementing the index of the line to move it to the
+        # next block
         index = index + ivmax[j]+1+1
-
     file.close()
-
-
+    Tracer()()
+    
     # opening the original ascii file
     file = open('Read/j2j', 'r')
     read = file.readlines()
