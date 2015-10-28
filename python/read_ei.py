@@ -42,10 +42,10 @@ def read_einstein():
 
 
     # # opening the original ascii file
-    # file = open('Read/j2j', 'r')
-    # read = file.readlines()
-    #
-    # k = read[0].split()[0]
+    #file = open('Read/j2j', 'r')
+    #read = file.readlines()
+
+    #k = read[0].split()[0]
     # ivmax = numpy.array(read[2].split(), dtype = 'i')
     #
     # index = 3
