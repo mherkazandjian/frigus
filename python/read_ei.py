@@ -93,7 +93,7 @@ def read_einstein():
 
         #initializing Aj2j. The indices are as follows:
         # A[vi, ji, vf, jf]
-        Aj2j_down = zeros((vmax+1, jmax+1, vmax+1, jmax+1), 'f8')
+        Aj2j = zeros((vmax+1, jmax+1, vmax+1, jmax+1), 'f8')
 
     
         # opening the original ascii file
@@ -143,6 +143,10 @@ def read_einstein():
 
     def read_j2jup(fname):
 
+        #initializing Aj2j_up. The indices are as follows:
+        # A[vi, ji, vf, jf]
+        Aj2j_up = zeros((vmax+1, jmax+1, vmax+1, jmax+1), 'f8')
+
         # opening the original ascii file
         f = open('Read/j2jup', 'r')
         read = f.readlines()
@@ -159,29 +163,27 @@ def read_einstein():
             vis = numpy.array(read[index].split(), dtype = 'i')
 
             # processing the block data one row at time
-            for row_num, ivi in enumerate(range(0,ivmax[j])):
+            for row_num, ivi in enumerate(range(0,min(ivmax[j+2],ivmax[j]-1)+1)):
+                # the inital rotational level
+                ji = int(read[index+ivi+1].split()[0])
 
-             for row_num, ivi in enumerate(range(0,min(ivmax[j+2],ivmax[j]-1)+1)):
-                 # the inital rotational level
-                 ji = int(read[index+ivi+1].split()[0])
+                # the final vibrational level
+                vf = int(read[index+ivi+1].split()[1])
 
-                 # the final vibrational level
-                 vf = int(read[index+ivi+1].split()[1])
+                # the einstein coefficients for the whole row whose
+                # jf = ji -2
+                # vi = vis
+                es = numpy.array(read[index+ivi+1].replace('D', 'E').split()[2:])
 
-                 # the einstein coefficients for the whole row whose
-                 # jf = ji -2
-                 # vi = vis
-                 es = numpy.array(read[index+ivi+1].replace('D', 'E').split()[2:])
+                # A[vi, ji, vf, jf]
+                for col_index, vi in enumerate(vis[0:(es.size-1)]):
+                    Aj2j_up[vi, ji, vf, ji] = es[col_index]
+               #print ji,vf, a
+               #Tracer()()
 
-                 # A[vi, ji, vf, jf]
-                 for col_index, vi in enumerate(vis[0:(es.size-1)]):
-                     Aj2j_up[vi, ji, vf, ji] = es[col_index]
-                #print ji,vf, a
-                #Tracer()()
-
-             # incrementing the index of the line to move it to the
-             # next block
-             index = index + (min(ivmax[j+2],ivmax[j]-1)+1)+1
+            # incrementing the index of the line to move it to the
+            # next block
+            index = index + (min(ivmax[j+2],ivmax[j]-1)+1)+1
 
         # # read the saved array that has been quality checked and compare
         # # with what was read above
