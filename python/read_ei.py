@@ -191,8 +191,8 @@ def read_einstein():
         return Aj2j_up
 
     Aj2j_down = read_j2jdown('Read/j2jdown')
-    Aj2j = read_j2jdown('Read/j2jdown')
-    Aj2j_up = read_j2jdown('Read/j2jdown')
+    Aj2j = read_j2j('Read/j2j')
+    Aj2j_up = read_j2jup('Read/j2jup')
     A = Aj2j_down + Aj2j + Aj2j_up
 
     return A
