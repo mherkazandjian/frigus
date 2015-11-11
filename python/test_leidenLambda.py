@@ -1,48 +1,49 @@
-# this is a test file for leidenLambda.py.
 import sys, os
 import matplotlib
 matplotlib.use('Qt4Agg')
 import pylab
 
-from leidenLambda import molData 
+import molData
 import numpy
+from numpy import float64, abs, zeros, ones, zeros, arange, exp, eye, dot
+from numpy import linalg, vstack, array
 from ismUtils import planckOccupation as ng
+import mylib.numerics.ode
 
 restore = False
-#reading the whole database of line info of species from LAMBDA
+# reading the whole database of line info of species from LAMBDA
 lambdaPath = '/home/mher/ism/code/radex/Radex/data/home.strw.leidenuniv.nl/~moldata/datafiles'
 
-#reads the whole database
-#------------------------
-#reader = molData.reader(dirPath = lambdaPath)
+# reads the whole database
+# ------------------------
+# reader = molData.reader(dirPath = lambdaPath)
 
-#retrieves only one specie
+# retrieves only one specie
 reader = molData.reader(dirPath = lambdaPath, species = 'NH3')
 
-Tkin_min    = 15.0
-Tkin_max    = 300.0
+Tkin_min = 15.0
+Tkin_max = 300.0
 TkinSamples = 40.0 
-nH2         = [1e2, 1e4, 1e6]
+nH2 = [1e2, 1e4, 1e6]
 
-Tcmb     = 2.73  # temperature of background radiation (K)
+Tcmb = 2.73  # temperature of background radiation (K)
+
 # some constants
-#------------------------------
-hPlank = 6.63e-27    # erg.s 
+hPlank = 6.63e-27    # erg.s
 cLight = 29979245800.0 # cm.s^-1
 kBoltz = 1.38e-16    # erg.K^-1 
 ev2erg = 1.602e-12   #erg
-#------------------------------
 
-#selecting the one holding the info for p-NH3
+# selecting the one holding the info for p-NH3
 pNH3 = reader.get_specie(specStr='NH3', inInfo='p-')
 
 # converting the energy units to K 
 for idx, level in enumerate(pNH3.levels):
     level['E'] *= hPlank*cLight/kBoltz # energies in K
 
-#############################################################################
-# compute the matrix of transition rates
+
 def computeRateMatrix(pNH3, Tkin, nc):
+    """compute the matrix of transition rates"""
 
     n = pNH3.nlevels
 
@@ -54,28 +55,31 @@ def computeRateMatrix(pNH3, Tkin, nc):
     # constructing the matrix 
     ###########################################################
     def fill_K_matrix():
-        """fill the kij matrix from the lambda collisional transition database"""
-        #n  = 5
-        K = numpy.zeros( (n, n), dtype = numpy.float64)
+        """fill the kij matrix from the lambda collisional transition
+        database"""
+
+        # n  = 5
+        K = zeros( (n, n), dtype = float64)
         for trans in transColl:
             u  = trans['u']; l = trans['l']
             gu = levels[u]['g']; gl = levels[l]['g']
-            
-            dE = numpy.abs(levels[u]['E'] - levels[l]['E']) # difference in the enrergy in K
+
+            # difference in the enrergy in K
+            dE = abs(levels[u]['E'] - levels[l]['E'])
             
             K[u, l] = trans['rc'](Tkin)
-            K[l, u] = (numpy.float64(gu) / numpy.float64(gl)) * K[u,l] * numpy.exp(-dE / Tkin)
+            K[l, u] = (float64(gu) / float64(gl)) * K[u,l] * exp(-dE / Tkin)
         
         return K
-    
-    
+
     def fill_AP_matrix():
-        """fill the (A prime)_ij matrix from the lambda radiative transitions database"""
-        AP = numpy.zeros( (n, n), dtype = numpy.float64)
+        """fill the (A prime)_ij matrix from the lambda radiative transitions
+        database"""
+        AP = zeros( (n, n), dtype = float64)
         
         for trans in transRad:
             u  = trans['u']; l = trans['l']
-            dE = numpy.abs( levels[u]['E'] - levels[l]['E'] ) # energy in K
+            dE = abs( levels[u]['E'] - levels[l]['E'] ) # energy in K
             
             nu = dE*kBoltz / hPlank # freq in Hz
             
@@ -84,23 +88,24 @@ def computeRateMatrix(pNH3, Tkin, nc):
         return AP
     
     def fill_ABS_matrix():
-        """fill the Aij matrix for absorbtion transitions from the lambda radiative transitions database"""
-        ABS = numpy.zeros( (n, n), dtype = numpy.float64)
+        """fill the Aij matrix for absorbtion transitions from the lambda
+        radiative transitions database"""
+        ABS = zeros( (n, n), dtype = float64)
         
         for trans in transRad:
             u  = trans['u']; l = trans['l']
-            dE = numpy.abs( levels[u]['E'] - levels[l]['E'] ) # energy in K
-            gu = levels[u]['g']; gl = levels[l]['g'] 
+            dE = abs( levels[u]['E'] - levels[l]['E'] ) # energy in K
+            gu, gl = float64(levels[u]['g']), float64(levels[l]['g'])
             
             nu = dE*kBoltz / hPlank # freq in Hz
             
-            ABS[u, l] = (numpy.float64(gu)/numpy.float64(gl))*ng(hPlank, nu, kBoltz, Tcmb)*trans['A']
+            ABS[u, l] = (gu/gl)*ng(hPlank, nu, kBoltz, Tcmb)*trans['A']
     
         return ABS
     
     def fill_E_matrix():
         """This is a matrix full of ones (it is a utility matrix"""
-        return numpy.ones((n,n))
+        return ones((n,n))
     
     K = fill_K_matrix()
     AP = fill_AP_matrix()
@@ -108,7 +113,7 @@ def computeRateMatrix(pNH3, Tkin, nc):
     E = fill_E_matrix()
     
     F = nc * K + AP + ABS.T
-    diag = numpy.eye(n)*numpy.dot(F, E)[:,1]
+    diag = eye(n)*dot(F, E)[:, 1]
     offdiag = F.T
     
     full = -diag + offdiag
@@ -116,79 +121,78 @@ def computeRateMatrix(pNH3, Tkin, nc):
     return full
 
 
-#############################################################################
-# solve for the equlibrium population densities
 def solveEquilibrium(pNH3, full):
+    """solve for the equlibrium population densities"""
     n = pNH3.nlevels
 
     # solving directly
     #replacing the first row with the conservation equation
-    dndt = numpy.zeros((n,1))
+    dndt = zeros((n,1))
     full[0,:] = 1.0
     dndt[0]   = 1.0
     
     A = full
     b = dndt
     #solving the system A.x = b
-    #--------------------------
     #before solving, we will devide each row by the diagonal
-    for i in numpy.arange(n):
+    for i in arange(n):
         A[i,:] = A[i,:]/A[i,i]
-    x = numpy.linalg.solve(A, b)
+    x = linalg.solve(A, b)
     
     #print x.T
     
     # the fractional population density
     f = x
-    return f    
-#############################################################################
+    return f
+
+
 def computeLuminosity(pNH3):
+    """.. todo:: add doc"""
     n = pNH3.nlevels
     levels = pNH3.levels
     transRad = pNH3.transRad
 
-    ## computing the total luminosity##
-    #----------------------------------
+
     def fill_R_matrix():
-        """fill the L_ij matrix from the lambda radiative transitions database"""
-        R = numpy.zeros( (n, n), dtype = numpy.float64)
+        """fill the L_ij matrix from the lambda radiative transitions
+        database"""
+        R = zeros( (n, n), dtype = float64)
         
         for trans in transRad:
             u  = trans['u']; l = trans['l']
-            dE = numpy.abs( levels[u]['E'] - levels[l]['E'] ) # energy in K
+            dE = abs( levels[u]['E'] - levels[l]['E'] ) # energy in K
             
             nu = dE*kBoltz / hPlank # freq in Hz
             
             R[u, l] = trans['A']*hPlank*nu
     
         return R
-    #------------------------------------
-    
+
     R = fill_R_matrix()
     
     return R
-#############################################################################
 
 ####### solve for one set of parameters ######
 Tkin = 30.0
 nc = 1000.0
 
-#solving using matrix inversion
-#-----------------------------------------------
+# solving using matrix inversion
 full = computeRateMatrix(pNH3, Tkin, nc)
-f    = solveEquilibrium(pNH3, full.copy())
+f = solveEquilibrium(pNH3, full.copy())
 
-#solving using minimization
-#-----------------------------------------------
+# solving using minimization
 full2 = computeRateMatrix(pNH3, Tkin, nc)
-#generating the constraint equation and appending it to the Matrix
-cons  = numpy.ones(pNH3.nlevels)
-full2 = numpy.vstack((full2, cons))
-#generating the RHS
-rhs   = numpy.zeros(pNH3.nlevels + 1)
+
+# generating the constraint equation and appending it to the Matrix
+cons  = ones(pNH3.nlevels)
+full2 = vstack((full2, cons))
+
+# generating the RHS
+rhs   = zeros(pNH3.nlevels + 1)
 rhs[-1] = 1
+
 # solving
-sol = numpy.linalg.lstsq(full2, rhs)
+sol = linalg.lstsq(full2, rhs)
 f2 = sol[0]
 
 pylab.figure( figsize = (6,12))
@@ -199,25 +203,24 @@ pylab.semilogy(f2, 'o')
 pylab.xlabel('level')
 pylab.ylabel('population density')
 
-#solving by evolving with time
-#-----------------------------
-f0 = numpy.zeros(pNH3.nlevels)
+# solving by evolving with time
+f0 = zeros(pNH3.nlevels)
 
-#setting up the initial conditions to population densities
+# setting up the initial conditions to population densities
 # that would be attained at LTE
 if False:
-    f0 = numpy.zeros(pNH3.nlevels)
-    Z = numpy.float64(0.0)  # the partition function
-    for i in numpy.arange(pNH3.nlevels):
-        f0[i] = pNH3.levels[i]['g']*numpy.exp(- pNH3.levels[i]['E'] / Tkin)
+    f0 = zeros(pNH3.nlevels)
+    Z = float64(0.0)  # the partition function
+    for i in arange(pNH3.nlevels):
+        f0[i] = pNH3.levels[i]['g']*exp(- pNH3.levels[i]['E'] / Tkin)
         Z += f0[i]
     f0 /= Z # the initial fractional population densities
     
 if False:
-    f0 = f #using the eq sol as ICs
+    f0 = f # using the eq sol as ICs
 
 if True:
-    #setting population levels manually
+    # setting population levels manually
     f0[0] = 0.3
     f0[1] = 1e-2
     f0[2] = 1e-3
@@ -225,14 +228,14 @@ if True:
     f0[4] = 1e-5
     f0[5] = 1e-6
     
-    #normalizing to 1
+    # normalizing to 1
     f0 /= f0.sum() 
     
 t0 = 0.0 # the initial time
-dt = 2e4 # initial timestep in seconds 
-tf = 2e8 #final time
+dt = 2e4 # initial timestep in seconds
+tf = 2e8 # final time
 
-lPlot = numpy.array([0, 1, 2, 3, 4, 5])   
+lPlot = array([0, 1, 2, 3, 4, 5])
 t = []
 ft_0 = []
 ft_1 = []
@@ -241,9 +244,10 @@ ft_3 = []
 ft_4 = []
 ft_5 = []
 
-#defining the function which will be the rhs of df/dt
+
 def ode_rhs(t, y, args):
-    return numpy.dot(full, y)
+    """defining the function which will be the rhs of df/dt"""
+    return dot(full, y)
 
 '''
 #evolving with respect to time
@@ -278,24 +282,23 @@ while r.successful() and r.t < tf:
             solving using my implementation of the bulrische stoer integrator
 ####################################################################################################
 '''
-import mylib.numerics.ode
-
 rel_tol = 1e-3
 n_steps = 1000
-dt0_bs  = 1.0
+dt0_bs = 1.0
 
-#intial conditions
+# intial conditions
 state = mylib.numerics.ode.State(f0.size)
-state.t    = 0.0
-state.y[:] =     f0
+state.t = 0.0
+state.y[:] = f0
 
-#defining the function which will be the rhs of df/dt
-def ode_rhs(state, state_der, parms=None):    
-    
-    state_der.y[:] = numpy.dot(full, state.y) 
+# defining the function which will be the rhs of df/dt
+def ode_rhs(state, state_der, parms=None):
+
+    state_der.y[:] = dot(full, state.y)
     return True
 
-solver = mylib.numerics.ode.BS(log_dir='.', dx0=dt0_bs, reltol=rel_tol, state0=state, verbose=False)
+solver = mylib.numerics.ode.BS(log_dir='.', dx0=dt0_bs, reltol=rel_tol,
+                               state0=state, verbose=False)
 solver.set_derivs_func(ode_rhs)
 
 stepNum = 0
@@ -312,32 +315,32 @@ while solver.state.x <= tf:
     solver.advance_one_step()
 
     if stepNum % 100 == 0:
-        print 'stepNum = %d t = %e, current dt = %e, 1 - sum(pop_dens) = %e' % (stepNum, solver.state.x, solver.dx, 1.0 - numpy.sum(solver.state.y))
+        print 'stepNum = %d t = %e, current dt = %e, 1 - sum(pop_dens) = %e' %\
+              (stepNum, solver.state.x, solver.dx,
+               1.0 - numpy.sum(solver.state.y))
     
     stepNum += 1
 
-'''
-###########################finishing integrating using the BS method##############################
-'''
+####### finishing integrating using the BS method #########
 
-t = numpy.array(t)
+t = array(t)
 
-#pylab.figure(1)
+# pylab.figure(1)
 pylab.subplot(212)
-#plotting the actual curves with the equilib sols (dashes)
+# plotting the actual curves with the equilib sols (dashes)
 pylab.hold(True)
 pylab.loglog(t, ft_0,'r')
 pylab.loglog(t, ft_1,'g')
 pylab.loglog(t, ft_2,'b')
-#pylab.loglog(t, ft_3,'c')
-#pylab.loglog(t, ft_4,'k')
-#pylab.loglog(t, ft_5,'y')
+# pylab.loglog(t, ft_3,'c')
+# pylab.loglog(t, ft_4,'k')
+# pylab.loglog(t, ft_5,'y')
 pylab.loglog([dt,tf], [f2[lPlot[0]],f2[lPlot[0]]], '--r')
 pylab.loglog([dt,tf], [f2[lPlot[1]],f2[lPlot[1]]], '--g')
 pylab.loglog([dt,tf], [f2[lPlot[2]],f2[lPlot[2]]], '--b')
-#pylab.loglog([dt,tf], [f2[lPlot[3]],f2[lPlot[3]]], '--c')
-#pylab.loglog([dt,tf], [f2[lPlot[4]],f2[lPlot[4]]], '--k')
-#pylab.loglog([dt,tf], [f2[lPlot[5]],f2[lPlot[5]]], '--y')
+# pylab.loglog([dt,tf], [f2[lPlot[3]],f2[lPlot[3]]], '--c')
+# pylab.loglog([dt,tf], [f2[lPlot[4]],f2[lPlot[4]]], '--k')
+# pylab.loglog([dt,tf], [f2[lPlot[5]],f2[lPlot[5]]], '--y')
 pylab.axis([dt, t.max()*1.1, 1e-13, 1])
 pylab.xlabel('time (s)')
 pylab.ylabel('population density')
@@ -431,10 +434,10 @@ for nc in nH2:
     if nc == 1000000.0:
         colorStr = 'b'
         
-    pylab.plot(Tkins, numpy.array(Llines['22'])/numpy.array(Llines['11']), colorStr)
+    pylab.plot(Tkins, array(Llines['22'])/array(Llines['11']), colorStr)
     pylab.hold(True)
-    pylab.plot(Tkins, numpy.array(Llines['44'])/numpy.array(Llines['22']), colorStr+'--')
-    pylab.plot(Tkins, numpy.array(Llines['44'])/numpy.array(Llines['11']), colorStr+'-.')
+    pylab.plot(Tkins, array(Llines['44'])/array(Llines['22']), colorStr+'--')
+    pylab.plot(Tkins, array(Llines['44'])/array(Llines['11']), colorStr+'-.')
     
 pylab.xscale('log')    
 pylab.yscale('log')
