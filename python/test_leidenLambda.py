@@ -8,6 +8,8 @@ import numpy
 from numpy import float64, abs, zeros, ones, zeros, arange, exp, eye, dot
 from numpy import linalg, vstack, array
 from ismUtils import planckOccupation as ng
+
+from scipy.integrate import ode
 import mylib.numerics.ode
 
 restore = False
@@ -15,11 +17,10 @@ restore = False
 lambdaPath = '/home/mher/ism/code/radex/Radex/data/home.strw.leidenuniv.nl/~moldata/datafiles'
 
 # reads the whole database
-# ------------------------
 # reader = molData.reader(dirPath = lambdaPath)
 
 # retrieves only one specie
-reader = molData.reader(dirPath = lambdaPath, species = 'NH3')
+reader = molData.reader(dirPath=lambdaPath, species='NH3')
 
 Tkin_min = 15.0
 Tkin_max = 300.0
@@ -184,11 +185,11 @@ f = solveEquilibrium(pNH3, full.copy())
 full2 = computeRateMatrix(pNH3, Tkin, nc)
 
 # generating the constraint equation and appending it to the Matrix
-cons  = ones(pNH3.nlevels)
+cons= ones(pNH3.nlevels)
 full2 = vstack((full2, cons))
 
 # generating the RHS
-rhs   = zeros(pNH3.nlevels + 1)
+rhs = zeros(pNH3.nlevels + 1)
 rhs[-1] = 1
 
 # solving
@@ -212,7 +213,7 @@ if False:
     f0 = zeros(pNH3.nlevels)
     Z = float64(0.0)  # the partition function
     for i in arange(pNH3.nlevels):
-        f0[i] = pNH3.levels[i]['g']*exp(- pNH3.levels[i]['E'] / Tkin)
+        f0[i] = pNH3.levels[i]['g']*exp(-pNH3.levels[i]['E']/Tkin)
         Z += f0[i]
     f0 /= Z # the initial fractional population densities
     
@@ -232,96 +233,83 @@ if True:
     f0 /= f0.sum() 
     
 t0 = 0.0 # the initial time
-dt = 2e4 # initial timestep in seconds
+dt = 1e4 # initial timestep in seconds
 tf = 2e8 # final time
 
 lPlot = array([0, 1, 2, 3, 4, 5])
-t = []
-ft_0 = []
-ft_1 = []
-ft_2 = []
-ft_3 = []
-ft_4 = []
-ft_5 = []
+t, ft_0, ft_1, ft_2, ft_3, ft_4, ft_5 = [], [], [], [], [], [], []
 
 
 def ode_rhs(t, y, args):
     """defining the function which will be the rhs of df/dt"""
     return dot(full, y)
 
-'''
-#evolving with respect to time
-from scipy.integrate import ode
-#r = ode(ode_rhs, jac = None).set_integrator('vode', 
-r = ode(ode_rhs, jac = None).set_integrator('dopri', 
-                                            method='bdf', 
-                                            #with_jacobian = False,
-                                            rtol = 1e-12)
-r.set_initial_value(f0, t0).set_f_params(1.0)
+# evolving with respect to time using scipy integrator
+if True:
+    r = ode(ode_rhs, jac = None).set_integrator('vode',
+    # r = ode(ode_rhs, jac = None).set_integrator('dopri',
+                                                method='bdf',
+                                                #with_jacobian = False,
+                                                rtol = 1e-3)
+    r.set_initial_value(f0, t0).set_f_params(1.0)
 
-i = 0
-while r.successful() and r.t < tf:
-    r.integrate(r.t+dt)
-    t.append(r.t)
-    ft_0.append(r.y[ lPlot[0] ])
-    ft_1.append(r.y[ lPlot[1] ])
-    ft_2.append(r.y[ lPlot[2] ])
-    ft_3.append(r.y[ lPlot[3] ])
-    ft_4.append(r.y[ lPlot[4] ])
-    ft_5.append(r.y[ lPlot[5] ])
+    i = 0
+    # while r.successful() and r.t < tf:
+    while r.t < tf:
+        r.integrate(r.t + dt)
+        t.append(r.t)
+        ft_0.append(r.y[lPlot[0]])
+        ft_1.append(r.y[lPlot[1]])
+        ft_2.append(r.y[lPlot[2]])
+        ft_3.append(r.y[lPlot[3]])
+        ft_4.append(r.y[lPlot[4]])
+        ft_5.append(r.y[lPlot[5]])
 
-    if i % 100 == 0:
-        print 'i = %d t = %e' % (i, r.t), 1.0 - numpy.sum(r.y), 1.0 - r.y[0]/f[0]
-        print 'stepNum = %d t = %e, current dt = %e, 1 - sum(pop_dens) = %e' % (i, r.t, dt, 1.0 - numpy.sum(r.y))
+        if i % 100 == 0:
+            print 'i = %d t = %e' % (i, r.t), 1.0 - numpy.sum(r.y), 1.0 - r.y[0]/f[0]
+            print 'stepNum = %d t = %e, current dt = %e, 1 - sum(pop_dens) = %e' % (i, r.t, dt, 1.0 - numpy.sum(r.y))
 
-    i+=1
-'''
+        i += 1
 
-'''
-####################################################################################################
-            solving using my implementation of the bulrische stoer integrator
-####################################################################################################
-'''
-rel_tol = 1e-3
-n_steps = 1000
-dt0_bs = 1.0
+# solving using my implementation of the bulrische stoer integrator
+if False:
+    rel_tol = 1e-3
+    dt0_bs = 1.0
 
-# intial conditions
-state = mylib.numerics.ode.State(f0.size)
-state.t = 0.0
-state.y[:] = f0
+    # initial conditions
+    state = mylib.numerics.ode.State(f0.size)
+    state.t = 0.0
+    state.y[:] = f0
 
-# defining the function which will be the rhs of df/dt
-def ode_rhs(state, state_der, parms=None):
+    # defining the function which will be the rhs of df/dt
+    def ode_rhs(state, state_der, parms=None):
 
-    state_der.y[:] = dot(full, state.y)
-    return True
+        state_der.y[:] = dot(full, state.y)
+        return True
 
-solver = mylib.numerics.ode.BS(log_dir='.', dx0=dt0_bs, reltol=rel_tol,
-                               state0=state, verbose=False)
-solver.set_derivs_func(ode_rhs)
+    solver = mylib.numerics.ode.BS(log_dir='.', dx0=dt0_bs, reltol=rel_tol,
+                                   state0=state, verbose=False)
+    solver.set_derivs_func(ode_rhs)
 
-stepNum = 0
-while solver.state.x <= tf:
+    stepNum = 0
+    while solver.state.x <= tf:
 
-    t.append(solver.state.x)
-    ft_0.append(solver.state.y[0])
-    ft_1.append(solver.state.y[1])
-    ft_2.append(solver.state.y[2])
-    ft_3.append(solver.state.y[3])
-    ft_4.append(solver.state.y[4])
-    ft_5.append(solver.state.y[5])
-    
-    solver.advance_one_step()
+        t.append(solver.state.x)
+        ft_0.append(solver.state.y[0])
+        ft_1.append(solver.state.y[1])
+        ft_2.append(solver.state.y[2])
+        ft_3.append(solver.state.y[3])
+        ft_4.append(solver.state.y[4])
+        ft_5.append(solver.state.y[5])
 
-    if stepNum % 100 == 0:
-        print 'stepNum = %d t = %e, current dt = %e, 1 - sum(pop_dens) = %e' %\
-              (stepNum, solver.state.x, solver.dx,
-               1.0 - numpy.sum(solver.state.y))
-    
-    stepNum += 1
+        solver.advance_one_step()
 
-####### finishing integrating using the BS method #########
+        if stepNum % 100 == 0:
+            print 'stepNum = %d t = %e, current dt = %e, 1 - sum(pop_dens) = %e' %\
+                  (stepNum, solver.state.x, solver.dx,
+                   1.0 - numpy.sum(solver.state.y))
+
+        stepNum += 1
 
 t = array(t)
 
