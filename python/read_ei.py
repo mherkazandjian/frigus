@@ -199,5 +199,3 @@ def read_einstein():
 
     return A
 
-read_einstein()
-print 'done'

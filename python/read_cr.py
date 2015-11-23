@@ -41,6 +41,8 @@ def read_coeff(fname):
     # read the data from the original ascii file
     data_read = loadtxt( fname, unpack=True, skiprows=10)
     (v, j, vp, jp), cr = int32(data_read[0:4]), data_read[4:]
+    ini = zeros((2, v.size), 'i')
+    fin = zeros((2, v.size), 'i')
 
     # declare the array where the data will be stored
     nv, nj, nvp, njp = v.max()+1, j.max()+1, vp.max()+1, jp.max()+1
@@ -49,10 +51,8 @@ def read_coeff(fname):
     # copy the read data into the container array
     for i, cri in enumerate(cr.T):
         data[v[i], j[i], vp[i], jp[i], :] = cri
+        ini[:,i] = v[i],j[i]
+        fin[:,i] = vp[i],jp[i]
 
-    return data, T
-#
+    return data, T, ini, fin
 
-data, T = read_coeff('Read/Rates_H_H2.dat')
-
-print 'done'
