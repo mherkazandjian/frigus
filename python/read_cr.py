@@ -6,9 +6,26 @@ Created on Wed Jan 28 01:51:39 2015
 """
 
 import numpy
-from numpy import loadtxt, genfromtxt, arange, int32, zeros
+from numpy import loadtxt, arange, int32, zeros, unique, void
+from numpy import ascontiguousarray, dtype, hstack
 import pylab
 from IPython.core.debugger import Tracer
+
+def unique_transitions(vj):
+    """from a list of levels find the list of unique levels and return them.
+    :param iterable vj: the list of v levels where each item vj[x] is a level.
+    The shape of vj should be (2,n) where n is the number of levels.
+    :return: (ndarray) The unique levels. The shape of this array is
+    (2,n_unique) where n_unique is the number of unique transitions."""
+
+    assert vj.shape[0] == 2
+
+    a = vj.T
+    new_dtype = dtype((void, a.dtype.itemsize * 2))
+    b = ascontiguousarray(a).view(new_dtype)
+    _, idx = unique(b, return_index=True)
+    unique_a = a[idx]
+    return unique_a.T
 
 def read_coeff(fname):
     '''parse the  data sent by François:
@@ -32,6 +49,8 @@ def read_coeff(fname):
       The first elemnt is a 5D array that holds all the rate coefficients
       The second elemnt is the temperature corresponding to the rate
       coefficients in the 5D array.
+
+    .. todo:: update the return value
     '''
 
     # the tempareture in the data file is not provided explicity. It
@@ -54,5 +73,10 @@ def read_coeff(fname):
         ini[:,i] = v[i],j[i]
         fin[:,i] = vp[i],jp[i]
 
-    return data, T, ini, fin
+    # find the unique levels from from the transitions
+    unique_levels = unique_transitions(hstack((unique_transitions(ini),
+                                              unique_transitions(fin))))
+
+
+    return data, T, ini, fin, unique_levels
 
