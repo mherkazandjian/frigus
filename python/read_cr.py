@@ -11,12 +11,19 @@ from numpy import ascontiguousarray, dtype, hstack
 import pylab
 from IPython.core.debugger import Tracer
 
-def unique_transitions(vj):
+def unique_level_pairs(vj):
     """from a list of levels find the list of unique levels and return them.
     :param iterable vj: the list of v levels where each item vj[x] is a level.
     The shape of vj should be (2,n) where n is the number of levels.
     :return: (ndarray) The unique levels. The shape of this array is
-    (2,n_unique) where n_unique is the number of unique transitions."""
+    (2,n_unique) where n_unique is the number of unique transitions.
+
+    .. code-block: python
+
+        vj = array([[0, 0, 0, 7, 4, 8, 4, 6, 9, 8, 9, 6, 2, 0, 5, 5, 9, 8, 1],
+                    [4, 4, 3, 5, 3, 6, 3, 8, 2, 5, 7, 8, 8, 6, 6, 9, 1, 0, 9]])
+        vj_unique = unique_level_pairs(vj)
+    """
 
     assert vj.shape[0] == 2
 
@@ -74,8 +81,8 @@ def read_coeff(fname):
         fin[:,i] = vp[i],jp[i]
 
     # find the unique levels from from the transitions
-    unique_levels = unique_transitions(hstack((unique_transitions(ini),
-                                              unique_transitions(fin))))
+    unique_levels = unique_level_pairs(hstack((unique_level_pairs(ini),
+                                               unique_level_pairs(fin))))
 
 
     return data, T, ini, fin, unique_levels
