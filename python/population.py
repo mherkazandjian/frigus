@@ -1,11 +1,17 @@
-def computeRateMatrix(pNH3, Tkin, nc):
+import read_ei
+import read_cr
+import read_levels
+
+
+#def computeRateMatrix(pNH3, Tkin, nc):
+def computeRateMatrix(nc):
     """compute the matrix of transition rates"""
 
     n = pNH3.nlevels
 
-    levels = pNH3.levels
-    transRad = pNH3.transRad
-    transColl = pNH3.transColl['p-H2']['trans']
+    levels = read_levels.read_levels('Read/H2Xvjlevels.cs')
+    transColl, T, ini, fin = read_cr.read_coeff("Read/Rates_H_H2.dat")
+    transRad = read_ei.read_einstein()
 
     ###########################################################
     # constructing the matrix
