@@ -8,7 +8,7 @@ from scipy.constants import c,h,Boltzmann
 
 kB = Boltzmann
 
-def reduce_vj_repr(en, a_eins, cr, ini, fin, vj_unique):
+def reduce_vj_repr(en, a_eins, cr, T,  ini, fin, vj_unique):
 
     nv, nj =  en.shape
 
@@ -28,21 +28,30 @@ def reduce_vj_repr(en, a_eins, cr, ini, fin, vj_unique):
     # coefficients from a 4D representation v,j,v',j'
     # to a 2D representation i,j
     a_eins_l = a_eins.reshape(en.size, en.size)
+    ##added for checking the reshaping
     #for v in arange(nv):
     #    for j in arange(nj):
     #        for vp in arange(nv):
     #            for jp in arange(nj):
     #                a_l = a_eins_l[lind2d[v,j], lind2d[vp,jp]]
     #                a = a_eins[v,j,vp,jp]
-    #                assert a_l == a + 0.1
+    #                assert a_l == a
 
     cr_l = zeros((en.size, en.size, T.size), 'f8')
     for (v,j), (vp,jp) in zip(ini.T, fin.T):
-        cr_l[lind2d[v,j], lind2d[vp,jp], :] = cr[v,j,vp,jp,:]
-    ### add the check here ###
-    # asdasdasd
-    ##########################
+	for itemp in arange(T.size):
+	    cr_l[lind2d[v,j], lind2d[vp,jp], itemp] = cr[v,j,vp,jp,itemp]
+    ##added for checking the reshaping
+    for v in arange(nv):
+        for j in arange(nj):
+            for vp in arange(nv):
+                for jp in arange(nj):
+		    for itemp in arange(T.size):
+                        cr_l = cr_l[lind2d[v,j], lind2d[vp,jp],itemp]
+                        cr = cr[v,j,vp,jp,itemp]
+                        assert cr_l.all() == cr.all()
     Tracer()()
+    ##########################
     
 
     return en_l, cr_l, a_eins_l, ini_l, fin_l, vj_unique_l

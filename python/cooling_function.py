@@ -24,7 +24,7 @@ cr, T, ini, fin, vj_unique = read_cr.read_coeff("Read/Rates_H_H2.dat")
 A = read_ei.read_einstein()
 
 # reduce the level representation from 2D indexing to 1D indexing
-data = reduce_vj_repr(en_H2, A, cr, ini, fin, vj_unique)
+data = reduce_vj_repr(en_H2, A, cr, T, ini, fin, vj_unique)
 
 Tracer()()
 #
