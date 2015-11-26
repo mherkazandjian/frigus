@@ -86,19 +86,16 @@ def read_coeff(fname):
     unique_levels = unique_level_pairs(hstack((unique_level_pairs(ini),
                                                unique_level_pairs(fin))))
 
-    return data, T, v, j, vp, jp, ini, fin, unique_levels
+    return data, T, ini, fin, unique_levels
 
 def label(vj_unique):
     '''Given a series of different couples this function assign an integer
     to each of them'''
-    couple_label = zeros(len(vj_unique[0])+1,'int')
-    for icouple in range(len(vj_unique[0])+1):
-        print icouple
-        couple_label = [vj_unique[0][icouple],vj_unique[1][icouple]]
-#    for i in range(len(v)):
-#        vi, ji = v[i], j[i]
-#        enh2[vi,ji] = energies[i]
-    return couple_label
+    couple_label = zeros(vj_unique.shape[1], 'i')
+    for i, couple in vj_unique.T:
+        couple_label[i] = i
+        
+    return 
 
 
 
