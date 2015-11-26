@@ -8,6 +8,8 @@ Created on Wed Jan 28 01:51:39 2015
 import numpy
 from numpy import loadtxt, arange, int32, zeros, unique, void
 from numpy import ascontiguousarray, dtype, hstack
+from numpy import log10
+from scipy import interpolate
 import pylab
 from IPython.core.debugger import Tracer
 
@@ -84,6 +86,62 @@ def read_coeff(fname):
     unique_levels = unique_level_pairs(hstack((unique_level_pairs(ini),
                                                unique_level_pairs(fin))))
 
+    return data, T, v, j, vp, jp, ini, fin, unique_levels
 
-    return data, T, ini, fin, unique_levels
+def label(vj_unique):
+    '''Given a series of different couples this function assign an integer
+    to each of them'''
+    couple_label = zeros(len(vj_unique[0])+1,'int')
+    for icouple in range(len(vj_unique[0])+1):
+        print icouple
+        couple_label = [vj_unique[0][icouple],vj_unique[1][icouple]]
+#    for i in range(len(v)):
+#        vi, ji = v[i], j[i]
+#        enh2[vi,ji] = energies[i]
+    return couple_label
 
+
+
+def interpol(T_grid, vi, ji, vf, jf, data):
+    '''Given a grid of temperatures, it returns the interpolated reaction rates for
+    a given set of quantum numbers. Moreover, if the provided temperatures are outside
+    the range of available temperature in the data, a reaction rate of TINY will be
+    assigned to them.
+
+    T_grid must be provided in K
+    EXAMPLE OF USAGE:
+    T_grid   = numpy.logspace(2, 3, 100) #in K
+    rc_francois =  interpol(T_grid ,0,0,1,0, rcinterp)
+
+    def test_call_interpolav(rcu):
+        en_grid   = numpy.logspace(10, 16, 3000) #in Hz
+        cs_interp =  interpolav_uga(en_grid , 2, 1, 3, csu)
+        return cs_interp
+    test = test_call_interpolav_uga(cs_uga)
+    '''
+
+    data, T, ini, fin, vj_unique, interp_cr = read_cr.read_coeff("Read/Rates_H_H2.dat")
+
+    cr_ret = numpy.zeros( T_grid.size, 'f8' )
+
+    mask = ( T_grid >= T.min() )*( T_grid <= T.max() )
+    inds_in  = numpy.where( mask )
+    inds_out = numpy.where( numpy.invert(mask) )
+                                         # the indexes of the points in the data range
+
+    f_interp = interpolate.interp1d(T, log10(data))
+                                         # constructing the interpolation function
+
+    cr_ret[ inds_in  ] = 10.0**f_interp( T_grid[ inds_in ] )
+                                         # interpolating the value of the points
+                                         # within the range
+
+    cr_ret[ inds_out ] = 1.e-50
+                                         # setting the value of the points outside
+                                         # the range to a tiny number
+#
+#    pylab.loglog( en*29979245852.398716, cs/1e20, '*' )
+#    pylab.loglog( en_grid*29979245852.398716, cs_ret, 'o' )
+#    pylab.show()
+
+    return rc_ret
