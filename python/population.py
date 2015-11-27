@@ -185,7 +185,7 @@ def computeRateMatrix(en, a_eins, cr, ini, fin, unique_col, g, tkin, nc):
             # the einstein coefficients. we are useing ir and ip in
             # indexing g since g has the same length as the unique levels   
             tcmb_index = 0
-            APiip = (1.0 + ng(h, nu, kb, tcmb[tcbm_index]))*a_eins[i,ip]
+            APiip = (1.0 + ng(h, nu, kb, tcmb[tcmb_index]))*a_eins[i,ip]
              
             A[ir,irp] = APiip
         
