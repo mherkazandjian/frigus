@@ -1,4 +1,4 @@
-from numpy import zeros, fabs, arange
+from numpy import zeros, fabs, arange, array_equal, exp
 from IPython.core.debugger import Tracer
 
 import read_ei
@@ -6,10 +6,13 @@ import read_cr
 import read_levels
 from scipy.constants import c,h,Boltzmann
 
-kB = Boltzmann
+kb = Boltzmann
 
-def reduce_vj_repr(en, a_eins, cr, T,  ini, fin, vj_unique):
+def reduce_vj_repr(en, a_eins, cr, T,  ini, fin, vj_unique,
+                   debug=False):
+    """.. todo:: add doc"""
 
+    # number of v and j levels respectively
     nv, nj =  en.shape
 
     # linear indices for all the energy levels
@@ -22,112 +25,123 @@ def reduce_vj_repr(en, a_eins, cr, T,  ini, fin, vj_unique):
     # convert the energies from a v,j representation
     # to a linear reporesentation
     en_l = en.flatten()
-    #assert en[:,:] - en_l[lind2d[:,:]]
+    if debug is True:
+        assert en[:,:] - en_l[lind2d[:,:]]
 
     # convert the representation of the einstein
     # coefficients from a 4D representation v,j,v',j'
     # to a 2D representation i,j
     a_eins_l = a_eins.reshape(en.size, en.size)
-    ##added for checking the reshaping
-    #for v in arange(nv):
-    #    for j in arange(nj):
-    #        for vp in arange(nv):
-    #            for jp in arange(nj):
-    #                a_l = a_eins_l[lind2d[v,j], lind2d[vp,jp]]
-    #                a = a_eins[v,j,vp,jp]
-    #                assert a_l == a
+    # added for checking the reshaping
+    if debug is True:
+        for v in arange(nv):
+            for j in arange(nj):
+                for vp in arange(nv):
+                    for jp in arange(nj):
+                        a_l = a_eins_l[lind2d[v,j], lind2d[vp,jp]]
+                        a = a_eins[v,j,vp,jp]
+                        assert a_l == a
 
+    # .. todo:: add comment what is being done here
     cr_l = zeros((en.size, en.size, T.size), 'f8')
-    for (v,j), (vp,jp) in zip(ini.T, fin.T):
-	for itemp in arange(T.size):
-	    cr_l[lind2d[v,j], lind2d[vp,jp], itemp] = cr[v,j,vp,jp,itemp]
-    ##added for checking the reshaping
-    for v in arange(nv):
-        for j in arange(nj):
-            for vp in arange(nv):
-                for jp in arange(nj):
-		    for itemp in arange(T.size):
-                        cr_l = cr_l[lind2d[v,j], lind2d[vp,jp],itemp]
-                        cr = cr[v,j,vp,jp,itemp]
-                        assert cr_l.all() == cr.all()
-    Tracer()()
-    ##########################
+    ini_l = zeros(ini.shape[1], 'i')
+    fin_l = zeros(fin.shape[1], 'i')
+    
+    for i, ((v,j), (vp,jp)) in enumerate(zip(ini.T, fin.T)):
+        cr_l[lind2d[v,j], lind2d[vp,jp], :] = cr[v, j, vp, jp,:]
+        ini_l[i] = lind2d[v,j]
+        fin_l[i] = lind2d[vp,jp]
+    vj_unique_l = lind2d[vj_unique[0], vj_unique[1]]
+    # added for checking the reshaping
+    # .. todo:: think of a better test
+    # .. todo:: see how ini_l and fin_l can be checked
+    if debug is True:
+        for (v,j), (vp,jp) in zip(ini.T, fin.T):
+            T1 = cr_l[lind2d[v,j], lind2d[vp,jp], :]
+            T2 = cr[v, j, vp, jp, :]
+            assert array_equal(T1, T2)
     
 
-    return en_l, cr_l, a_eins_l, ini_l, fin_l, vj_unique_l
+    # computing the degeneracies
+    g = vj_unique[1]*2 + 1
+
+    return en_l, a_eins_l, cr_l, ini_l, fin_l, vj_unique_l, g
 
 
 #def computeRateMatrix(pNH3, Tkin, nc):
-def computeRateMatrix():
+def computeRateMatrix(en, a_eins, cr, ini, fin, unique_col, g, tkin, nc):
     """compute the matrix of transition rates"""
-    rovib_levels = read_levels.read_levels("Read/H2Xvjlevels.cs")
-    transColl, T, ini, fin, vj_unique = read_cr.read_coeff("Read/Rates_H_H2.dat")
-
-    A = read_ei.read_einstein()
 
     ###########################################################
     # constructing the matrix
     ###########################################################
     def fill_K_matrix(cr=None,
                       levels=None,
-                      collider_density=None, tkin=None):
+                      collider_density=None,
+                      unique_col=None,
+                      g=None,
+                      ini=None,
+                      fin=None, tkin=None):
         """fill the kij matrix from the collsion rates
         
         .. todo:: improve documentation
+        .. todo:: add the documentation of the keywords
         """
 
-        # 1) get the rate coefficient for (v,j) -> (v',j')
-        # at temperature T
+        # 1) get the rate coefficient for level i -> i' at
+        # temperature T. The collision rate matrix should
+        # look like this
         #
-        #    k = rate_coeff_for_transition_cr[v,j, v', j', T]
+        #    k = rate_coeff_for_transition_cr[i, i', T]
         # 
-        # 2) get the energy difference between (v,j) -> (v',j')
+        # 2) get the energy difference between i -> i'
         #
-        #    e = fabs(E[v,j] - E[v',j']
+        #    e = fabs(E[i] - E[i']
         #
         # 3) fill the k matrix by repeating 1 for the direct transitions
-        #    i.e. (v,j) -> (v',j'). and use the detailed balance to
-        #    get the rate coeff for the reverse transtion (v',j') -> (v,j)
+        #    i.e. i -> i'. and use the detailed balance to
+        #    get the rate coeff for the reverse transtion i' -> i
 
-        n = vj_unique.shape[1]
-        K = zeros( (n, n), 'f8')
+        n = unique_col.size
+        K = zeros((n, n), 'f8')
 
-        for (v,j), (vp,jp) in zip(ini.T, fin.T):
+        # mapping the level number to the entry column/row
+        # in the K matrix
+        ired = zeros(unique_col.max() + 1, 'i4')
+        for i, iu in enumerate(unique_col):
+            ired[iu] = i
+
+        # filling the K matrix
+        for i, ip in zip(ini, fin):
+
+            # indicies of the levels in the matrix K
+            ir, irp = ired[i], ired[ip]
 
             # the difference between the two energy levels
-            dE = fabs(levels[v, j] - levels[vp, jp])
+            dE = fabs(levels[i] - levels[ip])
 
-            #attaching a label to each unique level
-        for i, couple in vj_unique.T:
-            couple_label[i] = i
-
-        #for trans in transColl:
+            # the collision rate at tkin[0]. we are useing ir and ip in
+            # indexing g since g has the same length as the unqiue levels
+            tkin_ind = 0
+            criip = cr[i,ip, tkin_ind]
+            criip_rev = cr[ip,i, 0] * exp( -dE / (kb*tkin[tkin_ind]) ) * g[ir]/g[irp]
             
-
-        """
-        for trans in transColl:
-            # id1_trans =
-            # id2_trans =
-            # [vj_unique[0][:],vj_unique[1][:]][v[trans]][j[trans]]
-            u = ini[:,trans]
-            l = fin[:,trans]
-            gu = 2*u[1]+1
-            gl = 2*l[1]+1
-            v = ini[:,trans][0]
-        #cr[ini[:,1][0],ini[:,1][1],fin[:,1][0],fin[:,1][1]]
-
-            # difference in the energy in K
-            dE = abs(levels[v,j] - levels[vp,jp])
-            K[u,l] = transColl[ini[:,trans][0],ini[:,trans][1],fin[:,trans][0],fin[:,trans][1]]
-        #            K[u, l] = trans['rc'](Tkin)
-        #            K[l, u] = (float64(gu) / float64(gl)) * K[u,l] * exp(-dE / Tkin)
-        """
-        return K
+            K[ir,irp] = criip
+            K[irp,ir] = criip_rev
         
-    k_mat = fill_K_matrix(cr=transColl,
-                          levels=rovib_levels,
-                          collider_density=2.5,
-                          tkin=400.0)
+        return K
+
+    k_mat = fill_K_matrix(cr=cr,
+                          levels=en,
+                          collider_density=nc,
+                          unique_col=unique_col,
+                          g=g,
+                          ini=ini,
+                          fin=fin,
+                          tkin=tkin)
+
+    Tracer()()
+
     asdasdasd
     # def fill_AP_matrix():
     #     """fill the (A prime)_ij matrix from the lambda radiative transitions
@@ -138,9 +152,9 @@ def computeRateMatrix():
     #         u  = trans['u']; l = trans['l']
     #         dE = abs( levels[u]['E'] - levels[l]['E'] ) # energy in K
     #
-    #         nu = dE*kBoltz / hPlank # freq in Hz
+    #         nu = dE*kboltz / hPlank # freq in Hz
     #
-    #         AP[u, l] = (1.0 + ng(hPlank, nu, kBoltz, Tcmb))*trans['A']
+    #         AP[u, l] = (1.0 + ng(hPlank, nu, kboltz, Tcmb))*trans['A']
     #
     #     return AP
     #
@@ -154,9 +168,9 @@ def computeRateMatrix():
     #         dE = abs( levels[u]['E'] - levels[l]['E'] ) # energy in K
     #         gu, gl = float64(levels[u]['g']), float64(levels[l]['g'])
     #
-    #         nu = dE*kBoltz / hPlank # freq in Hz
+    #         nu = dE*kboltz / hPlank # freq in Hz
     #
-    #         ABS[u, l] = (gu/gl)*ng(hPlank, nu, kBoltz, Tcmb)*trans['A']
+    #         ABS[u, l] = (gu/gl)*ng(hPlank, nu, kboltz, Tcmb)*trans['A']
     #
     #     return ABS
     #

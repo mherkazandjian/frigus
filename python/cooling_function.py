@@ -14,6 +14,8 @@ from population import reduce_vj_repr
 import matplotlib.pyplot as plt
 from IPython.core.debugger import Tracer
 
+nc = 2.0
+
 # read the energy levels of H2
 en_H2 = read_levels.read_levels("Read/H2Xvjlevels.cs")
 
@@ -24,11 +26,18 @@ cr, T, ini, fin, vj_unique = read_cr.read_coeff("Read/Rates_H_H2.dat")
 A = read_ei.read_einstein()
 
 # reduce the level representation from 2D indexing to 1D indexing
-data = reduce_vj_repr(en_H2, A, cr, T, ini, fin, vj_unique)
+lin_data = reduce_vj_repr(en_H2, A, cr, T, ini, fin, vj_unique)
+en_l, a_eins_l, cr_l, ini_l, fin_l, vj_unique_l, g = lin_data
 
-Tracer()()
-#
-matrix = population.computeRateMatrix()
+matrix = population.computeRateMatrix(en_l,
+                                      a_eins_l,
+                                      cr_l,
+                                      ini_l,
+                                      fin_l,
+                                      vj_unique_l,
+                                      g,
+                                      T,
+                                      nc)
 #nvj = population.solveEquilibrium()
 
 #print A,c,h,kB,en_H2
