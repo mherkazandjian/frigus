@@ -5,6 +5,7 @@ import read_ei
 import read_cr
 import read_levels
 from scipy.constants import c,h,Boltzmann
+from ismUtils import planckOccupation as ng
 
 kb = Boltzmann
 
@@ -86,7 +87,7 @@ def computeRateMatrix(en, a_eins, cr, ini, fin, unique_col, g, tkin, nc):
                       g=None,
                       ini=None,
                       fin=None, tkin=None):
-       """fill the kij matrix from the collsion rates
+        """fill the kij matrix from the collsion rates
         cr:  matrix containing the coolisional
              rates in the linearized form (58,58,50)
         levels: energies for all the rovibrational 
@@ -153,16 +154,17 @@ def computeRateMatrix(en, a_eins, cr, ini, fin, unique_col, g, tkin, nc):
 
 
 
-    def fill_AP_matrix(A=None,
+    def fill_AP_matrix(a_eins=None,
                        levels=None,
                        unique_col=None,
                        ini=None,
                        fin=None,
-                       tcmb=None):
-       """fill the (A prime)_ij matrix from the lambda radiative transitions
+                       tkin=None):
+        """fill the (A prime)_ij matrix from the lambda radiative transitions
         database"""
+        tcmb = tkin
         n = unique_col.size
-        APiip = zeros( (n, n), dtype = float64)
+        A = zeros( (n, n), dtype = 'f8')
 
         # mapping the level number to the entry column/row
         # in the K matrix
@@ -182,11 +184,11 @@ def computeRateMatrix(en, a_eins, cr, ini, fin, unique_col, g, tkin, nc):
  
             # the einstein coefficients. we are useing ir and ip in
             # indexing g since g has the same length as the unique levels   
-            APiip[ir, irp] = (1.0 + ng(h, nu, kb, tcmb))*A[ir,irp]
- 
-  #          APiip = A[i,ip]
+            APiip = (1.0 + ng(h, nu, kb, tcmb))*a_eins[i,ip]
+             
+            A[ir,irp] = APiip
         
-        return APiip
+        return A
    
     
     # def fill_ABS_matrix():
@@ -216,12 +218,12 @@ def computeRateMatrix(en, a_eins, cr, ini, fin, unique_col, g, tkin, nc):
                           ini=ini,
                           fin=fin,
                           tkin=tkin)
-    ap_mat = fill_AP_matrix(A=a_eins,
+    ap_mat = fill_AP_matrix(a_eins=a_eins,
                       levels=en,
                       unique_col=unique_col,
                       ini=ini,
                       fin=fin,
-                      tcmb=tkin)
+                      tkin=tkin)
 
     Tracer()()
     ABS = fill_ABS_matrix()
