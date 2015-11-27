@@ -299,4 +299,3 @@ def solveEquilibrium(full):
     f = x
     return f
 
-#def coolingFunction(en_l,a_eins_l,nvj)
