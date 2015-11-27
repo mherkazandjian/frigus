@@ -86,7 +86,7 @@ def computeRateMatrix(en, a_eins, cr, ini, fin, unique_col, g, tkin, nc):
                       g=None,
                       ini=None,
                       fin=None, tkin=None):
-        """fill the kij matrix from the collsion rates
+       """fill the kij matrix from the collsion rates
         cr:  matrix containing the coolisional
              rates in the linearized form (58,58,50)
         levels: energies for all the rovibrational 
@@ -151,31 +151,43 @@ def computeRateMatrix(en, a_eins, cr, ini, fin, unique_col, g, tkin, nc):
         
         return K
 
-    k_mat = fill_K_matrix(cr=cr,
-                          levels=en,
-                          collider_density=nc,
-                          unique_col=unique_col,
-                          g=g,
-                          ini=ini,
-                          fin=fin,
-                          tkin=tkin)
 
 
-    def fill_AP_matrix():
-        """fill the (A prime)_ij matrix from the lambda radiative transitions
+    def fill_AP_matrix(A=None,
+                       levels=None,
+                       unique_col=None,
+                       ini=None,
+                       fin=None,
+                       tcmb=None):
+       """fill the (A prime)_ij matrix from the lambda radiative transitions
         database"""
-        AP = zeros( (n, n), dtype = float64)
-    
-        Tracer()()
-        for trans in transRad:
-            u  = trans['u']; l = trans['l']
-            dE = abs( levels[u]['E'] - levels[l]['E'] ) # energy in K
+        n = unique_col.size
+        APiip = zeros( (n, n), dtype = float64)
+
+        # mapping the level number to the entry column/row
+        # in the K matrix
+        ired = zeros(unique_col.max() + 1, 'i4')
+        for i, iu in enumerate(unique_col):
+            ired[iu] = i
+
+        # filling the AP matrix
+        for i, ip in zip(ini, fin):
+
+            # indicies of the levels in the matrix K
+            ir, irp = ired[i], ired[ip]
+
+            # the difference between the two energy levels
+            dE = fabs(levels[i] - levels[ip])
+            nu = dE*kb / h # freq in Hz
+ 
+            # the einstein coefficients. we are useing ir and ip in
+            # indexing g since g has the same length as the unique levels   
+            APiip[ir, irp] = (1.0 + ng(h, nu, kb, tcmb))*A[ir,irp]
+ 
+  #          APiip = A[i,ip]
+        
+        return APiip
    
-            nu = dE*kboltz / hPlank # freq in Hz
-   
-            AP[u, l] = (1.0 + ng(hPlank, nu, kboltz, Tcmb))*trans['A']
-    
-        return AP
     
     # def fill_ABS_matrix():
     #     """fill the Aij matrix for absorbtion transitions from the lambda
@@ -196,13 +208,26 @@ def computeRateMatrix(en, a_eins, cr, ini, fin, unique_col, g, tkin, nc):
     # def fill_E_matrix():
     #     """This is a matrix full of ones (it is a utility matrix"""
     #     return ones((n,n))
+    k_mat = fill_K_matrix(cr=cr,
+                          levels=en,
+                          collider_density=nc,
+                          unique_col=unique_col,
+                          g=g,
+                          ini=ini,
+                          fin=fin,
+                          tkin=tkin)
+    ap_mat = fill_AP_matrix(A=a_eins,
+                      levels=en,
+                      unique_col=unique_col,
+                      ini=ini,
+                      fin=fin,
+                      tcmb=tkin)
 
-    K = fill_K_matrix()
-    AP = fill_AP_matrix()
+    Tracer()()
     ABS = fill_ABS_matrix()
     E = fill_E_matrix()
 
-    F = nc * K + AP + ABS.T
+    F = nc * k_mat + AP + ABS.T
     diag = eye(n)*dot(F, E)[:, 1]
     offdiag = F.T
 
