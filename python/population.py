@@ -145,7 +145,7 @@ def computeRateMatrix(en, a_eins, cr, ini, fin, unique_col, g, tkin, nc):
 
             # the collision rate at tkin[0]. we are useing ir and ip in
             # indexing g since g has the same length as the unqiue levels
-            tkin_ind = 0
+            tkin_ind = 40
             criip = cr[i,ip, tkin_ind]
             criip_rev = cr[ip,i, 0] * exp( -dE / (kb*tkin[tkin_ind]) ) * g[ir]/g[irp]
             
@@ -181,15 +181,15 @@ def computeRateMatrix(en, a_eins, cr, ini, fin, unique_col, g, tkin, nc):
 
             # the difference between the two energy levels
             dE = fabs(levels[i] - levels[ip])
-            nu = dE*kb / h # freq in Hz
+            
+            nu = dE / h # freq in Hz
  
             # the einstein coefficients. we are useing ir and ip in
             # indexing g since g has the same length as the unique levels   
-            tcmb_index = 0
+            tcmb_index = 40
             APiip = (1.0 + ng(h, nu, kb, tcmb[tcmb_index]))*a_eins[i,ip]
              
             AP[ir,irp] = APiip
-        
         return AP
   
     def fill_ABS_matrix(a_eins=None,
@@ -219,11 +219,11 @@ def computeRateMatrix(en, a_eins, cr, ini, fin, unique_col, g, tkin, nc):
 
             # the difference between the two energy levels
             dE = fabs(levels[i] - levels[ip])
-            nu = dE*kb / h # freq in Hz
+            nu = dE / h # freq in Hz
  
             # the einstein coefficients. we are useing ir and ip in
             # indexing g since g has the same length as the unique levels   
-            tcmb_index = 0
+            tcmb_index = 40
             ABSiip = (g[ir]/g[irp])*ng(h, nu, kb, tcmb[tcmb_index])*a_eins[i,ip] 
             ABS[ir,irp] = ABSiip
         
