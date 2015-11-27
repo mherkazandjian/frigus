@@ -13,6 +13,7 @@ import population
 from population import reduce_vj_repr
 import matplotlib.pyplot as plt
 from IPython.core.debugger import Tracer
+from numpy import log10
 
 nc = 2.0
 
@@ -42,6 +43,22 @@ matrix = population.computeRateMatrix(en_l,
 nvj = population.solveEquilibrium(matrix)
 
 #print A,c,h,kB,en_H2
+
+# plotting the population densities
+
+def plot_vj_populations(v, j, nvj):
+    import pylab
+    from mpl_toolkits.mplot3d import Axes3D
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.plot(v, j, nvj, 'o')
+    ax.set_xlabel('v')
+    ax.set_ylabel('j')
+    ax.set_zlabel('n(v,j)')
+    pylab.show()
+
+nvj[0] = 0
+plot_vj_populations(vj_unique[0], vj_unique[1], log10(nvj.flatten()))
 
 print 'done reading!'
 
