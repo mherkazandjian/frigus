@@ -23,7 +23,7 @@ def reduce_vj_repr(en, a_eins, cr, T,  ini, fin, vj_unique,
     lind2d = lind.copy().reshape(en.shape)
 
     # convert the energies from a v,j representation
-    # to a linear reporesentation
+    # to a linear representation
     en_l = en.flatten()
     if debug is True:
         assert en[:,:] - en_l[lind2d[:,:]]
@@ -42,7 +42,11 @@ def reduce_vj_repr(en, a_eins, cr, T,  ini, fin, vj_unique,
                         a = a_eins[v,j,vp,jp]
                         assert a_l == a
 
-    # .. todo:: add comment what is being done here
+    # initializing the linearized version of the
+    # the collisional reaction rates and 
+    # initial and final quantum numbers; the  
+    # reshape is done according to the total 
+    # number of rovibrational levels of H2 
     cr_l = zeros((en.size, en.size, T.size), 'f8')
     ini_l = zeros(ini.shape[1], 'i')
     fin_l = zeros(fin.shape[1], 'i')
@@ -83,9 +87,25 @@ def computeRateMatrix(en, a_eins, cr, ini, fin, unique_col, g, tkin, nc):
                       ini=None,
                       fin=None, tkin=None):
         """fill the kij matrix from the collsion rates
-        
+        cr:  matrix containing the coolisional
+             rates in the linearized form (58,58,50)
+        levels: energies for all the rovibrational 
+                state of H2 (480 from UCLA database)
+        collider_density: density of the coolider for which
+                          the collisional reaction rates are
+                          given (H in Francois's case)
+        unique_col: couples (v,j) for which the collisional  
+                    reaction rates are provided
+                    (58 in Francois's case)
+        g: degeneracies of the levels for which the collisional 
+           reaction rates are provided
+        ini: couple of all possible initial (v,j) in the provided
+             table of reaction rates
+        fin: couple of all possible final (v',j') in the provided
+             table of reaction rates
+        tkin: array containing the temperature at which the reaction
+              rates are provided
         .. todo:: improve documentation
-        .. todo:: add the documentation of the keywords
         """
 
         # 1) get the rate coefficient for level i -> i' at
@@ -140,24 +160,23 @@ def computeRateMatrix(en, a_eins, cr, ini, fin, unique_col, g, tkin, nc):
                           fin=fin,
                           tkin=tkin)
 
-    Tracer()()
 
-    asdasdasd
-    # def fill_AP_matrix():
-    #     """fill the (A prime)_ij matrix from the lambda radiative transitions
-    #     database"""
-    #     AP = zeros( (n, n), dtype = float64)
-    #
-    #     for trans in transRad:
-    #         u  = trans['u']; l = trans['l']
-    #         dE = abs( levels[u]['E'] - levels[l]['E'] ) # energy in K
-    #
-    #         nu = dE*kboltz / hPlank # freq in Hz
-    #
-    #         AP[u, l] = (1.0 + ng(hPlank, nu, kboltz, Tcmb))*trans['A']
-    #
-    #     return AP
-    #
+    def fill_AP_matrix():
+        """fill the (A prime)_ij matrix from the lambda radiative transitions
+        database"""
+        AP = zeros( (n, n), dtype = float64)
+    
+        Tracer()()
+        for trans in transRad:
+            u  = trans['u']; l = trans['l']
+            dE = abs( levels[u]['E'] - levels[l]['E'] ) # energy in K
+   
+            nu = dE*kboltz / hPlank # freq in Hz
+   
+            AP[u, l] = (1.0 + ng(hPlank, nu, kboltz, Tcmb))*trans['A']
+    
+        return AP
+    
     # def fill_ABS_matrix():
     #     """fill the Aij matrix for absorbtion transitions from the lambda
     #     radiative transitions database"""
