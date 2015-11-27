@@ -298,3 +298,5 @@ def solveEquilibrium(full):
     # the fractional population density
     f = x
     return f
+
+#def coolingFunction(en_l,a_eins_l,nvj)

@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 from IPython.core.debugger import Tracer
 from numpy import log10
 
-nc = 2.0
+nc = 2.e-6
 
 # read the energy levels of H2
 en_H2 = read_levels.read_levels("Read/H2Xvjlevels.cs")
@@ -60,6 +60,7 @@ def plot_vj_populations(v, j, nvj):
 nvj[0] = 0
 plot_vj_populations(vj_unique[0], vj_unique[1], log10(nvj.flatten()))
 
+cf = population.coolingFunction(en_l,a_eins_l,nvj)
 print 'done reading!'
 
 #plt.yscale('log')
