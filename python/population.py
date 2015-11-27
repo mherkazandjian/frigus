@@ -1,11 +1,12 @@
 from numpy import zeros, fabs, arange, array_equal, exp, ones
+from numpy import linalg, eye, dot
 from IPython.core.debugger import Tracer
 
 import read_ei
 import read_cr
 import read_levels
 from scipy.constants import c,h,Boltzmann
-from ismUtils import planckOccupation as ng
+from Leiden_ISM.ismUtils import planckOccupation as ng
 
 kb = Boltzmann
 
@@ -231,8 +232,10 @@ def computeRateMatrix(en, a_eins, cr, ini, fin, unique_col, g, tkin, nc):
     def fill_E_matrix(unique_col = None):
         """This is a matrix full of ones (it is a utility matrix"""
         n = unique_col.size
-        return ones((n,n))
+        return ones((n, n))
 
+
+    n = unique_col.size
 
     k_mat = fill_K_matrix(cr=cr,
                           levels=en,
@@ -260,38 +263,38 @@ def computeRateMatrix(en, a_eins, cr, ini, fin, unique_col, g, tkin, nc):
 
     E = fill_E_matrix(unique_col = unique_col)
 
-    Tracer()()
-
-
     F = nc * k_mat + ap_mat + abs_mat.T
     diag = eye(n)*dot(F, E)[:, 1]
     offdiag = F.T
-
     full = -diag + offdiag
-
+    
     return full
 
 
-# def solveEquilibrium(pNH3, full):
-#     """solve for the equlibrium population densities"""
-#     n = pNH3.nlevels
-#
-#     # solving directly
-#     #replacing the first row with the conservation equation
-#     dndt = zeros((n,1))
-#     full[0,:] = 1.0
-#     dndt[0]   = 1.0
-#
-#     A = full
-#     b = dndt
-#     #solving the system A.x = b
-#     #before solving, we will devide each row by the diagonal
-#     for i in arange(n):
-#         A[i,:] = A[i,:]/A[i,i]
-#     x = linalg.solve(A, b)
-#
-#     #print x.T
-#
-#     # the fractional population density
-#     f = x
-#     return f
+def solveEquilibrium(full):
+    """solve for the equlibrium population densities.
+    
+    i.e solving A.x = b
+    where full = A
+    """
+
+    n = full.shape[0]
+    
+    # solving directly
+    # replacing the first row with the conservation equation
+    dndt = zeros((n, 1), 'f8')
+    full[0,:] = 1.0
+    dndt[0]   = 1.0
+
+    # solving the system A.x = b
+    # before solving, we will devide each row by the diagonal
+    A, b = full, dndt
+    for i in arange(n):
+        A[i,:] = A[i,:]/A[i,i]
+        x = linalg.solve(A, b)
+
+    #print x.T
+
+    # the fractional population density
+    f = x
+    return f

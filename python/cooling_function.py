@@ -38,7 +38,8 @@ matrix = population.computeRateMatrix(en_l,
                                       g,
                                       T,
                                       nc)
-#nvj = population.solveEquilibrium()
+
+nvj = population.solveEquilibrium(matrix)
 
 #print A,c,h,kB,en_H2
 
