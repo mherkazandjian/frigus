@@ -256,10 +256,10 @@ def computeRateMatrix(en, a_eins, cr, ini, fin, unique_col, g, tkin, nc):
     abs_mat = fill_ABS_matrix(a_eins=a_eins,
                               levels=en,
                               unique_col=unique_col,
-			      g = g,
+                              g = g,
                               ini=ini,
-	                      fin=fin,
-	                      tkin=tkin)
+                              fin=fin,
+                              tkin=tkin)
 
     E = fill_E_matrix(unique_col = unique_col)
 

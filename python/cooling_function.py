@@ -13,7 +13,7 @@ import population
 from population import reduce_vj_repr
 import matplotlib.pyplot as plt
 from IPython.core.debugger import Tracer
-from numpy import log10
+from numpy import log10, unique
 
 nc = 2.e-6
 
@@ -52,12 +52,13 @@ def plot_vj_populations(v, j, nvj):
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
     ax.plot(v, j, nvj, 'o')
+    ax.axes.xaxis.set_ticks(unique(v))
+    ax.axes.yaxis.set_ticks(unique(j)[::2])
     ax.set_xlabel('v')
     ax.set_ylabel('j')
     ax.set_zlabel('n(v,j)')
     pylab.show()
 
-nvj[0] = 0
 plot_vj_populations(vj_unique[0], vj_unique[1], log10(nvj.flatten()))
 
 cf = population.coolingFunction(en_l,a_eins_l,nvj)
