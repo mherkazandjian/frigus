@@ -1,4 +1,4 @@
-from numpy import zeros, fabs, arange, array_equal, exp
+from numpy import zeros, fabs, arange, array_equal, exp, ones
 from IPython.core.debugger import Tracer
 
 import read_ei
@@ -86,7 +86,8 @@ def computeRateMatrix(en, a_eins, cr, ini, fin, unique_col, g, tkin, nc):
                       unique_col=None,
                       g=None,
                       ini=None,
-                      fin=None, tkin=None):
+                      fin=None, 
+                      tkin=None):
         """fill the kij matrix from the collsion rates
         cr:  matrix containing the coolisional
              rates in the linearized form (58,58,50)
@@ -153,7 +154,6 @@ def computeRateMatrix(en, a_eins, cr, ini, fin, unique_col, g, tkin, nc):
         return K
 
 
-
     def fill_AP_matrix(a_eins=None,
                        levels=None,
                        unique_col=None,
@@ -161,10 +161,10 @@ def computeRateMatrix(en, a_eins, cr, ini, fin, unique_col, g, tkin, nc):
                        fin=None,
                        tkin=None):
         """fill the (A prime)_ij matrix from the lambda radiative transitions
-        database"""
+        """
         tcmb = tkin
         n = unique_col.size
-        A = zeros( (n, n), dtype = 'f8')
+        AP = zeros( (n, n), dtype = 'f8')
 
         # mapping the level number to the entry column/row
         # in the K matrix
@@ -187,30 +187,53 @@ def computeRateMatrix(en, a_eins, cr, ini, fin, unique_col, g, tkin, nc):
             tcmb_index = 0
             APiip = (1.0 + ng(h, nu, kb, tcmb[tcmb_index]))*a_eins[i,ip]
              
-            A[ir,irp] = APiip
+            AP[ir,irp] = APiip
         
-        return A
-   
+        return AP
+  
+    def fill_ABS_matrix(a_eins=None,
+                       levels=None,
+                       unique_col=None,
+                       g = None,
+                       ini=None,
+                       fin=None,
+                       tkin=None):
+        """fill the Aij matrix for absorbtion transitions from the lambda
+        radiative transitions"""
+        tcmb = tkin
+        n = unique_col.size
+        ABS = zeros( (n, n), dtype = 'f8')
+
+        # mapping the level number to the entry column/row
+        # in the K matrix
+        ired = zeros(unique_col.max() + 1, 'i4')
+        for i, iu in enumerate(unique_col):
+            ired[iu] = i
+
+        # filling the AP matrix
+        for i, ip in zip(ini, fin):
+
+            # indicies of the levels in the matrix K
+            ir, irp = ired[i], ired[ip]
+
+            # the difference between the two energy levels
+            dE = fabs(levels[i] - levels[ip])
+            nu = dE*kb / h # freq in Hz
+ 
+            # the einstein coefficients. we are useing ir and ip in
+            # indexing g since g has the same length as the unique levels   
+            tcmb_index = 0
+            ABSiip = (g[ir]/g[irp])*ng(h, nu, kb, tcmb[tcmb_index])*a_eins[i,ip] 
+            ABS[ir,irp] = ABSiip
+        
+        return ABS
     
-    # def fill_ABS_matrix():
-    #     """fill the Aij matrix for absorbtion transitions from the lambda
-    #     radiative transitions database"""
-    #     ABS = zeros( (n, n), dtype = float64)
-    #
-    #     for trans in transRad:
-    #         u  = trans['u']; l = trans['l']
-    #         dE = abs( levels[u]['E'] - levels[l]['E'] ) # energy in K
-    #         gu, gl = float64(levels[u]['g']), float64(levels[l]['g'])
-    #
-    #         nu = dE*kboltz / hPlank # freq in Hz
-    #
-    #         ABS[u, l] = (gu/gl)*ng(hPlank, nu, kboltz, Tcmb)*trans['A']
-    #
-    #     return ABS
-    #
-    # def fill_E_matrix():
-    #     """This is a matrix full of ones (it is a utility matrix"""
-    #     return ones((n,n))
+    def fill_E_matrix(unique_col = None):
+        """This is a matrix full of ones (it is a utility matrix"""
+        n = unique_col.size
+        return ones((n,n))
+
+
     k_mat = fill_K_matrix(cr=cr,
                           levels=en,
                           collider_density=nc,
@@ -219,18 +242,28 @@ def computeRateMatrix(en, a_eins, cr, ini, fin, unique_col, g, tkin, nc):
                           ini=ini,
                           fin=fin,
                           tkin=tkin)
+
     ap_mat = fill_AP_matrix(a_eins=a_eins,
-                      levels=en,
-                      unique_col=unique_col,
-                      ini=ini,
-                      fin=fin,
-                      tkin=tkin)
+                            levels=en,
+                            unique_col=unique_col,
+                            ini=ini,
+                            fin=fin,
+                            tkin=tkin)
+
+    abs_mat = fill_ABS_matrix(a_eins=a_eins,
+                              levels=en,
+                              unique_col=unique_col,
+			      g = g,
+                              ini=ini,
+	                      fin=fin,
+	                      tkin=tkin)
+
+    E = fill_E_matrix(unique_col = unique_col)
 
     Tracer()()
-    ABS = fill_ABS_matrix()
-    E = fill_E_matrix()
 
-    F = nc * k_mat + AP + ABS.T
+
+    F = nc * k_mat + ap_mat + abs_mat.T
     diag = eye(n)*dot(F, E)[:, 1]
     offdiag = F.T
 
