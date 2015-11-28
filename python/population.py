@@ -311,10 +311,19 @@ def solveEquilibrium(full):
 
 
 def coolingFunction(x, en, eins, T, ini, fin, unique_col):
-    cf = zeros(1,'f8')
+    cooling_rate = 0.0
     tkin_index = 40
 
+    # mapping the level number to the entry column/row
+    # in the K matrix
+    ired = zeros(unique_col.max() + 1, 'i4')
+    for i, iu in enumerate(unique_col):
+        ired[iu] = i
+
     for i, ip in zip(ini, fin):
+        # indicies of the levels in the matrix K
+        ir, irp = ired[i], ired[ip]
+
         # the difference between the two energy levels:
         dE = fabs(en[i] - en[ip])
 
@@ -322,6 +331,7 @@ def coolingFunction(x, en, eins, T, ini, fin, unique_col):
         Ai_ip = eins[i,ip]
 
         #the population of the upper level:
-        chi = x[i]
-        cf =+  Ai_ip*dE*x[i]
-    return cf
+        chi = x[ir]
+        cooling_rate += Ai_ip*dE*chi
+
+    return cooling_rate

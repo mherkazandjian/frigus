@@ -44,7 +44,7 @@ nvj = population.solveEquilibrium(matrix)
 
 cooling_function = population.coolingFunction(nvj, en_l, a_eins_l, T, ini_l, fin_l, vj_unique_l)
 
-print cooling_function
+print cooling_function*1e13 # to have the output in erg cm-3 s-1
 
 #print A,c,h,kB,en_H2
 
