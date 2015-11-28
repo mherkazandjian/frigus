@@ -311,8 +311,23 @@ def solveEquilibrium(full):
 
 
 def coolingFunction(x, en, eins, T, ini, fin, unique_col):
-    for il, uniq in enumerate(unique_col):
+    cf = zeros(1,'f8')
+    ired = zeros(unique_col.max() + 1, 'i4')
+    for i, iu in enumerate(unique_col):
+        ired[iu] = i
         tkin_index = 40
-        cf =+  eins[ini[il],fin[il],T[tkin_index]]*en[ini[il]]*x[il]
-    return cf 
-    
+
+    for i, ip in zip(ini, fin):
+        # indicies of the levels in the matrix K
+            ir, irp = ired[i], ired[ip]
+
+            # the difference between the two energy levels:
+            dE = fabs(en[i] - en[ip])
+
+            # the einstein coefficient connecting i to ip:
+            Ai_ip = eins[i,ip]
+
+            #the population of the upper level:
+            chi = x[i]
+            cf =+  Ai_ip*dE*x[i]
+    return cf

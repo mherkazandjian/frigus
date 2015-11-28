@@ -42,7 +42,7 @@ matrix = population.computeRateMatrix(en_l,
 
 nvj = population.solveEquilibrium(matrix)
 
-cooling_function = population.coolingFunction(nvj, en_H2, A, T, ini, fin, vj_unique)
+cooling_function = population.coolingFunction(nvj, en_l, a_eins_l, T, ini_l, fin_l, vj_unique_l)
 
 print cooling_function
 
