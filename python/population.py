@@ -8,6 +8,8 @@ import read_levels
 from scipy.constants import c,h,Boltzmann
 from Leiden_ISM.ismUtils import planckOccupation as ng
 
+import temperature
+
 kb = Boltzmann
 
 def reduce_vj_repr(en, a_eins, cr, T,  ini, fin, vj_unique,
@@ -299,3 +301,18 @@ def solveEquilibrium(full):
     f = x
     return f
 
+def Tg2Tr(Tg):
+    '''Given the array of kinetic temperatures, it returns the 
+    array with the corresponding radiation temperatures (through 
+    the redshift parameter z)
+    '''
+    return Tr
+
+
+
+def coolingFunction(x, en, eins, T, ini, fin, unique_col):
+    for il, uniq in enumerate(unique_coll):
+        tkin_index = 40
+        cf +=  eins[ini[il],fin[il],T[tkin_index]]*en[ini[il]]*x[il]
+    return cf 
+    

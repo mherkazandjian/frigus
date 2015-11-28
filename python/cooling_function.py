@@ -10,7 +10,7 @@ import read_cr
 from read_cr import label
 import read_levels
 import population
-from population import reduce_vj_repr
+from population import reduce_vj_repr, coolingFunction
 import matplotlib.pyplot as plt
 from IPython.core.debugger import Tracer
 from numpy import log10, unique
@@ -41,6 +41,10 @@ matrix = population.computeRateMatrix(en_l,
                                       nc)
 
 nvj = population.solveEquilibrium(matrix)
+
+cooling_function = population.coolingFunction(nvj, en_H2, A, T, ini, fin, vj_unique)
+
+print cooling_function
 
 #print A,c,h,kB,en_H2
 
