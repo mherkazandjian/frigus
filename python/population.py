@@ -315,16 +315,13 @@ def coolingFunction(x, en, eins, T, ini, fin, unique_col):
     tkin_index = 40
 
     for i, ip in zip(ini, fin):
-        # indicies of the levels in the matrix K
-            ir, irp = ired[i], ired[ip]
+        # the difference between the two energy levels:
+        dE = fabs(en[i] - en[ip])
 
-            # the difference between the two energy levels:
-            dE = fabs(en[i] - en[ip])
+        # the einstein coefficient connecting i to ip:
+        Ai_ip = eins[i,ip]
 
-            # the einstein coefficient connecting i to ip:
-            Ai_ip = eins[i,ip]
-
-            #the population of the upper level:
-            chi = x[i]
-            cf =+  Ai_ip*dE*x[i]
+        #the population of the upper level:
+        chi = x[i]
+        cf =+  Ai_ip*dE*x[i]
     return cf
