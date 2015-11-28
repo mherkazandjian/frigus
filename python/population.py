@@ -301,18 +301,18 @@ def solveEquilibrium(full):
     f = x
     return f
 
-def Tg2Tr(Tg):
-    '''Given the array of kinetic temperatures, it returns the 
-    array with the corresponding radiation temperatures (through 
-    the redshift parameter z)
-    '''
-    return Tr
+#def Tg2Tr(Tg):
+#    '''Given the array of kinetic temperatures, it returns the
+#     array with the corresponding radiation temperatures (through
+#     the redshift parameter z)
+#     '''
+#     return Tr
 
 
 
 def coolingFunction(x, en, eins, T, ini, fin, unique_col):
-    for il, uniq in enumerate(unique_coll):
+    for il, uniq in enumerate(unique_col):
         tkin_index = 40
-        cf +=  eins[ini[il],fin[il],T[tkin_index]]*en[ini[il]]*x[il]
+        cf =+  eins[ini[il],fin[il],T[tkin_index]]*en[ini[il]]*x[il]
     return cf 
     

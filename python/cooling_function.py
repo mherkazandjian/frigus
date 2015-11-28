@@ -65,7 +65,6 @@ def plot_vj_populations(v, j, nvj):
 
 plot_vj_populations(vj_unique[0], vj_unique[1], log10(nvj.flatten()))
 
-cf = population.coolingFunction(en_l,a_eins_l,nvj)
 print 'done reading!'
 
 #plt.yscale('log')
