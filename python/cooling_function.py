@@ -46,28 +46,21 @@ cooling_function = population.coolingFunction(nvj, en_l, a_eins_l, T, ini_l, fin
 
 print cooling_function*1e13 # to have the output in erg cm-3 s-1
 
-#print A,c,h,kB,en_H2
+## plotting the population densities
 
-# plotting the population densities
-
-def plot_vj_populations(v, j, nvj):
-    import pylab
-    from mpl_toolkits.mplot3d import Axes3D
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    ax.plot(v, j, nvj, 'o')
-    ax.axes.xaxis.set_ticks(unique(v))
-    ax.axes.yaxis.set_ticks(unique(j)[::2])
-    ax.set_xlabel('v')
-    ax.set_ylabel('j')
-    ax.set_zlabel('n(v,j)')
-    pylab.show()
-
-plot_vj_populations(vj_unique[0], vj_unique[1], log10(nvj.flatten()))
+# def plot_vj_populations(v, j, nvj):
+#     import pylab
+#     from mpl_toolkits.mplot3d import Axes3D
+#     fig = plt.figure()
+#     ax = fig.add_subplot(111, projection='3d')
+#     ax.plot(v, j, nvj, 'o')
+#     ax.axes.xaxis.set_ticks(unique(v))
+#     ax.axes.yaxis.set_ticks(unique(j)[::2])
+#     ax.set_xlabel('v')
+#     ax.set_ylabel('j')
+#     ax.set_zlabel('n(v,j)')
+#     pylab.show()
+#
+# plot_vj_populations(vj_unique[0], vj_unique[1], log10(nvj.flatten()))
 
 print 'done reading!'
-
-#plt.yscale('log')
-#plt.xscale('log')
-#plt.plot(T, cr[ini[:,1][0],ini[:,1][1],fin[:,1][0],fin[:,1][1]])
-#plt.show()
