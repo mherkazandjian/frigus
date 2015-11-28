@@ -147,7 +147,7 @@ def computeRateMatrix(en, a_eins, cr, ini, fin, unique_col, g, tkin, nc):
             # indexing g since g has the same length as the unqiue levels
             tkin_ind = 40
             criip = cr[i,ip, tkin_ind]
-            criip_rev = cr[ip,i, 0] * exp( -dE / (kb*tkin[tkin_ind]) ) * g[ir]/g[irp]
+            criip_rev = cr[ip,i, tkin_ind] * exp( -dE / (kb*tkin[tkin_ind]) ) * g[ir]/g[irp]
             
             K[ir,irp] = criip
             K[irp,ir] = criip_rev
