@@ -312,10 +312,7 @@ def solveEquilibrium(full):
 
 def coolingFunction(x, en, eins, T, ini, fin, unique_col):
     cf = zeros(1,'f8')
-    ired = zeros(unique_col.max() + 1, 'i4')
-    for i, iu in enumerate(unique_col):
-        ired[iu] = i
-        tkin_index = 40
+    tkin_index = 40
 
     for i, ip in zip(ini, fin):
         # indicies of the levels in the matrix K
