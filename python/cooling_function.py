@@ -30,7 +30,8 @@ A = read_ei.read_einstein()
 # creating the array for the radiation temperatures;
 # at the moment, same size of tkin but constant value @ 2.73
 tcmb = zeros(T.size)
-tcmb[:] = T[:]
+tcmb = 2*T
+#tcmb[:] = 2.*T[:]
 
 
 # reduce the level representation from 2D indexing to 1D indexing
@@ -57,18 +58,16 @@ for itemp in range(T.size):
     cooling_function = population.coolingFunction(nvj,
                                               en_l,
                                               a_eins_l,
-                                              T,
                                               ini_l,
                                               fin_l,
-                                              vj_unique_l,
-                                              itemp)
+                                              vj_unique_l)
     cf[itemp] = cooling_function
     fit[itemp] = fit_glover(T[itemp])
 
     print cooling_function*1e13 # to have the output in erg cm-3 s-1
 
 
-plt.plot(T, cf*1e13, '-', T, fit, 'o')
+plt.plot(T, cf*1e13, 'x', T, fit, 'o')
 plt.xscale('log')
 plt.yscale('log')
 plt.show()

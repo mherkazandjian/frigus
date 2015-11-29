@@ -1,4 +1,4 @@
-from numpy import zeros, fabs, arange, array_equal, exp, ones
+from numpy import zeros, fabs, arange, array_equal, exp, ones, log10
 from numpy import linalg, eye, dot
 from IPython.core.debugger import Tracer
 
@@ -148,7 +148,8 @@ def computeRateMatrix(en, a_eins, cr, ini, fin, unique_col,
             # the collision rate at tkin[0]. we are useing ir and ip in
             # indexing g since g has the same length as the unqiue levels
             criip = cr[i,ip, tkin_ind]
-            criip_rev = cr[ip,i, tkin_ind] * exp( -dE / (kb*tkin[tkin_ind]) ) * g[ir]/g[irp]
+            criip_rev = cr[ip,i, tkin_ind] * exp( -dE / (kb*tkin[tkin_ind]) )\
+                        * g[ir]/g[irp]
             
             K[ir,irp] = criip
             K[irp,ir] = criip_rev
@@ -188,7 +189,8 @@ def computeRateMatrix(en, a_eins, cr, ini, fin, unique_col,
             # the einstein coefficients. we are useing ir and ip in
             # indexing g since g has the same length as the unique levels   
             APiip = (1.0 + ng(h, nu, kb, tcmb[tcmb_ind]))*a_eins[i,ip]
-             
+            #APiip = (1.0)*a_eins[i,ip]
+
             AP[ir,irp] = APiip
         return AP
   
@@ -224,6 +226,7 @@ def computeRateMatrix(en, a_eins, cr, ini, fin, unique_col,
             # the einstein coefficients. we are useing ir and ip in
             # indexing g since g has the same length as the unique levels   
             ABSiip = (g[ir]/g[irp])*ng(h, nu, kb, tcmb[tcmb_ind])*a_eins[i,ip]
+            #ABSiip = 0.0
             ABS[ir,irp] = ABSiip
         
         return ABS
@@ -252,7 +255,7 @@ def computeRateMatrix(en, a_eins, cr, ini, fin, unique_col,
                             ini=ini,
                             fin=fin,
                             tcmb=tcmb,
-                            tcmb_ind=tcmb_ind)
+                            tcmb_ind=tkin_ind)
 
     abs_mat = fill_ABS_matrix(a_eins=a_eins,
                               levels=en,
@@ -261,7 +264,7 @@ def computeRateMatrix(en, a_eins, cr, ini, fin, unique_col,
                               ini=ini,
                               fin=fin,
                               tcmb=tcmb,
-                              tcmb_ind=tcmb_ind)
+                              tcmb_ind=tkin_ind)
 
     E = fill_E_matrix(unique_col = unique_col)
 
@@ -310,7 +313,7 @@ def solveEquilibrium(full):
 
 
 
-def coolingFunction(x, en, eins, T, ini, fin, unique_col,tkin_index):
+def coolingFunction(x, en, eins, ini, fin, unique_col):
     cooling_rate = 0.0
 
     # mapping the level number to the entry column/row
@@ -335,19 +338,19 @@ def coolingFunction(x, en, eins, T, ini, fin, unique_col,tkin_index):
 
     return cooling_rate
 
+f=0.
 def fit_glover(T):
-    if (100 < T and T <= 1000):
-      f = 10**(-24.311209
+    if 100 < T and T <= 1000:
+      return   10**(-24.311209
                +3.5692468*log10(T/1000.)
                -11.332860*(log10(T/1000.))**2
                -27.850082*(log10(T/1000.))**3
                -21.328264*(log10(T/1000.))**4
                -4.2519023*(log10(T/1000.))**5)
-    elif (1000 < T and T <=6000):
-      f = 10**(-24.311209
+    elif 1000 < T and T <=6000:
+      return 10**(-24.311209
                +4.6450521*log10(T/1000.)
                -3.7209846*log10((T/1000.))**2
                +5.9369081*log10((T/1000.))**3
                -5.5108047*log10((T/1000.))**4
                +1.5538288*log10((T/1000.))**5)
-    return f
