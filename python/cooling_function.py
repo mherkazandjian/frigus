@@ -7,7 +7,6 @@ Created on Sat Nov 21 23:45:39 2015
 
 import read_ei
 import read_cr
-from read_cr import label
 import read_levels
 import population
 from population import reduce_vj_repr, coolingFunction
