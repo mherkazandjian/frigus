@@ -21,6 +21,8 @@ do i=1,ntrans
    read(12,*) v,j,vp,jp, (rr(v,j,vp,jp,it),it=1,ntemp)
 enddo
 
+print*, tg
+
 end
 
 subroutine tableh2(a,ivmax)
@@ -29,24 +31,24 @@ implicit real*8(a-h,o-z)
 parameter(jmax=31)
 integer ivmax
 dimension a(-1:1,0:14,0:14,0:jmax),ivmax(0:jmax)
-c*****************************************************************************
-c     The subroutine reads the quadrupole transition probabilities 'a' from  *
-c     3 data-files: 'j2jdown,' 'j2j,' and 'j2jup.' Thus, a(k,ivf,ivi,j) is   *
-c     the probability for the transition from an initial (upper) state with  *
-c     rotational quantum number 'j' and vibrational quantum number 'ivi' to  *
-c     a final (lower) state with vibrational quantum number 'ivf' and        *
-c     rotational quantum number equal to j-2 for k=-1, j for k=0, and        *
-c     j+2 for k=1.                                                           *
-c                                                                            *
-c     The array elements of 'a' for which the subscripts do NOT correspond   *
-c     to a quadrupole transition are put equal to ZERO.                      *
-c
-c     The subroutine also gives the maximum of the vibrational number for    *
-c     each rotational quantum number j. Thus, for a fixed value j, the       *
-c     vibrational quantum number can be v=0,1,2,...,ivmax(j). The maximum    *
-c     value for j is jmax=31, in which case there is only one possible       *
-c     vibrational state, i.e. ivmax(31)=0.                                   *
-c*****************************************************************************
+!****************************************************************************
+!     The subroutine reads the quadrupole transition probabilities 'a' from  *
+!     3 data-files: 'j2jdown,' 'j2j,' and 'j2jup.' Thus, a(k,ivf,ivi,j) is   *
+!     the probability for the transition from an initial (upper) state with  *
+!     rotational quantum number 'j' and vibrational quantum number 'ivi' to  *
+!     a final (lower) state with vibrational quantum number 'ivf' and        *
+!     rotational quantum number equal to j-2 for k=-1, j for k=0, and        *
+!     j+2 for k=1.                                                           *
+!                                                                            *
+!     The array elements of 'a' for which the subscripts do NOT correspond   *
+!     to a quadrupole transition are put equal to ZERO.                      *
+!
+!     The subroutine also gives the maximum of the vibrational number for    *
+!     each rotational quantum number j. Thus, for a fixed value j, the       *
+!     vibrational quantum number can be v=0,1,2,...,ivmax(j). The maximum    *
+!     value for j is jmax=31, in which case there is only one possible       *
+!     vibrational state, i.e. ivmax(31)=0.                                   *
+!*****************************************************************************
 do j=0,jmax
    do ii1=0,14
       do ii2=0,14
@@ -60,7 +62,7 @@ enddo
 open(16,file='../Read/j2jdown')
 read(16,*)k
 read(16,*) (jj,j=0,jmax)
-(read(16,*) (ivmax(j),j=0,jmax))
+read(16,*) (ivmax(j),j=0,jmax)
 do j=2,jmax
    read(16,*)(ii,i=ivmax(j),1,-1)
    do ivf=0,ivmax(j)
