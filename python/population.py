@@ -77,7 +77,8 @@ def reduce_vj_repr(en, a_eins, cr, T,  ini, fin, vj_unique,
 
 
 #def computeRateMatrix(pNH3, Tkin, nc):
-def computeRateMatrix(en, a_eins, cr, ini, fin, unique_col, g, tkin, nc):
+def computeRateMatrix(en, a_eins, cr, ini, fin, unique_col,
+                      g, tkin, nc,tkin_ind):
     """compute the matrix of transition rates"""
 
     ###########################################################
@@ -90,7 +91,8 @@ def computeRateMatrix(en, a_eins, cr, ini, fin, unique_col, g, tkin, nc):
                       g=None,
                       ini=None,
                       fin=None, 
-                      tkin=None):
+                      tkin=None,
+                      tkin_ind=None):
         """fill the kij matrix from the collsion rates
         cr:  matrix containing the coolisional
              rates in the linearized form (58,58,50)
@@ -147,7 +149,6 @@ def computeRateMatrix(en, a_eins, cr, ini, fin, unique_col, g, tkin, nc):
 
             # the collision rate at tkin[0]. we are useing ir and ip in
             # indexing g since g has the same length as the unqiue levels
-            tkin_ind = 0
             criip = cr[i,ip, tkin_ind]
             criip_rev = cr[ip,i, tkin_ind] * exp( -dE / (kb*tkin[tkin_ind]) ) * g[ir]/g[irp]
             
@@ -246,7 +247,8 @@ def computeRateMatrix(en, a_eins, cr, ini, fin, unique_col, g, tkin, nc):
                           g=g,
                           ini=ini,
                           fin=fin,
-                          tkin=tkin)
+                          tkin=tkin,
+                          tkin_ind=tkin_ind)
 
     ap_mat = fill_AP_matrix(a_eins=a_eins,
                             levels=en,
@@ -310,9 +312,8 @@ def solveEquilibrium(full):
 
 
 
-def coolingFunction(x, en, eins, T, ini, fin, unique_col):
+def coolingFunction(x, en, eins, T, ini, fin, unique_col,tkin_index):
     cooling_rate = 0.0
-    tkin_index = 40
 
     # mapping the level number to the entry column/row
     # in the K matrix

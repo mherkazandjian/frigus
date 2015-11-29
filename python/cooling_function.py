@@ -11,10 +11,12 @@ import read_levels
 import population
 from population import reduce_vj_repr, coolingFunction
 import matplotlib.pyplot as plt
+
+from numpy import zeros
 from IPython.core.debugger import Tracer
 from numpy import log10, unique
 
-nc = 2.e-6
+nc = 1.e9 #corresponding to 1.e3 cm-3 as in Lipovka
 
 # read the energy levels of H2
 en_H2 = read_levels.read_levels("Read/H2Xvjlevels.cs")
@@ -29,7 +31,9 @@ A = read_ei.read_einstein()
 lin_data = reduce_vj_repr(en_H2, A, cr, T, ini, fin, vj_unique)
 en_l, a_eins_l, cr_l, ini_l, fin_l, vj_unique_l, g = lin_data
 
-matrix = population.computeRateMatrix(en_l,
+cf = zeros(T.size)
+for itemp in range(T.size):
+    matrix = population.computeRateMatrix(en_l,
                                       a_eins_l,
                                       cr_l,
                                       ini_l,
@@ -37,13 +41,29 @@ matrix = population.computeRateMatrix(en_l,
                                       vj_unique_l,
                                       g,
                                       T,
-                                      nc)
+                                      nc,
+                                      itemp)
 
-nvj = population.solveEquilibrium(matrix)
+    nvj = population.solveEquilibrium(matrix)
+    cooling_function = population.coolingFunction(nvj,
+                                              en_l,
+                                              a_eins_l,
+                                              T,
+                                              ini_l,
+                                              fin_l,
+                                              vj_unique_l,
+                                              itemp)
+    cf[itemp] = cooling_function
 
-cooling_function = population.coolingFunction(nvj, en_l, a_eins_l, T, ini_l, fin_l, vj_unique_l)
+    print cooling_function*1e13 # to have the output in erg cm-3 s-1
 
-print cooling_function*1e13 # to have the output in erg cm-3 s-1
+
+plt.plot(T, cf*1e13, '-')
+plt.xscale('log')
+plt.yscale('log')
+plt.show()
+
+
 
 ## plotting the population densities
 
