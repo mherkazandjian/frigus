@@ -8,8 +8,6 @@ import read_levels
 from scipy.constants import c,h,Boltzmann
 from Leiden_ISM.ismUtils import planckOccupation as ng
 
-import temperature
-
 kb = Boltzmann
 
 def reduce_vj_repr(en, a_eins, cr, T,  ini, fin, vj_unique,
@@ -78,7 +76,7 @@ def reduce_vj_repr(en, a_eins, cr, T,  ini, fin, vj_unique,
 
 #def computeRateMatrix(pNH3, Tkin, nc):
 def computeRateMatrix(en, a_eins, cr, ini, fin, unique_col,
-                      g, tkin, nc,tkin_ind):
+                      g, tkin, tcmb, nc,tkin_ind,tcmb_ind):
     """compute the matrix of transition rates"""
 
     ###########################################################
@@ -163,10 +161,10 @@ def computeRateMatrix(en, a_eins, cr, ini, fin, unique_col,
                        unique_col=None,
                        ini=None,
                        fin=None,
-                       tkin=None):
+                       tcmb=None,
+                       tcmb_ind=None):
         """fill the (A prime)_ij matrix from the lambda radiative transitions
         """
-        tcmb = tkin
         n = unique_col.size
         AP = zeros( (n, n), dtype = 'f8')
 
@@ -189,8 +187,7 @@ def computeRateMatrix(en, a_eins, cr, ini, fin, unique_col,
  
             # the einstein coefficients. we are useing ir and ip in
             # indexing g since g has the same length as the unique levels   
-            tcmb_index = 40
-            APiip = (1.0 + ng(h, nu, kb, tcmb[tcmb_index]))*a_eins[i,ip]
+            APiip = (1.0 + ng(h, nu, kb, tcmb[tcmb_ind]))*a_eins[i,ip]
              
             AP[ir,irp] = APiip
         return AP
@@ -201,10 +198,10 @@ def computeRateMatrix(en, a_eins, cr, ini, fin, unique_col,
                        g = None,
                        ini=None,
                        fin=None,
-                       tkin=None):
+                       tcmb=None,
+                       tcmb_ind=None):
         """fill the Aij matrix for absorbtion transitions from the lambda
         radiative transitions"""
-        tcmb = tkin
         n = unique_col.size
         ABS = zeros( (n, n), dtype = 'f8')
 
@@ -226,8 +223,7 @@ def computeRateMatrix(en, a_eins, cr, ini, fin, unique_col,
  
             # the einstein coefficients. we are useing ir and ip in
             # indexing g since g has the same length as the unique levels   
-            tcmb_index = 40
-            ABSiip = (g[ir]/g[irp])*ng(h, nu, kb, tcmb[tcmb_index])*a_eins[i,ip] 
+            ABSiip = (g[ir]/g[irp])*ng(h, nu, kb, tcmb[tcmb_ind])*a_eins[i,ip]
             ABS[ir,irp] = ABSiip
         
         return ABS
@@ -255,7 +251,8 @@ def computeRateMatrix(en, a_eins, cr, ini, fin, unique_col,
                             unique_col=unique_col,
                             ini=ini,
                             fin=fin,
-                            tkin=tkin)
+                            tcmb=tcmb,
+                            tcmb_ind=tcmb_ind)
 
     abs_mat = fill_ABS_matrix(a_eins=a_eins,
                               levels=en,
@@ -263,7 +260,8 @@ def computeRateMatrix(en, a_eins, cr, ini, fin, unique_col,
                               g = g,
                               ini=ini,
                               fin=fin,
-                              tkin=tkin)
+                              tcmb=tcmb,
+                              tcmb_ind=tcmb_ind)
 
     E = fill_E_matrix(unique_col = unique_col)
 
@@ -336,3 +334,20 @@ def coolingFunction(x, en, eins, T, ini, fin, unique_col,tkin_index):
         cooling_rate += Ai_ip*dE*chi
 
     return cooling_rate
+
+def fit_glover(T):
+    if (100 < T and T <= 1000):
+      f = 10**(-24.311209
+               +3.5692468*log10(T/1000.)
+               -11.332860*(log10(T/1000.))**2
+               -27.850082*(log10(T/1000.))**3
+               -21.328264*(log10(T/1000.))**4
+               -4.2519023*(log10(T/1000.))**5)
+    elif (1000 < T and T <=6000):
+      f = 10**(-24.311209
+               +4.6450521*log10(T/1000.)
+               -3.7209846*log10((T/1000.))**2
+               +5.9369081*log10((T/1000.))**3
+               -5.5108047*log10((T/1000.))**4
+               +1.5538288*log10((T/1000.))**5)
+    return f
