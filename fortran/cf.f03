@@ -1,41 +1,91 @@
-integer                    :: i
-integer                    :: v,j,vp,jp
-integer, parameter         :: vimax=3,jimax=18,vfmax=2,jfmax=17 !collisional transition
-integer, parameter         :: jmax=31                           !radiative transition
-integer, parameter                          :: ntemp=50,ntrans=1653
-real*8, dimension(1:ntemp)                  :: tg     !gas temperature
-real*8, allocatable, dimension(:,:,:,:,:)   :: rr     !collisional reaction rates
-integer, dimension(0:jmax)                  :: ivmax  !radiative transition
-real*8, allocatable, dimension(:,:,:,:)     :: a      !radiative transition
-real*8, allocatable, dimension(:,:)         :: nvj    !level population
+!GENERAL PURPOSE INDEXES DEFITION 
+integer                             :: i
+integer, allocatable, dimension (:) :: v,j,vp,jp
+integer                             :: vi,ji,vf,jf
 
-open (12, file='/home/carla/Science/Francois/H+H2/Rates_H_H2.dat', status = 'unknown')
+!COLLISIONAL TRANSITION
+integer, parameter         :: vimax=3,jimax=18,vfmax=2,jfmax=17 !collisional transition
+integer, parameter                          :: ntemp=50,ntrans=1653
+real*8, dimension(1:ntemp)                  :: tg      !gas temperature
+real*8, allocatable, dimension(:,:,:,:,:)   :: rr      !collisional reaction rates
+real*8, allocatable, dimension(:,:,:,:,:)   :: K       !collisional reaction rates complete (with detailed balance + for all the transitions)
+
+!RADIATIVE TRANSITION
+integer, parameter                          :: jmax=31 !radiative transition
+integer, parameter                          :: vmax=14 !radiative transition
+integer, dimension(0:jmax)                  :: ivmax   !radiative transition
+real*8, allocatable, dimension(:,:,:,:)     :: a       !radiative transition
+
+!LEVEL POPULATION
+integer, parameter                          :: nlev = 301 ! number of rovibrational levels according Stancil
+real*8, allocatable, dimension(:,:)         :: nvj     !level population
+
+!ENERGY LEVELS
+real*8, dimension(:,:), allocatable         :: en
+
+open (20, file='/home/carla/Science/Francois/H+H2/Rates_H_H2.dat', status = 'unknown')
+open (21, file='Read/H2Xvjlevels.cs', status = 'unknown')
+
 
 allocate(rr(0:vimax,0:jimax,0:vfmax,0:jfmax,1:ntemp))
+allocate(K(0:vmax,0:jmax,0:vmax,0:jmax,1:ntemp))
 allocate(a(-1:1,0:14,0:14,0:jmax))
-allocate(nvj(0:vimax,0:jimax))
+allocate(en(0:vmax,0:jmax))
 
+allocate(v(1:ntrans),j(1:ntrans),vp(1:ntrans),jp(1:ntrans))
+allocate(nvj(0:vimax,0:jimax))
 !initializing variables
-rr=0.d0
-nvj=0.d0
-tg =(/ (i, i=100,5000,100) /)
+rr = 0.d0
+K = 0.d0
+a = 0.d0
+en = 0.d0
+nvj = 0.d0
+tg = (/ (i, i=100,5000,100) /)
+
+
 
 !reading data 
+!-energy levels
+do i=1,10
+   read(21,*)
+enddo
+do i=1,nlev
+   read(21,*) vi,ji, en(vi,ji), b
+   write(6,'(4(e10.4))') vi, ji, en(vi,ji)
+enddo
+
+
 !-collisional
 do i=1,10 
-   read(12,*) 
+   read(20,*) 
 enddo
 do i=1,ntrans
-   read(12,*) v,j,vp,jp, (rr(v,j,vp,jp,it),it=1,ntemp)
+   read(20,*) v(i),j(i),vp(i),jp(i),  &
+             (rr(v(i),j(i),vp(i),jp(i),it),it=1,ntemp)
+   vi=v(i)
+   ji=j(i)
+   vf=vp(i)
+   jf=jp(i)
+!   dE=
+   do it=1,ntemp
+!      K(vi,ji,vf,jf,it) = dexp(-dE/(kb*temp(it))) * rr(vi,ji,vf,jf,it)
+      K(vf,jf,vi,ji,it) = rr(vi,ji,vf,jf,it)
+   enddo
 enddo
 !-radiative
 call tableh2(a,ivmax)
 !write(6,'(a24,2x,e10.4)') 'a(-1:1,0:14,0:14,0:jmax)',a(1,0,1,0)
 
+!filling the matrix
 
 
 
 end
+
+
+
+
+
 
 
 subroutine tableh2(a,ivmax)
