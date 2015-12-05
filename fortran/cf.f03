@@ -30,7 +30,7 @@ do i=1,ntrans
 enddo
 !-radiative
 call tableh2(a,ivmax)
-c write(6,'(a24,2x,e10.4)') 'a(-1:1,0:14,0:14,0:jmax)',a(1,0,1,0)
+!write(6,'(a24,2x,e10.4)') 'a(-1:1,0:14,0:14,0:jmax)',a(1,0,1,0)
 
 
 
@@ -63,7 +63,7 @@ dimension a(-1:1,0:14,0:14,0:jmax),ivmax(0:jmax)
 
 a=0.d0
 
-open(16,file='radiative/j2jdown')
+open(16,file='Read/j2jdown')
 read(16,*)k
 read(16,*) (jj,j=0,jmax)
 read(16,*) (ivmax(j),j=0,jmax)
@@ -74,7 +74,7 @@ do j=2,jmax
    enddo
 enddo
       close(16)
-      open(17,file='radiative/j2j')
+      open(17,file='Read/j2j')
       read(17,*)k
       do j=1,jmax-1
          read(17,*)(ii,i=ivmax(j),1,-1)
@@ -83,7 +83,7 @@ enddo
          enddo
       enddo
       close(17)
-      open(18,file='radiative/j2jup')
+      open(18,file='Read/j2jup')
       read(18,*)k
       do j=0,jmax-2
          read(18,*)(ii,i=ivmax(j),1,-1)
