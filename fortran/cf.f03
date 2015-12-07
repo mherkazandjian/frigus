@@ -1,7 +1,8 @@
 !GENERAL PURPOSE INDEXES DEFITION 
 integer                             :: i
-integer, allocatable, dimension (:) :: v,j,vp,jp
-integer                             :: vi,ji,vf,jf
+integer, allocatable, dimension(:) :: v,j,vp,jp    ! labels for the collisional transitions
+integer                            :: vi,ji,vf,jf  ! integers for identifying the collisional transitions
+integer, allocatable, dimension(:) :: vl, jl       ! labels for the levels (for the final ordering)
 
 !COLLISIONAL TRANSITION
 integer, parameter         :: vimax=3,jimax=18,vfmax=2,jfmax=17 !collisional transition
@@ -33,6 +34,7 @@ allocate(a(-1:1,0:14,0:14,0:jmax))
 allocate(en(0:vmax,0:jmax))
 
 allocate(v(1:ntrans),j(1:ntrans),vp(1:ntrans),jp(1:ntrans))
+allocate(vl(1:nlev),jl(1:nlev))
 allocate(nvj(0:vimax,0:jimax))
 !initializing variables
 rr = 0.d0
@@ -48,10 +50,11 @@ tg = (/ (i, i=100,5000,100) /)
 !-energy levels
 do i=1,10
    read(21,*)
+   print*, i
 enddo
 do i=1,nlev
-   read(21,*) vi,ji, en(vi,ji), b
-   write(6,'(4(e10.4))') vi, ji, en(vi,ji)
+   read(21,*) vl(i),jl(i), en(vl(i),jl(i)), b
+   write(6,'(i3,2x,i2,2x,i2,2x,e10.4)') i, vl(i), jl(i), en(vl(i),jl(i))
 enddo
 
 
