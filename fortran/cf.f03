@@ -1,11 +1,14 @@
+!PHYSICAL PARAMETERS
+real*8, parameter                           :: kb = 1.38064852e-23 !J/K
+real*8, parameter                           :: hp = 6.62607004e-34 !J s
+
 !GENERAL PURPOSE INDEXES DEFITION 
-integer                             :: i
-integer, allocatable, dimension(:) :: v,j,vp,jp    ! labels for the collisional transitions
-integer                            :: vi,ji,vf,jf  ! integers for identifying the collisional transitions
-integer, allocatable, dimension(:) :: vl, jl       ! labels for the levels (for the final ordering)
+integer                                     :: i,l
+integer, allocatable, dimension(:)          :: v,j,vp,jp    ! labels for the collisional transitions
+integer                                     :: vi,ji,vf,jf  ! integers for identifying the collisional transitions
 
 !COLLISIONAL TRANSITION
-integer, parameter         :: vimax=3,jimax=18,vfmax=2,jfmax=17 !collisional transition
+integer, parameter                          :: vimax=3,jimax=18,vfmax=2,jfmax=17 !collisional transition
 integer, parameter                          :: ntemp=50,ntrans=1653
 real*8, dimension(1:ntemp)                  :: tg      !gas temperature
 real*8, allocatable, dimension(:,:,:,:,:)   :: rr      !collisional reaction rates
@@ -19,10 +22,20 @@ real*8, allocatable, dimension(:,:,:,:)     :: a       !radiative transition
 
 !LEVEL POPULATION
 integer, parameter                          :: nlev = 301 ! number of rovibrational levels according Stancil
-real*8, allocatable, dimension(:,:)         :: nvj     !level population
 
 !ENERGY LEVELS
 real*8, dimension(:,:), allocatable         :: en
+real*8, dimension(:), allocatable           :: ene
+integer, allocatable, dimension(:)          :: vl, jl     ! labels for the levels (for the final ordering)
+real*8                                      :: dE
+
+!LABELLING TRANSITIONS
+integer, dimension(:), allocatable           :: couple1, couple2 !they contain the indexes of the couples in the collisional file
+
+!MATRICES FOR THE SYSTEM (nlev * nlev)
+real*8, dimension(:,:,:), allocatable        :: KK
+real*8, dimension(:,:), allocatable          :: AA
+real*8, dimension(:)  , allocatable          :: nvj        !level population
 
 open (20, file='/home/carla/Science/Francois/H+H2/Rates_H_H2.dat', status = 'unknown')
 open (21, file='Read/H2Xvjlevels.cs', status = 'unknown')
@@ -32,33 +45,40 @@ allocate(rr(0:vimax,0:jimax,0:vfmax,0:jfmax,1:ntemp))
 allocate(K(0:vmax,0:jmax,0:vmax,0:jmax,1:ntemp))
 allocate(a(-1:1,0:14,0:14,0:jmax))
 allocate(en(0:vmax,0:jmax))
+allocate(ene(1:nlev))
 
 allocate(v(1:ntrans),j(1:ntrans),vp(1:ntrans),jp(1:ntrans))
 allocate(vl(1:nlev),jl(1:nlev))
-allocate(nvj(0:vimax,0:jimax))
+allocate(couple1(1:ntrans),couple2(1:ntrans))
+allocate(nvj(1:nlev))
+allocate(KK(1:nlev,1:nlev,1:ntemp),AA(1:nlev,1:nlev))
+
 !initializing variables
-rr = 0.d0
-K = 0.d0
-a = 0.d0
-en = 0.d0
+rr  = 0.d0
+K   = 0.d0
+a   = 0.d0
+en  = 0.d0
 nvj = 0.d0
+KK  = 0.d0
+AA  = 0.d0
 tg = (/ (i, i=100,5000,100) /)
 
 
 
-!reading data 
-!-energy levels
+!READING DATA
+!-ENERGY LEVELS
 do i=1,10
    read(21,*)
-   print*, i
 enddo
 do i=1,nlev
    read(21,*) vl(i),jl(i), en(vl(i),jl(i)), b
-   write(6,'(i3,2x,i2,2x,i2,2x,e10.4)') i, vl(i), jl(i), en(vl(i),jl(i))
+   ene(i) = en(vl(i),jl(i))
+!   write(6,'(i3,2x,i2,2x,i2,2x,e10.4)') i, vl(i), jl(i), en(vl(i),jl(i))
 enddo
+!conversion cm-1 -->  Joule
+en = en*1.98630e-23
 
-
-!-collisional
+!-COLLISIONAL
 do i=1,10 
    read(20,*) 
 enddo
@@ -69,13 +89,46 @@ do i=1,ntrans
    ji=j(i)
    vf=vp(i)
    jf=jp(i)
-!   dE=
+   do l=1,nlev
+      if(vi.eq.vl(l)) then
+        if(ji.eq.jl(l)) then
+          couple1(i) = l
+        endif
+      endif
+      if(vf.eq.vl(l)) then
+        if(jf.eq.jl(l)) then
+          couple2(i) = l
+        endif
+      endif
+   enddo
+   dE=abs(en(vi,ji)-en(vf,jf))
+!   print*, vi,ji,vf,jf,dE
    do it=1,ntemp
-!      K(vi,ji,vf,jf,it) = dexp(-dE/(kb*temp(it))) * rr(vi,ji,vf,jf,it)
-      K(vf,jf,vi,ji,it) = rr(vi,ji,vf,jf,it)
+      K(vi,ji,vf,jf,it) = rr(vi,ji,vf,jf,it)
+      K(vf,jf,vi,ji,it) = dexp(-dE/(kb*tg(it))) * rr(vi,ji,vf,jf,it)
+      KK(couple1(i),couple2(i),it) = rr(vi,ji,vf,jf,it)
+      KK(couple2(i),couple1(i),it) = dexp(-dE/(kb*tg(it))) * rr(vi,ji,vf,jf,it)
    enddo
 enddo
-!-radiative
+!do i=1,ntrans
+!   do l=1,ntemp 
+!  if(K(v(i),j(i),vp(i),jp(i),l).ne.0.d0) print*, K(v(i),j(i),vp(i),jp(i),l)
+!   enddo
+!enddo
+
+
+!write(6,'(i3,2x,i3)') couple1,couple2
+
+do i=1,ntrans
+   do l=1,ntemp 
+  if(KK(couple1(i),couple2(i),l).ne.0.d0) print*, i, KK(couple1(i),couple2(i),l)
+   enddo
+enddo
+
+
+
+
+!-RADIATIVE
 call tableh2(a,ivmax)
 !write(6,'(a24,2x,e10.4)') 'a(-1:1,0:14,0:14,0:jmax)',a(1,0,1,0)
 
