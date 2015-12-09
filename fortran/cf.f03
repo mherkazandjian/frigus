@@ -109,9 +109,9 @@ do i=1,ntrans
       endif
    enddo
 enddo
-do i=1,ntrans
-   print*, couple1(i),couple2(i)
-enddo
+!do i=1,ntrans
+!   print*, couple1(i),couple2(i)
+!enddo
 do i=1,ntrans
    vi=v(i)
    ji=j(i)
@@ -190,9 +190,9 @@ do i=1,nradtrans
       endif
    enddo
 enddo
-do i=1,nradtrans
-   print*, coupler1(i),coupler2(i)
-enddo
+!do i=1,nradtrans
+!   print*, coupler1(i),coupler2(i)
+!enddo
 do i=1,nradtrans
    vi=vrad(i)
    ji=jrad(i)
@@ -205,13 +205,22 @@ enddo
 !checking the transitions/coefficients
 !for example,  1 -> 1 means from level 1 to level 1 in the list etc
 ! AA(in, fin) = a(vl(in),jl(in),vl(fin),jl(fin))
-upper  = 102 !in the nlev order
-lower  = 44 !in the nlev order
-write(6,'(a19,i2,a3,i2,a10,i2,a4,i2,a1)') 'transition from (v=',vl(upper),',j=',jl(upper),') to (vf=',vl(lower),',jf=',jl(lower),')'
-write(6,'(a4,e10.4,2x,a3,e10.4,2x,a14,e10.4)'),  'AA =', AA(upper,lower), 'KK=',KK(upper,lower,ntemp),'at gas temp T=',tg(ntemp)
+!upper  = 102 !in the nlev order
+!lower  = 44 !in the nlev order
+!write(6,'(a19,i2,a3,i2,a10,i2,a4,i2,a1)') 'transition from (v=',vl(upper),',j=',jl(upper),') to (vf=',vl(lower),',jf=',jl(lower),')'
+!write(6,'(a4,e10.4,2x,a3,e10.4,2x,a14,e10.4)'),  'AA =', AA(upper,lower), 'KK=',KK(upper,lower,ntemp),'at gas temp T=',tg(ntemp)
 
 ! searching for the transitions that are in common between the collisional and the radiative ones
-
+do i=1,nradtrans
+   do l=1,ntrans
+      if(couple1(l).eq.coupler1(i)) then
+        if(couple2(l).eq.coupler2(i)) then
+          write(6,'(i3,2x,i3,2x)') couple1(l),couple2(l)
+        endif
+      endif
+   enddo      
+enddo
+ 
 
 
 
