@@ -16,7 +16,8 @@ from numpy import zeros
 from IPython.core.debugger import Tracer
 from numpy import log10, unique
 
-nc = 1.e9 #corresponding to 1.e3 cm-3 as in Lipovka
+nc = 1.e9
+'''density of the colliding species, in units of 1.e3 cm-3 as in Lipovka'''
 
 # read the energy levels of H2
 en_H2 = read_levels.read_levels("Read/H2Xvjlevels.cs")
