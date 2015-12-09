@@ -71,26 +71,29 @@ for itemp in range(T.size):
 plt.plot(T, cf*1e13, 'x', T, fit, 'o')
 plt.xscale('log')
 plt.yscale('log')
+#plt.axes(xrange())
+#yaxes: 1e-29:1e-22
+#plt.legend('reaction rate [cm^{-3}s^{-1}]')
 plt.show()
 
 
 
 ## plotting the population densities
 
-# def plot_vj_populations(v, j, nvj):
-#     import pylab
-#     from mpl_toolkits.mplot3d import Axes3D
-#     fig = plt.figure()
-#     ax = fig.add_subplot(111, projection='3d')
-#     ax.plot(v, j, nvj, 'o')
-#     ax.axes.xaxis.set_ticks(unique(v))
-#     ax.axes.yaxis.set_ticks(unique(j)[::2])
-#     ax.set_xlabel('v')
-#     ax.set_ylabel('j')
-#     ax.set_zlabel('n(v,j)')
-#     pylab.show()
-#
-# plot_vj_populations(vj_unique[0], vj_unique[1], log10(nvj.flatten()))
+def plot_vj_populations(v, j, nvj):
+    import pylab
+    from mpl_toolkits.mplot3d import Axes3D
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.plot(v, j, nvj, 'o')
+    ax.axes.xaxis.set_ticks(unique(v))
+    ax.axes.yaxis.set_ticks(unique(j)[::2])
+    ax.set_xlabel('v')
+    ax.set_ylabel('j')
+    ax.set_zlabel('n(v,j)')
+    pylab.show()
+
+plot_vj_populations(vj_unique[0], vj_unique[1], log10(nvj.flatten()))
 
 
 print 'done reading!'

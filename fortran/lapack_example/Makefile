@@ -1,8 +1,7 @@
 #FFLAGS = -Wall
 FC     = gfortran
-#FC     = ifort
 
-target = cf.f03
+target = lapack_prb.f90
 
 default:
 	$(FC) $(target) -llapack -L/usr/lib/lapack -lblas -L/usr/lib/libblas

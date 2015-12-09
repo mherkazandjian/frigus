@@ -5,12 +5,17 @@ integer, parameter                          :: ntemp=50,ntrans=1653
 real*8, dimension(1:ntemp)                  :: tg !gas temperature
 real*8, allocatable, dimension(:,:,:,:,:)   :: rr !collisional reaction rates
 
+integer, parameter  :: jmax = 31
+real*8, dimension(-1:1,0:14,0:14,0:jmax) :: a_eins
+integer, dimension(0:jmax) :: ivm
+
 open (12, file='/home/carla/Science/Francois/H+H2/Rates_H_H2.dat', status = 'unknown')
 
 allocate(rr(0:vimax,0:jimax,0:vfmax,0:jfmax,1:ntemp))
 
 tg=0.d0
 rr=0.d0
+a_eins = 0.d0
 
 tg =(/ (i, i=100,5000,100) /)
 
@@ -23,14 +28,17 @@ enddo
 
 print*, tg
 
-end
+call tableh2(a_eins,ivm)
+
+write(1522,*) a_eins
+
 
 subroutine tableh2(a,ivmax)
 
 implicit real*8(a-h,o-z)
 parameter(jmax=31)
-integer ivmax
-dimension a(-1:1,0:14,0:14,0:jmax),ivmax(0:jmax)
+real*8 a(-1:1,0:14,0:14,0:jmax)
+integer ivmax(0:jmax)
 !****************************************************************************
 !     The subroutine reads the quadrupole transition probabilities 'a' from  *
 !     3 data-files: 'j2jdown,' 'j2j,' and 'j2jup.' Thus, a(k,ivf,ivi,j) is   *
@@ -49,17 +57,9 @@ dimension a(-1:1,0:14,0:14,0:jmax),ivmax(0:jmax)
 !     value for j is jmax=31, in which case there is only one possible       *
 !     vibrational state, i.e. ivmax(31)=0.                                   *
 !*****************************************************************************
-do j=0,jmax
-   do ii1=0,14
-      do ii2=0,14
-         do k=-1,1
-            a(k,ii2,ii1,j)=0.d0
-         enddo
-      enddo
-   enddo
-enddo      
+a = 0.d0
 
-open(16,file='../Read/j2jdown')
+open(16,file='Read/j2jdown')
 read(16,*)k
 read(16,*) (jj,j=0,jmax)
 read(16,*) (ivmax(j),j=0,jmax)
@@ -70,7 +70,7 @@ do j=2,jmax
    enddo
 enddo
       close(16)
-      open(17,file='../Read/j2j')
+      open(17,file='Read/j2j')
       read(17,*)k
       do j=1,jmax-1
          read(17,*)(ii,i=ivmax(j),1,-1)
@@ -79,7 +79,7 @@ enddo
          enddo
       enddo
       close(17)
-      open(18,file='../Read/j2jup')
+      open(18,file='Read/j2jup')
       read(18,*)k
       do j=0,jmax-2
          read(18,*)(ii,i=ivmax(j),1,-1)
