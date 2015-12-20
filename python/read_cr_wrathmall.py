@@ -13,88 +13,9 @@ from scipy import interpolate
 import pylab
 from IPython.core.debugger import Tracer
 
-def unique_level_pairs(vj):
-    """from a list of levels find the list of unique levels and return them.
-    :param iterable vj: the list of v levels where each item vj[x] is a level.
-    The shape of vj should be (2,n) where n is the number of levels.
-    :return: (ndarray) The unique levels. The shape of this array is
-    (2,n_unique) where n_unique is the number of unique transitions.
-
-    .. code-block: python
-
-        vj = array([[0, 0, 0, 7, 4, 8, 4, 6, 9, 8, 9, 6, 2, 0, 5, 5, 9, 8, 1],
-                    [4, 4, 3, 5, 3, 6, 3, 8, 2, 5, 7, 8, 8, 6, 6, 9, 1, 0, 9]])
-        vj_unique = unique_level_pairs(vj)
-    """
-
-    assert vj.shape[0] == 2
-
-    a = vj.T
-    new_dtype = dtype((void, a.dtype.itemsize * 2))
-    b = ascontiguousarray(a).view(new_dtype)
-    _, idx = unique(b, return_index=True)
-    unique_a = a[idx]
-    return unique_a.T
-
-def read_coeff(fname):
-    '''parse the  data sent by François:
-
-    Supplementary Information for manuscript:
-    "Revisited study of the ro-vibrational excitation of H$_2$ by H: Towards a
-    revision of the cooling of astrophysical media" by François LIQUE
-
-    The table contains the H2-H collisional rate coefficients
-
-    v, v' : initial and final vibrational state
-    j, j' : initial and final rotational state
-
-    v  j  v' j'    k(cm3 s-1) (T) , T= 100 to 5000K by steps of 100K
-
-    0  1  0  0     0.3098E-21  0.1521E-18  0.1791E-16  0.3164E-15.....
-    0  2  0  0     0.6561E-13  0.7861E-13  0.9070E-13  0.1266E-12....
-
-    :param string fname: The path to the ascii data.
-    :return: a tuple of two elemtns. 
-      The first elemnt is a 5D array that holds all the rate coefficients
-      The second elemnt is the temperature corresponding to the rate
-      coefficients in the 5D array.
-
-    .. todo:: update the return value
-    '''
-
-    # the tempareture in the data file is not provided explicity. It
-    # it prived as a range. So we refine the temperature and an array
-    T = arange(100.0, 5000.1, 100.0)
-
-    # read the data from the original ascii file
-    data_read = loadtxt( fname, unpack=True, skiprows=10)
-    (v, j, vp, jp), cr = int32(data_read[0:4]), data_read[4:]
-    ini = zeros((2, v.size), 'i')
-    fin = zeros((2, v.size), 'i')
-
-    # declare the array where the data will be stored
-    nv, nj, nvp, njp = v.max()+1, j.max()+1, vp.max()+1, jp.max()+1
-    data = zeros((int(nv), int(nj), int(nvp), int(njp), cr.shape[0]), 'f8')
-
-    # copy the read data into the container array
-    for i, cri in enumerate(cr.T):
-        data[v[i], j[i], vp[i], jp[i], :] = cri
-        ini[:,i] = v[i],j[i]
-        fin[:,i] = vp[i],jp[i]
-
-    # find the unique levels from from the transitions
-    unique_levels = unique_level_pairs(hstack((unique_level_pairs(ini),
-                                               unique_level_pairs(fin))))
-
-    return data*1e6, T, ini, fin, unique_levels
 
 
-
-import numpy 
-import pylab
-import matplotlib.pyplot as plt
-
-class uga(object):
+class Reader(object):
     '''parse the  data by Wrathmall and Flower contained in the files
        H.ortho_H2 and H.para_H2
        to numpy arrays and provide utilities to get information from the data.
@@ -114,22 +35,7 @@ class uga(object):
        ( 0, 1) ( 0, 3) ( 0, 5) ( 0, 7) ( 1, 1) ( 1, 3) ( 0, 9) ( 1, 5) ( 0,11) ( 1, 7) ( 2, 1) ( 2, 3) ( 1, 9) ( 0,13) ( 2, 5)  
        ( 1,11) ( 2, 7) ( 3, 1) ( 0,15) ( 3, 3) ( 2, 9) ( 1,13) ( 3, 5) ( 3, 7)
        6.6D-10 1.4D-13 7.3D-15 5.2D-17 1.6D-16 5.6D-17 5.7D-18 1.4D-17 1.0D-18 2.9D-18 6.3D-18 3.8D-18 1.0D-18 2.2D-19 1.7D-18 ...
-       ...................................................................................
-
-    
-            #!  nei=0, nef=2, vi= 0, ji= 0
-            #!  et=118421.5
-            #!  np=   2044
-             118441.3,1.053E-06
-             118455.3,9.454E-06
-             118469.4,4.419E-05
-                   .
-                   .
-                   .
-                   .
-             980392.2,4.963E-15
-             990099.0,2.190E-15
-            1000000.0,1.623E-16
+       ...................................................................................    
     '''
     def __init__(self, fname, tiny=1e-70):
 
@@ -152,35 +58,69 @@ class uga(object):
         '''
         
         # temporary lists to store the energies, crossection, v, j for all the block
-        en_cs, v, j, ef = [], [], [], []
-        
-        self.fd = open(self.fname, 'r')
+        tkin, levels, rates = [], [], []
 
-        block = 0
-        while self.eof == False:
+        with open(self.fname, 'r') as f:
 
-            print '.',
+            lines = f.readlines()
+            
+            # 
+            # .. todo:: remove all empty lines from
+            #
 
-            header, data = self.read_block()
+            raw_data = ''.join(lines)
 
-            if header != None:
+        self.parse_data(raw_data)
 
-                nei, nef, vi, ji, et, np = header
+        # self.optimize_data(en_cs, v, j, ef)
 
-                en_cs.append( data )
-                
-                ef.append( nef )
-                v.append( vi )
-                j.append( ji )
+    def parse_data(self, raw_data):
+        """parses the read data into blocks, one block for each temperature"""
 
-            block += 1
+        # split the raw data into blocks
+        blocks = raw_data.split('T =')[1:]
 
-            if header == None:
-                break
-        print '\nread data file\n\t%s' % self.fname
-        
-        self.optimize_data(en_cs, v, j, ef)
-        
+        # get the needed info from each block
+        blocks_parsed = []
+        for block in blocks:
+            
+            lines = block.split('\n')
+
+            # get the temperature
+            T = lines[0]
+            assert 'K' in T
+            print T
+
+            #
+            # .. todo:: get the header (levels)
+            #
+
+            #
+            # .. todo:: get the data (put them in a 2D numpy array)
+            #
+
+            #
+            # .. todo:: put the parsed data, header and T in blocks_parsed
+            #           as a dictionary. For example, the extracted data
+            #           should be accessed via:
+            #
+            #              T = block_parsed[0]['T']
+            #              levels = block_parsed[0]['levels']
+            #              cr = block_parsed[0]['cr']
+            Tracer()()
+        pass
+
+    def parse_block(self, block):
+        """parase a block of data and return the temperature, the levels
+        and the collision rates"""
+
+        #
+        # put the stuff
+        #   for block in blocks:
+        #  
+        # in the above method, into this method
+        pass
+    
     def optimize_data(self, en_cs, v, j, ef):
         '''store the data in an efficient way. convert en_cs into a 2D matrix
         of numpy array objects, and v and j into numpy arrays.
@@ -220,13 +160,6 @@ class uga(object):
             pylab.show()
             '''            
    
-#    def skip_header(self):
-#        ''' skip reading the header at the top of the file'''
-#        self.fd.next()
-#        self.fd.next()
-#        self.fd.next()
-#        self.fd.next()
-    
     def info(self):
         '''print a summary of the read info'''
 
@@ -263,72 +196,3 @@ class uga(object):
 #        pylab.show()
 
 
-    def read_block_header(self):
-        '''read the header of a block
-           T = float            
-           and return
-           T
-           as
-           f
-        '''
-        try:
-            hd1 = self.fd.next().replace(' K','').replace('\n','')
-        except:
-            print 'end of file reached'
-            return None
-
-        ''' T = 300 K'''
-        hd1 = self.fd.next().replace(' K','').replace('\n','')
-        T =  numpy.float64(hd1.split('=')[1])
-
-        '''  ( 0, 0) ( 0, 2) ( 0, 4) ( 0, 6) ( 0, 8) ( 1, 0) ( 1, 2) ( 1, 4) ( 0,10)'''
-        hd2 = self.fd.next().replace(' K','').replace('\n','')
-        T =  numpy.float64(hd1.split('=')[1])
-
-        return T
-        
-    def read_block(self):
-        '''reads one block of data. When an eof is encountered the attribute eof
-        is changed to True. The header is returned as a list and the data of the
-        block is returned as a n x n numpy float array.
-        ''' 
-        
-        header = self.read_block_header()
-        if header == None:
-            self.eof == True
-            return None, None 
-        
-        T  = header
-        self.fd.next()
-     
-        data = numpy.zeros( (2,np), 'f8')
-        
-        for i in numpy.arange(np):
-            
-            try:
-                en, cs = self.fd.next().replace('\n','').split(',')
-            except:
-                self.eof == True
-                break
-            
-            data[0,i] = numpy.float64(en)
-            
-            if '*' in cs:
-                data[1,i] = self.tiny
-            else:
-                data[1,i] = numpy.float64(cs)
-
-        return header, data
-    #
-#
-
-'''
-# definig the reader object
-reader = uga('/home/mher/tmp/foo/H2XBCphotodiss.cs')
-
-# showing info
-reader.info()
-
-# get the data of a certain transition
-en, cs = reader.data[4,1,2]
-'''
