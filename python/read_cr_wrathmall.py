@@ -52,12 +52,12 @@ class Reader(object):
         self.read_data()
 
     def read_data(self):
-        '''read all the data to temporary storage in self.data. The fromat 
+        '''read all the data to temporary storage in self.data. The format 
         of the data can be transformed into more efficient storage by calling
         the method self.optmize_data
         '''
         
-        # temporary lists to store the energies, crossection, v, j for all the block
+        # temporary lists to store kinetic temperatures, levels and rates for all the block
         tkin, levels, rates = [], [], []
 
         with open(self.fname, 'r') as f:
@@ -94,7 +94,8 @@ class Reader(object):
             #
             # .. todo:: get the header (levels)
             #
-
+            #levels = lines[2].split
+            #print levels
             #
             # .. todo:: get the data (put them in a 2D numpy array)
             #
@@ -111,7 +112,7 @@ class Reader(object):
         pass
 
     def parse_block(self, block):
-        """parase a block of data and return the temperature, the levels
+        """parse a block of data and return the temperature, the levels
         and the collision rates"""
 
         #
