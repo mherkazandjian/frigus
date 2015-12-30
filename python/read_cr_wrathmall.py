@@ -62,12 +62,11 @@ class Reader(object):
 
         with open(self.fname, 'r') as f:
 
-            lines = f.readlines()
-            
-            # 
-            # .. todo:: remove all empty lines from
-            #
-
+            linesold = f.readlines()
+            lines = []
+            for line in linesold:
+                if line.isspace() is False:
+     		   lines.append(line)
             raw_data = ''.join(lines)
 
         self.parse_data(raw_data)
@@ -108,7 +107,6 @@ class Reader(object):
             #              T = block_parsed[0]['T']
             #              levels = block_parsed[0]['levels']
             #              cr = block_parsed[0]['cr']
-            Tracer()()
         pass
 
     def parse_block(self, block):
