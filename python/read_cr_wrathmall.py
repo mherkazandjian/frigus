@@ -90,15 +90,22 @@ class Reader(object):
             assert 'K' in T
             print T
 
+            # get the header (levels)
+            levels = lines[1].replace(' ','').replace(')(',':')[1:-1].split(':')
+            v , j = [] , []
+            for level in levels:
+		v.append(int32(level.split(',')[0]))
+                j.append(int32(level.split(',')[1]))        
+            
+            Tracer()() 
+	    #
+            # get the data (put them in a 2D numpy array)
             #
-            # .. todo:: get the header (levels)
-            #
-            #levels = lines[2].split
-            #print levels
-            #
-            # .. todo:: get the data (put them in a 2D numpy array)
-            #
-
+            #            data = lines[2:24]
+            #for ini in levels:
+#		for fin in levels:
+            #		    k(v[ini],j[ini],v[fin],j[fin]) = lines[2+ini]
+            
             #
             # .. todo:: put the parsed data, header and T in blocks_parsed
             #           as a dictionary. For example, the extracted data
@@ -107,6 +114,7 @@ class Reader(object):
             #              T = block_parsed[0]['T']
             #              levels = block_parsed[0]['levels']
             #              cr = block_parsed[0]['cr']
+	Tracer()()
         pass
 
     def parse_block(self, block):
