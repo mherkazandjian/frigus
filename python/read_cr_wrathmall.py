@@ -82,31 +82,29 @@ class Reader(object):
         # get the needed info from each block
         blocks_parsed = []
         for block in blocks:
-            
-            lines = block.split('\n')
-
+            lines = iter(block.split('\n'))
             # get the temperature
-            T = lines[0]
+            T = lines.next()
             assert 'K' in T
             print T
 
             # get the header (levels)
-            levels = lines[1].replace(' ','').replace(')(',':')[1:-1].split(':')
+            levels = lines.next().replace(' ','').replace(')(',':')[1:-1].split(':')
             v , j = [] , []
             for level in levels:
-		v.append(int32(level.split(',')[0]))
+                v.append(int32(level.split(',')[0]))
                 j.append(int32(level.split(',')[1]))        
             
-            Tracer()() 
-	    #
-            # get the data (put them in a 2D numpy array)
-            #
-            #            data = lines[2:24]
-            #for ini in levels:
-#		for fin in levels:
-            #		    k(v[ini],j[ini],v[fin],j[fin]) = lines[2+ini]
+            cr = zeros((int(len(v)), int(len(j)), int(len(v)), int(len(j))), 'f8')
+            for ini, line in enumerate(lines):
+                if len(line.strip()) > 0:
+                   data = numpy.float64(line.replace('D','E').strip().split())    
+                   for fin, (vp, jp) in enumerate(zip(v,j)):
+                       cr[v[ini], j[ini], vp, jp] = data[fin]
+                      
+                   print data[0]
             
-            #
+            
             # .. todo:: put the parsed data, header and T in blocks_parsed
             #           as a dictionary. For example, the extracted data
             #           should be accessed via:
