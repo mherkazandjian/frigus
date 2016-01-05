@@ -79,28 +79,39 @@ class Reader(object):
         # split the raw data into blocks
         blocks = raw_data.split('T =')[1:]
 
+
         # get the needed info from each block
         blocks_parsed = []
-        for block in blocks:
+
+        tkin = zeros(len(blocks), 'f8')
+
+        for ib, block in enumerate(blocks):
             lines = iter(block.split('\n'))
             # get the temperature
             T = lines.next()
             assert 'K' in T
-            print T
+            tkin[ib] = T.replace('K','')
+            print T, tkin[ib]
 
             # get the header (levels)
             levels = lines.next().replace(' ','').replace(')(',':')[1:-1].split(':')
             v , j = [] , []
             for level in levels:
                 v.append(int32(level.split(',')[0]))
-                j.append(int32(level.split(',')[1]))        
+                j.append(int32(level.split(',')[1]))
+
             
+            ini = numpy.repeat(numpy.vstack((v,j)), len(v), axis=1)
+            fin = numpy.tile([v,j], len(v))
+
+            Tracer()()
+
             cr = zeros((int(len(v)), int(len(j)), int(len(v)), int(len(j))), 'f8')
-            for ini, line in enumerate(lines):
+            for initial, line in enumerate(lines):
                 if len(line.strip()) > 0:
                    data = numpy.float64(line.replace('D','E').strip().split())    
                    for fin, (vp, jp) in enumerate(zip(v,j)):
-                       cr[v[ini], j[ini], vp, jp] = data[fin]
+                       cr[v[initial], j[initial], vp, jp] = data[fin]
                       
                    print data[0]
             
