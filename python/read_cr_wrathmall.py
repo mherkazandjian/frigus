@@ -36,6 +36,10 @@ class Reader(object):
        ( 1,11) ( 2, 7) ( 3, 1) ( 0,15) ( 3, 3) ( 2, 9) ( 1,13) ( 3, 5) ( 3, 7)
        6.6D-10 1.4D-13 7.3D-15 5.2D-17 1.6D-16 5.6D-17 5.7D-18 1.4D-17 1.0D-18 2.9D-18 6.3D-18 3.8D-18 1.0D-18 2.2D-19 1.7D-18 ...
        ...................................................................................    
+
+    reader = read_cr_wrathmall.Reader('path_to_the_file')
+
+    cr_tkin[tindex][v,j,vp,jp]
     '''
     def __init__(self, fname, tiny=1e-70):
 
@@ -84,6 +88,9 @@ class Reader(object):
         blocks_parsed = []
 
         tkin = zeros(len(blocks), 'f8')
+        cr_tkin = []
+        ini_tkin = []
+        fin_tkin = []
 
         for ib, block in enumerate(blocks):
             lines = iter(block.split('\n'))
@@ -104,17 +111,18 @@ class Reader(object):
             ini = numpy.repeat(numpy.vstack((v,j)), len(v), axis=1)
             fin = numpy.tile([v,j], len(v))
 
-            Tracer()()
 
             cr = zeros((int(len(v)), int(len(j)), int(len(v)), int(len(j))), 'f8')
             for initial, line in enumerate(lines):
                 if len(line.strip()) > 0:
                    data = numpy.float64(line.replace('D','E').strip().split())    
-                   for fin, (vp, jp) in enumerate(zip(v,j)):
-                       cr[v[initial], j[initial], vp, jp] = data[fin]
-                      
+                   for final, (vp, jp) in enumerate(zip(v,j)):
+                       cr[v[initial], j[initial], vp, jp] = data[final]
+                       
                    print data[0]
-            
+            cr_tkin.append(cr)
+            ini_tkin.append(ini)
+            fin_tkin.append(fin)
             
             # .. todo:: put the parsed data, header and T in blocks_parsed
             #           as a dictionary. For example, the extracted data
@@ -122,15 +130,13 @@ class Reader(object):
             #
             #              T = block_parsed[0]['T']
             #              levels = block_parsed[0]['levels']
-            #              cr = block_parsed[0]['cr']
-	Tracer()()
-        pass
+              #              cr = block_parsed[0]['cr']
+        return cr_tkin, ini_tkin, fin_tkin 
 
     def parse_block(self, block):
         """parse a block of data and return the temperature, the levels
         and the collision rates"""
 
-        #
         # put the stuff
         #   for block in blocks:
         #  
