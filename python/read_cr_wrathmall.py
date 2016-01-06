@@ -16,15 +16,15 @@ from IPython.core.debugger import Tracer
 
 
 class Reader(object):
-    '''parse the  data by Wrathmall and Flower contained in the files
+    """parse the  data by Wrathmall and Flower contained in the files
        H.ortho_H2 and H.para_H2
        to numpy arrays and provide utilities to get information from the data.
-       
+
        A block of data is defined everything between :
 
        T = 100 K
 
-       ( 0, 1) ( 0, 3) ( 0, 5) ( 0, 7) ( 1, 1) ( 1, 3) ( 0, 9) ( 1, 5) ( 0,11) ( 1, 7) ( 2, 1) ( 2, 3) ( 1, 9) ( 0,13) ( 2, 5)     
+       ( 0, 1) ( 0, 3) ( 0, 5) ( 0, 7) ( 1, 1) ( 1, 3) ( 0, 9) ( 1, 5) ( 0,11) ( 1, 7) ( 2, 1) ( 2, 3) ( 1, 9) ( 0,13) ( 2, 5)
        ( 1,11) ( 2, 7) ( 3, 1) ( 0,15) ( 3, 3) ( 2, 9) ( 1,13) ( 3, 5) ( 3, 7)
        8.6D-12 7.8D-14 1.1D-15 6.0D-18 6.6D-18 1.7D-18 2.2D-19 1.9D-19 1.1D-20 1.8D-20 2.1D-19 1.2D-19 5.4D-20 2.0D-20 5.7D-20 ...
        ...................................................................................
@@ -32,15 +32,19 @@ class Reader(object):
 
        T = 300 K
 
-       ( 0, 1) ( 0, 3) ( 0, 5) ( 0, 7) ( 1, 1) ( 1, 3) ( 0, 9) ( 1, 5) ( 0,11) ( 1, 7) ( 2, 1) ( 2, 3) ( 1, 9) ( 0,13) ( 2, 5)  
+       ( 0, 1) ( 0, 3) ( 0, 5) ( 0, 7) ( 1, 1) ( 1, 3) ( 0, 9) ( 1, 5) ( 0,11) ( 1, 7) ( 2, 1) ( 2, 3) ( 1, 9) ( 0,13) ( 2, 5)
        ( 1,11) ( 2, 7) ( 3, 1) ( 0,15) ( 3, 3) ( 2, 9) ( 1,13) ( 3, 5) ( 3, 7)
        6.6D-10 1.4D-13 7.3D-15 5.2D-17 1.6D-16 5.6D-17 5.7D-18 1.4D-17 1.0D-18 2.9D-18 6.3D-18 3.8D-18 1.0D-18 2.2D-19 1.7D-18 ...
-       ...................................................................................    
+       ...................................................................................
 
-    reader = read_cr_wrathmall.Reader('path_to_the_file')
+    .. code-block:: python
 
-    cr_tkin[tindex][v,j,vp,jp]
-    '''
+        reader = read_cr_wrathmall.Reader('path_to_the_file')
+
+        # print all the collision rates for the transition (v,j) -> (vp,jp) for
+        # all the temperatures
+        print reader.data[v, j, vp, jp, :]
+    """
     def __init__(self, fname, tiny=1e-70):
 
         self.fname = fname
@@ -48,10 +52,13 @@ class Reader(object):
         self.tiny  = tiny
         self.eof   = False
 
-        self.data  = None  #: all the crossection data as a function of energy
+        self.data  = None  #: the collision rates for all the transitions for all the tempratures
         self.datai = None  #: an ndarray of object of interpolation function which has the same shape of self.data
         self.v     = None  #: all the read v  levels
         self.j     = None  #: all the read j  levels
+        self.ini   = None  #: the initial v,j of all the transitions
+        self.fin   = None  #: the final v,j of all the transitions
+        self.tkin  = None  #: the temperatures at which the collisional data are given
 
         self.read_data()
 
@@ -73,9 +80,8 @@ class Reader(object):
      		   lines.append(line)
             raw_data = ''.join(lines)
 
-        self.parse_data(raw_data)
-
-        # self.optimize_data(en_cs, v, j, ef)
+        cr, ini, fin, tkin = self.parse_data(raw_data)
+        self.optimize_data(cr, ini, fin, tkin)
 
     def parse_data(self, raw_data):
         """parses the read data into blocks, one block for each temperature"""
@@ -98,8 +104,8 @@ class Reader(object):
             cr_tkin.append(cr)
             ini_tkin.append(ini)
             fin_tkin.append(fin)
-        Tracer()()   
-        return cr_tkin, ini_tkin, fin_tkin 
+
+        return cr_tkin, ini_tkin, fin_tkin, tkin
 
     def parse_block(self, block):
         """parse a block of data and return the temperature, the levels
@@ -118,10 +124,8 @@ class Reader(object):
             v.append(int32(level.split(',')[0]))
             j.append(int32(level.split(',')[1]))
 
-            
         ini = numpy.repeat(numpy.vstack((v,j)), len(v), axis=1)
         fin = numpy.tile([v,j], len(v))
-
 
         cr = zeros((int(len(v)), int(len(j)), int(len(v)), int(len(j))), 'f8')
         for initial, line in enumerate(lines):
@@ -134,11 +138,26 @@ class Reader(object):
 
         return ini, fin, tkin, cr
     
-    def optimize_data(self, en_cs, v, j, ef):
-        '''store the data in an efficient way. convert en_cs into a 2D matrix
+    def optimize_data(self, cr, ini, fin, tkin):
+        """store the data in an efficient way. convert en_cs into a 2D matrix
         of numpy array objects, and v and j into numpy arrays.
-        '''
-        
+
+        .. todo:: update this docstring
+        .. todo:: update also the parameter list
+        """
+
+        # set these attributes from the parsed data that is returned by
+        # self.parse_data
+        #
+        # self.data
+        # self.datai
+        # self.v
+        # self.j
+        # self.ini
+        # self.fin
+        # self.tkin
+        raise NotImplementedError('not implelented yet')
+
         self.v   = numpy.array( v , 'i' )
         self.j   = numpy.array( j , 'i' )
         self.ef  = numpy.array( ef, 'i' )
