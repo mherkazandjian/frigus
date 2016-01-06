@@ -93,55 +93,46 @@ class Reader(object):
         fin_tkin = []
 
         for ib, block in enumerate(blocks):
-            lines = iter(block.split('\n'))
-            # get the temperature
-            T = lines.next()
-            assert 'K' in T
-            tkin[ib] = T.replace('K','')
-            print T, tkin[ib]
-
-            # get the header (levels)
-            levels = lines.next().replace(' ','').replace(')(',':')[1:-1].split(':')
-            v , j = [] , []
-            for level in levels:
-                v.append(int32(level.split(',')[0]))
-                j.append(int32(level.split(',')[1]))
-
-            
-            ini = numpy.repeat(numpy.vstack((v,j)), len(v), axis=1)
-            fin = numpy.tile([v,j], len(v))
-
-
-            cr = zeros((int(len(v)), int(len(j)), int(len(v)), int(len(j))), 'f8')
-            for initial, line in enumerate(lines):
-                if len(line.strip()) > 0:
-                   data = numpy.float64(line.replace('D','E').strip().split())    
-                   for final, (vp, jp) in enumerate(zip(v,j)):
-                       cr[v[initial], j[initial], vp, jp] = data[final]
-                       
-                   print data[0]
+            ini, fin, t, cr = self.parse_block(block)
+            tkin[ib] = t
             cr_tkin.append(cr)
             ini_tkin.append(ini)
             fin_tkin.append(fin)
-            
-            # .. todo:: put the parsed data, header and T in blocks_parsed
-            #           as a dictionary. For example, the extracted data
-            #           should be accessed via:
-            #
-            #              T = block_parsed[0]['T']
-            #              levels = block_parsed[0]['levels']
-              #              cr = block_parsed[0]['cr']
+        Tracer()()   
         return cr_tkin, ini_tkin, fin_tkin 
 
     def parse_block(self, block):
         """parse a block of data and return the temperature, the levels
         and the collision rates"""
+        lines = iter(block.split('\n'))
+        # get the temperature
+        T = lines.next()
+        assert 'K' in T
+        tkin = T.replace('K','')
+        print T, tkin
 
-        # put the stuff
-        #   for block in blocks:
-        #  
-        # in the above method, into this method
-        pass
+        # get the header (levels)
+        levels = lines.next().replace(' ','').replace(')(',':')[1:-1].split(':')
+        v , j = [] , []
+        for level in levels:
+            v.append(int32(level.split(',')[0]))
+            j.append(int32(level.split(',')[1]))
+
+            
+        ini = numpy.repeat(numpy.vstack((v,j)), len(v), axis=1)
+        fin = numpy.tile([v,j], len(v))
+
+
+        cr = zeros((int(len(v)), int(len(j)), int(len(v)), int(len(j))), 'f8')
+        for initial, line in enumerate(lines):
+            if len(line.strip()) > 0:
+               data = numpy.float64(line.replace('D','E').strip().split())    
+               for final, (vp, jp) in enumerate(zip(v,j)):
+                   cr[v[initial], j[initial], vp, jp] = data[final]
+                     
+               print data[0]
+
+        return ini, fin, tkin, cr
     
     def optimize_data(self, en_cs, v, j, ef):
         '''store the data in an efficient way. convert en_cs into a 2D matrix
