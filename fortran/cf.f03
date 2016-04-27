@@ -22,7 +22,7 @@ integer, dimension(0:jmax)                  :: ivmax   !radiative transition
 real*8, allocatable, dimension(:,:,:,:)     :: a       !radiative transition
 
 !LEVEL POPULATION
-integer, parameter                          :: nlev = 301 ! number of rovibrational levels according Stancil
+integer, parameter                          :: nlev = 301 ! number of rovibrational levels according to Stancil
 
 !ENERGY LEVELS
 real*8, dimension(:,:), allocatable         :: en
@@ -215,12 +215,21 @@ do i=1,nradtrans
    do l=1,ntrans
       if(couple1(l).eq.coupler1(i)) then
         if(couple2(l).eq.coupler2(i)) then
-          write(6,'(i3,2x,i3,2x)') couple1(l),couple2(l)
+          write(6,'(i3,2x,i3,2x)')  couple1(l),couple2(l)
+          write(6,'(a10,2x,i3,2x,i3,2x,i3,2x,i3,2x)') &
+                    'radiation:',vrad(i),jrad(i),vprad(i),jprad(i)
+          write(6,'(a10,2x,i3,2x,i3,2x,i3,2x,i3,2x)') &
+                    'collision:',v(l),j(l),vp(l),jp(l)
         endif
       endif
    enddo      
 enddo
  
+
+!solution of the linear system of equations M \cdot n = 0 where n = nvj while the matrix M contains the 
+!term of de/excitations due to collisions and radiative de-excitations (only spontaneous transitions included)
+
+
 
 
 
