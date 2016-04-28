@@ -5,4 +5,6 @@
 *.pdf
 .ropeproject
 cooling_glover.f90 
+*.mod
+*.o
 
