@@ -2,3 +2,7 @@
 *~
 .idea
 *.pyc
+*.pdf
+.ropeproject
+cooling_glover.f90 
+
