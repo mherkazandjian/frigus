@@ -1,100 +1,102 @@
 module radiation
 
+    use energy_levels
+    use types_and_parameters, only: jmax, radiative_coeffs
+    
+    
     ! in this module the reading, indexes arrangement and calculations of
     ! stimulated coefficients are performed, starting from the data by
     ! Wolniewicz et al 1998
 
-    integer, parameter                          :: jmax=31
-    integer, parameter                          :: vmax=14
-    integer, dimension(0:jmax)                  :: ivmax
-    real*8,  allocatable, dimension(:,:,:,:)    :: a
-    integer, allocatable, dimension(:)          :: vrad,jrad,vprad,jprad  ! labels for the radiative transitions with non-zero  with non-zero A
-    real*8, dimension(:,:),   allocatable       :: AA         !einstein coefficients (radiative spontaneous transitions)
-    integer, dimension(:), allocatable          :: coupler1, coupler2 !they contain the indexes of the couples in the radiative file
-    integer                                     :: nradtrans          !number of radiative transitions not equal to 0
+    type(radiative_coeffs) :: a21, b21, b12
     
     contains
 
-      subroutine reading_data_radiative(a, AA, coupler1, coupler2)
-                integer, parameter                          :: jmax=31
-                integer, parameter                          :: vmax=14
-                integer, dimension(0:jmax)                  :: ivmax
-                real*8,  allocatable, dimension(:,:,:,:)    :: a
-                real*8, dimension(:,:),   allocatable       :: AA  !einstein coefficients (spontaneous transitions)
-                integer, dimension(:), allocatable          :: coupler1, coupler2 
-                integer                                     :: nradtrans  !number of radiative transitions not equal to 0
+      subroutine reading_data_radiative(e, a21)
+                 use energy_levels, only: energy_lev
+                 use types_and_parameters, only: jmax, nlev, vi, ji, vf, jf
+ 
+                 type(radiative_coeffs) :: a21, b21, b12
+                 type(energy_lev) :: e 
+                 integer, dimension(0:jmax)                  :: ivmax
+                 integer, dimension(:), allocatable          :: coupler1, coupler2 
+ 
+ 
+                 call reading_data(e)
 
-                call tableh2(a,ivmax)
+                
+                
+                 call tableh2(a21%reading,ivmax)
+                 
+                 a21%ntransrad = 0
                 !write(6,'(a24,2x,e10.4)') 'a(-1:1,0:14,0:14,0:jmax)',a(1,0,1,0)
-                do i0=0,jmax
+                 do i0=0,jmax
                     do i1=0,14
                         do i2=0,14
                             do i3=-1,1
-                               if(a(i3,i2,i1,i0).ne.0.d0) then
-                                nradtrans = nradtrans + 1
-                                write(22,'(4(i2,2x),e10.4)') i1,i0,i2,i0+i3,a(i3,i2,i1,i0)
+                               if(a21%reading(i3,i2,i1,i0).ne.0.d0) then
+                               a21%ntransrad = a21%ntransrad + 1                               
+                                write(22,'(4(i2,2x),e10.4)') i1,i0,i2,i0+i3,a21%reading(i3,i2,i1,i0)
                                endif
                             enddo
                         enddo
                     enddo
                 enddo
                 rewind(22)
-                allocate(coupler1(1:nradtrans),coupler2(1:nradtrans))
-                allocate(vrad(1:nradtrans),jrad(1:nradtrans))
-                allocate(vprad(1:nradtrans),jprad(1:nradtrans))
+                allocate(a21%couple1r(1:a21%ntransrad),a21%couple2r(1:a21%ntransrad))
+                allocate(a21%vir(1:a21%ntransrad),a21%jir(1:a21%ntransrad))
+                allocate(a21%vfr(1:a21%ntransrad),a21%jfr(1:a21%ntransrad))
+                ! print*, a21%ntransrad, (jmax+1)*15*15*3
+! 
+                 do i=1,a21%ntransrad
+                     read(22,*)  a21%vir(i),a21%jir(i),a21%vfr(i),a21%jfr(i), &
+                     a21%reading(a21%vir(i),a21%jir(i),a21%vfr(i),a21%jfr(i))
+                 !   write(6,'(4(i2,2x),e10.4)')  vrad(i),jrad(i),vprad(i),jprad(i), &
+                 !              b   
+                     vi=a21%vir(i)
+                     ji=a21%jir(i)
+                     vf=a21%vfr(i)
+                     jf=a21%jfr(i)
+                     do l=1,nlev
+                         if(vi.eq.e%vl(l)) then
+                           if(ji.eq.e%jl(l)) then
+                             a21%couple1r(i) = l
+                           endif
+                         endif
+                         if(vf.eq.e%vl(l)) then
+                           if(jf.eq.e%jl(l)) then
+                             a21%couple2r(i) = l
+                           endif
+                         endif
+                     enddo
+                 enddo
 
-                !print*, nradtrans, (jmax+1)*15*15*3
-
-                do i=1,nradtrans
-                    read(22,*)  vrad(i),jrad(i),vprad(i),jprad(i), &
-                    a(vrad(i),jrad(i),vprad(i),jprad(i))
-                !   write(6,'(4(i2,2x),e10.4)')  vrad(i),jrad(i),vprad(i),jprad(i), &
-                !              b   
-                    vi=vrad(i)
-                    ji=jrad(i)
-                    vf=vprad(i)
-                    jf=jprad(i)
-                    do l=1,nlev
-                        if(vi.eq.vl(l)) then
-                          if(ji.eq.jl(l)) then
-                            coupler1(i) = l
-                          endif
-                        endif
-                        if(vf.eq.vl(l)) then
-                          if(jf.eq.jl(l)) then
-                            coupler2(i) = l
-                          endif
-                        endif
-                    enddo
-                enddo
-                !do i=1,nradtrans
-                !   print*, coupler1(i),coupler2(i)
-                !enddo
-                do i=1,nradtrans
-                    vi=vrad(i)
-                    ji=jrad(i)
-                    vf=vprad(i)
-                    jf=jprad(i)
-                    AA(coupler1(i),coupler2(i)) = a(vi,ji,vf,jf)
-                    !   write(6,*) vi,ji,vf,jf,a(vi,ji,vf,jf)
-                enddo
+                  do i=1,a21%ntransrad
+                      vi=a21%vir(i)
+                      ji=a21%jir(i)
+                      vf=a21%vfr(i)
+                      jf=a21%jfr(i)
+                      a21%M(a21%couple1r(i),a21%couple2r(i)) = a21%reading(vi,ji,vf,jf)
+                  enddo
+ 
+      end subroutine reading_data_radiative
 
 
-                !do i=1,nradtrans
-                !   vi=vrad(i)
-                !   ji=jrad(i)
-                !   vf=vprad(i)
-                !   jf=jprad(i)
-                !   if(en(vi,ji).gt.en(vf,jf)) then 
-                !      AA(coupler1(i),coupler2(i)) = a(vi,ji,vf,jf)+
-                !   else
-                !      AA(coupler1(i),coupler2(i)) =
-                !   endif
-                !!   write(6,*) vi,ji,vf,jf,a(vi,ji,vf,jf)
-                !enddo
-      end subroutine reading_data
-
-
+! 
+!                 !do i=1,nradtrans
+!                 !   vi=vrad(i)
+!                 !   ji=jrad(i)
+!                 !   vf=vprad(i)
+!                 !   jf=jprad(i)
+!                 !   if(en(vi,ji).gt.en(vf,jf)) then 
+!                 !      AA(coupler1(i),coupler2(i)) = a(vi,ji,vf,jf)+
+!                 !   else
+!                 !      AA(coupler1(i),coupler2(i)) =
+!                 !   endif
+!                 !!   write(6,*) vi,ji,vf,jf,a(vi,ji,vf,jf)
+!                 !enddo
+      
+      
       subroutine tableh2(a,ivmax)
 
         implicit real*8(a-h,o-z)
