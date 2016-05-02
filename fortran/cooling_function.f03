@@ -1,15 +1,23 @@
 program cooling_function
 
-    use types_and_parameters, only: nlev, energy_lev, vmax, jmax, radiative_coeffs
-    use energy_levels, only: reading_data
-    use radiation, only: reading_data_radiative
+    use types_and_parameters, only: nlev, energy_lev, vmax, jmax, &
+                                    ntrans, ntemp,               &
+                                    radiative_coeffs, collisional_coeffs
+    use energy_levels, only: reading_data_energies
+    use radiation, only: reading_data_radiative    
+    use collisions, only: reading_data_collisions
     
     type(energy_lev) :: e 
     type(radiative_coeffs) :: a21, b21, b12
+    type(collisional_coeffs) :: rr
 
-    call reading_data_radiative(e, a21)
-
-
+!    call reading_data_radiative(e, a21)
+    
+    call reading_data_collisions(e, rr)
+    
+   
+!    print*, rr
+    
 
 ! TEST READING ENERGY LEVELS
 !    call reading_data(e)

@@ -1,9 +1,8 @@
 module radiation
-
+    
     use energy_levels
-    use types_and_parameters, only: jmax, radiative_coeffs
-    
-    
+    use types_and_parameters, only: jmax, radiative_coeffs, vi, ji, vf, jf
+
     ! in this module the reading, indexes arrangement and calculations of
     ! stimulated coefficients are performed, starting from the data by
     ! Wolniewicz et al 1998
@@ -13,21 +12,19 @@ module radiation
     contains
 
       subroutine reading_data_radiative(e, a21)
-                 use energy_levels, only: energy_lev
-                 use types_and_parameters, only: jmax, nlev, vi, ji, vf, jf
+                 use energy_levels, only: reading_data_energies
+                 use types_and_parameters, only: jmax, nlev, vi, ji, &
+                                                  vf, jf, energy_lev
  
-                 type(radiative_coeffs) :: a21, b21, b12
+                 type(radiative_coeffs) :: a21
                  type(energy_lev) :: e 
                  integer, dimension(0:jmax)                  :: ivmax
-                 integer, dimension(:), allocatable          :: coupler1, coupler2 
+!                 integer, dimension(:), allocatable          :: coupler1, coupler2 
  
- 
-                 call reading_data(e)
+                 call reading_data_energies(e)
 
-                
-                
                  call tableh2(a21%reading,ivmax)
-                 
+
                  a21%ntransrad = 0
                 !write(6,'(a24,2x,e10.4)') 'a(-1:1,0:14,0:14,0:jmax)',a(1,0,1,0)
                  do i0=0,jmax
@@ -78,7 +75,7 @@ module radiation
                       jf=a21%jfr(i)
                       a21%M(a21%couple1r(i),a21%couple2r(i)) = a21%reading(vi,ji,vf,jf)
                   enddo
- 
+                !print*, ivmax
       end subroutine reading_data_radiative
 
 

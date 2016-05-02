@@ -5,8 +5,7 @@ module types_and_parameters
     real*8, parameter                           :: hp = 6.62607004e-34 !J s
 
     !GENERAL PURPOSE INDEXES DEFITION 
-    integer                                     :: i,l,m,n,i0,i1,i2,i3,upper,lower
-    integer, allocatable, dimension(:)          :: v,j,vp,jp   ! labels for the coll transitions
+    integer                                     :: i,l,m,n,i0,i1,i2,i3,upper,lower, it
     integer                                     :: vi,ji,vf,jf ! integers for identifying coll transitions
 
     ! ENERGY LEVELS
@@ -43,11 +42,11 @@ module types_and_parameters
     type :: collisional_coeffs
         integer  :: ntemp   ! # of temperatures @ which collisional data are given
         real*8, dimension(1:ntemp)  :: temp    ! temperatures @ which collisional data are given
-        integer, dimension(1:ntrans)  :: vi, ji, vf, jf ! initial and final rovibrational levels (transitions          
+        integer, dimension(1:ntrans)  :: vic, jic, vfc, jfc ! initial and final rovibrational levels (transitions          
                                                         ! order)
-        real*8  :: reading(1:nlev,1:nlev, 1:ntemp)
-        real*8  :: detailedbalance(1:nlev,1:nlev, 1:ntemp)
-        integer :: couple1(1:ntrans),couple2(1:ntrans)
+        real*8  :: reading(0:vimax, 0:jimax, 0:vfmax, 0:jfmax, 1:ntemp)
+        integer :: couple1c(1:ntrans),couple2c(1:ntrans)
+        real*8  :: matrix(1:nlev,1:nlev, 1:ntemp) ! n.b.: it includes the detailed balance of the read data
     end type collisional_coeffs
 
 

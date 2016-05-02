@@ -3,13 +3,11 @@ module energy_levels
        ! module that reads, converts to the appropriate units and 
        ! and store the energy levels of H2 (rovibrational); 
        ! input data from Stancil
-    use types_and_parameters, only: nlev, jmax, vmax, energy_lev
-
-    type(energy_lev) :: e
 
     contains
 
-        subroutine reading_data(e)
+        subroutine reading_data_energies(e)
+                   use types_and_parameters, only: nlev, jmax, vmax, energy_lev
                    type(energy_lev) :: e
                    open (21, file='Read/H2Xvjlevels.cs', status = 'unknown')
                    open (23, file='Read/lev_labels', status = 'unknown')
@@ -31,9 +29,9 @@ module energy_levels
                 !   write(6,'(i3,2x,i2,2x,i2,2x,e10.4)') i, vl(i), jl(i), en(vl(i),jl(i))
             enddo
             !conversion cm-1 -->  Joule
-            !e%en = e%en*1.98630d-23
-            !e%ene = e%ene*1.98630d-23
+            e%en = e%en*1.98630d-23
+            e%ene = e%ene*1.98630d-23
             return
-        end subroutine reading_data
+        end subroutine reading_data_energies
 
 end module energy_levels

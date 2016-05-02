@@ -7,4 +7,4 @@
 cooling_glover.f90 
 *.mod
 *.o
-
+fort.*
