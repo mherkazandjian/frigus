@@ -1,8 +1,9 @@
 module energy_levels
-
+                   
        ! module that reads, converts to the appropriate units and 
        ! and store the energy levels of H2 (rovibrational); 
        ! input data from Stancil
+       use types_and_parameters, only: nlev, jmax, vmax, energy_lev
 
     contains
 

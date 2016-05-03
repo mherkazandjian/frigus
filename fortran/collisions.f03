@@ -32,10 +32,10 @@ module collisions
                  rr%reading = 0.d0
                  rr%matrix = 0.d0
                  rr%temp = (/ (i, i=100,5000,100) /)
-                 print*, rr%temp
+                 ! print*, rr%temp
 
                  
-                 call reading_data_energies(e)
+!                 call reading_data_energies(e)
                  
                  open (20, file='Read/Rates_H_H2.dat', status = 'unknown')
 

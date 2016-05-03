@@ -11,7 +11,9 @@ program cooling_function
     type(radiative_coeffs) :: a21, b21, b12
     type(collisional_coeffs) :: rr
 
-!    call reading_data_radiative(e, a21)
+    call reading_data_energies(e)
+    
+    call reading_data_radiative(e, a21)
     
     call reading_data_collisions(e, rr)
     
@@ -36,11 +38,11 @@ program cooling_function
 !    enddo
 
 ! TEST EINSTEIN COEFFICIENTS AND TRANSITIONS
-!    do i = 1, nlev
-!       do j = 1, nlev
-!           write(6,'(2(i3,2x), e14.8)') i, j, a21%M(i,j)
-!       enddo
-!    enddo
+!  do i=1,a21%ntransrad
+!     write(6,'(4(i2,2x),e14.5)') a21%vir(i), a21%jir(i), &
+!                                 a21%vfr(i), a21%jfr(i), &
+!                   a21%M(a21%couple1r(i),a21%couple2r(i))
+!  enddo
 
 ! TEST COLLISIONAL COEFFICIENTS
 ! check of the coefficients compared to the read data by François + 
@@ -55,7 +57,6 @@ program cooling_function
 !                          (rr%matrix(rr%couple1c(i),rr%couple2c(i),it)-     &
 !                      rr%matrix(rr%couple2c(i),rr%couple1c(i),it))*1.d6/    &
 !                      (rr%matrix(rr%couple1c(i),rr%couple2c(i),it)*1.d6)
-!        enddo
 !    enddo
 
 

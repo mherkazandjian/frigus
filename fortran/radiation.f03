@@ -1,13 +1,15 @@
 module radiation
     
     use energy_levels
-    use types_and_parameters, only: jmax, radiative_coeffs, vi, ji, vf, jf
+    use types_and_parameters, only: jmax, vi, ji, vf, jf, &
+                                    radiative_coeffs, energy_lev
 
     ! in this module the reading, indexes arrangement and calculations of
     ! stimulated coefficients are performed, starting from the data by
     ! Wolniewicz et al 1998
 
     type(radiative_coeffs) :: a21, b21, b12
+    type(energy_lev) :: e
     
     contains
 
@@ -19,12 +21,15 @@ module radiation
                  type(radiative_coeffs) :: a21
                  type(energy_lev) :: e 
                  integer, dimension(0:jmax)                  :: ivmax
-!                 integer, dimension(:), allocatable          :: coupler1, coupler2 
- 
-                 call reading_data_energies(e)
 
+
+                 a21%reading = 0.d0
+                 a21%M = 0.d0
+                 
                  call tableh2(a21%reading,ivmax)
 
+                 !print*, e%en
+                 
                  a21%ntransrad = 0
                 !write(6,'(a24,2x,e10.4)') 'a(-1:1,0:14,0:14,0:jmax)',a(1,0,1,0)
                  do i0=0,jmax
@@ -32,7 +37,7 @@ module radiation
                         do i2=0,14
                             do i3=-1,1
                                if(a21%reading(i3,i2,i1,i0).ne.0.d0) then
-                               a21%ntransrad = a21%ntransrad + 1                               
+                               a21%ntransrad = a21%ntransrad + 1
                                 write(22,'(4(i2,2x),e10.4)') i1,i0,i2,i0+i3,a21%reading(i3,i2,i1,i0)
                                endif
                             enddo
@@ -47,7 +52,7 @@ module radiation
 ! 
                  do i=1,a21%ntransrad
                      read(22,*)  a21%vir(i),a21%jir(i),a21%vfr(i),a21%jfr(i), &
-                     a21%reading(a21%vir(i),a21%jir(i),a21%vfr(i),a21%jfr(i))
+                     a21%reading(a21%jfr(i),a21%vfr(i),a21%vir(i),a21%jir(i))
                  !   write(6,'(4(i2,2x),e10.4)')  vrad(i),jrad(i),vprad(i),jprad(i), &
                  !              b   
                      vi=a21%vir(i)
@@ -73,7 +78,7 @@ module radiation
                       ji=a21%jir(i)
                       vf=a21%vfr(i)
                       jf=a21%jfr(i)
-                      a21%M(a21%couple1r(i),a21%couple2r(i)) = a21%reading(vi,ji,vf,jf)
+                      a21%M(a21%couple1r(i),a21%couple2r(i)) = a21%reading(jf,vf,vi,ji)
                   enddo
                 !print*, ivmax
       end subroutine reading_data_radiative
