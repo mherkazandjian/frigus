@@ -82,18 +82,6 @@ module collisions
                  enddo
 !                 print*, kb
 
-                 !check of the coefficients compared to the read data by François
-                 do i=1, ntrans
-                     do it=1, ntemp
-                        write(6, '(2(i3,2x), 4(e14.5))') rr%couple1c(i),rr%couple2c(i),   &
-                                                     rr%temp(it),                         &
-                                        rr%matrix(rr%couple1c(i),rr%couple2c(i),it),      &
-                                        rr%matrix(rr%couple2c(i),rr%couple1c(i),it),      &
-                                        (rr%matrix(rr%couple1c(i),rr%couple2c(i),it)-     &
-                                         rr%matrix(rr%couple2c(i),rr%couple1c(i),it))/    &
-                                         rr%matrix(rr%couple1c(i),rr%couple2c(i),it)
-                     enddo
-                 enddo
 
                  !units conversion: cm3 s-1 -> m3 s-1
                  rr%matrix = rr%matrix*1.d-6
