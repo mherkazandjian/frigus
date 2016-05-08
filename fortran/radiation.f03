@@ -14,19 +14,20 @@ module radiation
     contains
 
       subroutine reading_data_radiative(e, a21)
-                 use energy_levels, only: reading_data_energies
-                 use types_and_parameters, only: jmax, nlev, vi, ji, &
-                                                  vf, jf, energy_lev
+                 use types_and_parameters, only: jmax, nlev,       &
+                                                 vi, ji,           &
+                                                 vf, jf,           &
+                                                 energy_lev
  
                  type(radiative_coeffs) :: a21
                  type(energy_lev) :: e 
-                 integer, dimension(0:jmax)                  :: ivmax
+                 integer, dimension(0:jmax)  :: ivmax
 
 
                  a21%reading = 0.d0
                  a21%M = 0.d0
                  
-                 call tableh2(a21%reading,ivmax)
+                 call tableh2(a21%reading, ivmax)
 
                  !print*, e%en
                  
@@ -81,24 +82,10 @@ module radiation
                       a21%M(a21%couple1r(i),a21%couple2r(i)) = a21%reading(jf,vf,vi,ji)
                   enddo
                 !print*, ivmax
+                return
       end subroutine reading_data_radiative
 
 
-! 
-!                 !do i=1,nradtrans
-!                 !   vi=vrad(i)
-!                 !   ji=jrad(i)
-!                 !   vf=vprad(i)
-!                 !   jf=jprad(i)
-!                 !   if(en(vi,ji).gt.en(vf,jf)) then 
-!                 !      AA(coupler1(i),coupler2(i)) = a(vi,ji,vf,jf)+
-!                 !   else
-!                 !      AA(coupler1(i),coupler2(i)) =
-!                 !   endif
-!                 !!   write(6,*) vi,ji,vf,jf,a(vi,ji,vf,jf)
-!                 !enddo
-      
-      
       subroutine tableh2(a,ivmax)
 
         implicit real*8(a-h,o-z)
@@ -170,7 +157,106 @@ module radiation
         return
       end subroutine tableh2
 
-      
+      subroutine stimulated_downwards(energy, a21, b21)
+                 ! this subroutine returns the Einstein coefficients
+                 ! for downward stimulated transitions
+                 ! input: a21
+                 ! output: b21 = c**2/(2*hp*nu)
+                 use types_and_parameters, only: hp, c, nlev,  &
+                                                 vi, ji,       &
+                                                 vf, jf,       &
+                                                 energy_lev,   &
+                                                 ini, fin
+
+                 type(radiative_coeffs) :: a21, b21
+                 type(energy_lev) :: energy
+
+                 b21%M = 0.d0
+                 do ini = 1, nlev
+                    do fin = 1, nlev
+                        if((energy%ene(ini)-energy%ene(fin)).lt.0.d0) then  ! according to the ordering in the  
+                                                                            ! energy file downwards => E2 - E1 < 0
+                           if(ini.ne.fin) then
+                                b21%M(ini, fin) = c**2/(2.d0*hp*(energy%freq(ini, fin))**3)* &
+                                                 a21%M(ini,fin)
+                           endif
+                        endif
+                    enddo
+                enddo
+                return
+      end subroutine stimulated_downwards 
+
+      subroutine downward_radiative(energy, Tr, a21, r21)
+                 use types_and_parameters, only: energy_lev, radiative_coeffs, &
+                                                 ini, fin
+                 real*8 Tr
+                 type(energy_lev) :: energy
+                 type(radiative_coeffs) :: a21, r21
+                 
+                 print*, 'Trad read from types module:', Tr
+                 
+                 r21%M = 0.d0
+                 
+                 call stimulated_downwards(energy, a21, b21)
+
+                 do ini = 1, nlev
+                     do fin = 1, nlev
+                        if((energy%ene(ini)-energy%ene(fin)).lt.0.d0) then  ! according to the ordering in the  
+                                                                            ! energy file downwards => E2 - E1 < 0
+                            if(ini.ne.fin) then
+                                r21%M(ini, fin) = a21%M(ini, fin) +    &
+                                             b21%M(ini, fin) *    &
+                                             planck(energy%freq(ini, fin), Tr)
+                            !print*, planck(energy%freq(ini, fin), Tr)
+                            endif
+                        endif
+                     enddo
+                 enddo
+                 return
+      end subroutine downward_radiative
+
+      subroutine stimulated_upwards(energy, a21, b12)
+                 use types_and_parameters, only: hp, nlev,   &
+                                                 vi, ji,     &
+                                                 vf, jf,     &
+                                                 energy_lev, &
+                                                 ini, fin
+                 integer ::  g1, g2
+                 type(radiative_coeffs) :: a21, b21, b12
+                 type(energy_lev) :: energy
+
+                 b12%M = 0.d0
+                 
+                 call stimulated_downwards(energy, a21, b21)
+                 !print*, 'a21%M', a21%M
+                 !print*, 'b21%M', b21%M
+                 
+                 do ini = 1, nlev
+                     do fin = 1, nlev
+                             if(energy%ene(ini).lt.energy%ene(fin)) then
+                                if(energy%jl(ini).ne.0) then
+                                    b12%M(ini, fin) = (energy%jl(fin)/energy%jl(ini))*     &
+                                                        b21%M(fin, ini)
+                                !print*, b12%M(ini, fin), b21%M(ini, fin), b21%M(fin, ini)
+                                endif
+                             endif
+                     enddo
+                 enddo
+                 !print*, 'b12%M', b12%M
+                 
+      end subroutine stimulated_upwards
+
+
+
+      real function planck(ni, T)
+    !    computes the planck function:
+    !    inputs: frequencies, Trad
+         use types_and_parameters, only: c, kb, hp
+         real*8 :: x, y, ni, T
+         x = hp * ni / (kb * T)
+         y = (2.d0*hp*ni**3)/c**2
+         planck = y* 1.0d0 / (dexp(x) - 1.0d0)
+         end      
       
       real function planckOccupation(hp, nu, kb, T)
     !    computes the planck function for input parameters.
@@ -181,8 +267,20 @@ module radiation
          planckOccupation = 1.0d0 / (dexp(x) - 1.0d0)
          end
 
-         
-         
-    
+! 
+!                 !do i=1,nradtrans
+!                 !   vi=vrad(i)
+!                 !   ji=jrad(i)
+!                 !   vf=vprad(i)
+!                 !   jf=jprad(i)
+!                 !   if(en(vi,ji).gt.en(vf,jf)) then 
+!                 !      AA(coupler1(i),coupler2(i)) = a(vi,ji,vf,jf)+
+!                 !   else
+!                 !      AA(coupler1(i),coupler2(i)) =
+!                 !   endif
+!                 !!   write(6,*) vi,ji,vf,jf,a(vi,ji,vf,jf)
+!                 !enddo
+
+
     end module radiation
 

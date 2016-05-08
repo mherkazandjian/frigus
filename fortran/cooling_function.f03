@@ -1,23 +1,35 @@
 program cooling_function
 
-    use types_and_parameters, only: nlev, energy_lev, vmax, jmax, &
-                                    ntrans, ntemp,               &
-                                    radiative_coeffs, collisional_coeffs
+    use types_and_parameters, only: nlev, energy_lev, vmax, jmax,         &
+                                    ntrans, ntemp,                        &
+                                    radiative_coeffs, collisional_coeffs, &
+                                    Trad, ini, fin
+
     use energy_levels, only: reading_data_energies
-    use radiation, only: reading_data_radiative    
+    use radiation, only: reading_data_radiative, stimulated_downwards,      &
+                         downward_radiative, stimulated_upwards
     use collisions, only: reading_data_collisions
-    
-    type(energy_lev) :: e 
-    type(radiative_coeffs) :: a21, b21, b12
+
+    type(energy_lev) :: energy
+    type(radiative_coeffs) :: a21, b21, b12, r21
     type(collisional_coeffs) :: rr
 
-    call reading_data_energies(e)
+    call reading_data_energies(energy)
     
-    call reading_data_radiative(e, a21)
+    call reading_data_radiative(energy, a21)
     
-    call reading_data_collisions(e, rr)
+    call reading_data_collisions(energy, rr)
     
-   
+    call stimulated_downwards(energy, a21, b21)
+    
+    call downward_radiative(energy, Trad, a21, r21)
+    
+    !call stimulated_upwards(energy, a21, b12)    
+    !print*, b12%M
+    
+    
+    
+    
 ! TEST READING ENERGY LEVELS
 !    call reading_data(e)
 !    do i = 0, vmax
@@ -29,7 +41,11 @@ program cooling_function
 ! TEST READING RADIATIVE COEFFICIENTS
 !    call reading_data_radiative(a21)
 !    print*, a21%ntransrad
-!    print*, a21%reading
+!    do ini = 1, nlev
+!        do fin = 1, nlev
+!           write(6,'(2(i3, 2x), e14.5)') ini, fin, a21%M(ini, fin)
+!        enddo
+!    enddo
 
 ! TEST COUPLES FOR RADIATIVE TRANSITIONS
 !    print*, a21%ntransrad, (jmax+1)*15*15*3
@@ -59,5 +75,13 @@ program cooling_function
 !                      (rr%matrix(rr%couple1c(i),rr%couple2c(i),it)*1.d6)
 !    enddo
 
+! TEST DOWNWARDS TRANSITIONS COEFFICIENTS
+ do ini = 1, nlev
+    do fin = 1, nlev
+       write(6,'(2(i3, 2x),4(e30.14))') ini, fin,                         &
+                                       a21%M(ini, fin), b21%M(ini, fin), &
+                                       r21%M(ini, fin)
+    enddo
+enddo
 
 end program cooling_function
