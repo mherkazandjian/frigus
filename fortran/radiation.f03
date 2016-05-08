@@ -233,7 +233,8 @@ module radiation
                  
                  do ini = 1, nlev
                      do fin = 1, nlev
-                             if(energy%ene(ini).lt.energy%ene(fin)) then
+                        if((energy%ene(ini)-energy%ene(fin)).gt.0.d0) then  ! according to the ordering in the  
+                                                                            ! energy file downwards => E2 - E1 < 0                             
                                 if(energy%jl(ini).ne.0) then
                                     b12%M(ini, fin) = (energy%jl(fin)/energy%jl(ini))*     &
                                                         b21%M(fin, ini)

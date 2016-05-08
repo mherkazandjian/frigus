@@ -24,7 +24,7 @@ program cooling_function
     
     call downward_radiative(energy, Trad, a21, r21)
     
-    !call stimulated_upwards(energy, a21, b12)    
+    call stimulated_upwards(energy, a21, b12)
     !print*, b12%M
     
     
@@ -76,12 +76,13 @@ program cooling_function
 !    enddo
 
 ! TEST DOWNWARDS TRANSITIONS COEFFICIENTS
- do ini = 1, nlev
-    do fin = 1, nlev
-       write(6,'(2(i3, 2x),4(e30.14))') ini, fin,                         &
-                                       a21%M(ini, fin), b21%M(ini, fin), &
-                                       r21%M(ini, fin)
-    enddo
-enddo
+! do ini = 1, nlev
+!    do fin = 1, nlev
+!       write(6,'(2(i3, 2x),4(e30.14))') ini, fin,                         &
+!                                       a21%M(ini, fin), b21%M(ini, fin),  &
+!                                       r21%M(ini, fin),                   & 
+!                                       b21%M(fin, ini) 
+!    enddo
+! enddo
 
 end program cooling_function
