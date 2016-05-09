@@ -6,12 +6,12 @@ program cooling_function
                                     Trad, ini, fin
 
     use energy_levels, only: reading_data_energies
-    use radiation, only: reading_data_radiative, stimulated_downwards,      &
-                         downward_radiative, stimulated_upwards
+    use radiation, only: reading_data_radiative,                          &
+                         radiative_downwards, radiative_upwards
     use collisions, only: reading_data_collisions
 
     type(energy_lev) :: energy
-    type(radiative_coeffs) :: a21, b21, b12, r21
+    type(radiative_coeffs) :: a21, b21, b12, r21, r12
     type(collisional_coeffs) :: rr
 
     call reading_data_energies(energy)
@@ -20,11 +20,9 @@ program cooling_function
     
     call reading_data_collisions(energy, rr)
     
-    call stimulated_downwards(energy, a21, b21)
+    call radiative_downwards(energy, Trad, a21, b21, r21)
     
-    call downward_radiative(energy, Trad, a21, r21)
-    
-    call stimulated_upwards(energy, a21, b12)
+    call radiative_upwards(energy, Trad, a21, b12, r12)
     !print*, b12%M
     
     
@@ -78,10 +76,14 @@ program cooling_function
 ! TEST DOWNWARDS TRANSITIONS COEFFICIENTS
 ! do ini = 1, nlev
 !    do fin = 1, nlev
-!       write(6,'(2(i3, 2x),4(e30.14))') ini, fin,                         &
+!       write(6,'(2(i3, 2x),5(e24.14))') ini, fin,                         &
 !                                       a21%M(ini, fin), b21%M(ini, fin),  &
-!                                       r21%M(ini, fin),                   & 
-!                                       b21%M(fin, ini) 
+!                                       r21%M(ini, fin),                   &
+!                                       b12%M(ini, fin),                   &
+!                                       r12%M(ini, fin)
+!                                       ! to have them into the same line although for the reverse transition:
+!                                       !b12%M(fin, ini),                   &
+!                                       !r12%M(fin, ini)                                       
 !    enddo
 ! enddo
 
