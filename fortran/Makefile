@@ -1,13 +1,21 @@
 #FFLAGS = -Wall
 FC     = gfortran
-#FC     = ifort
 
-target = cf.f03
+target = level_population.f03
 
 default:
-	$(FC) $(target) -llapack -L/usr/lib/lapack -lblas -L/usr/lib/libblas
+	#$(FC) $(target) -llapack -L/usr/lib/lapack -lblas -L/usr/lib/libblas
+	$(FC) -O -Wall -fcheck=all -g -fbacktrace $(target) types.o energy_levels.o radiation.o collisions.o matrix_construction.o
+
+object:
+	 $(FC) -c types.f03
+	 $(FC) -c energy_levels.f03
+	 $(FC) -c radiation.f03
+	 $(FC) -c collisions.f03
+	 $(FC) -c matrix_construction.f03
+
 
 
 clean:
-	rm -fvr a.out
+	rm -fvr a.out *.o *.mod
 

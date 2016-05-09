@@ -58,5 +58,8 @@ module types_and_parameters
         real*8  :: matrix(1:nlev,1:nlev, 1:ntemp) ! n.b.: it includes the detailed balance of the read data
     end type collisional_coeffs
 
+    type :: reaction_matrix
+        real*8 :: A(1:nlev,1:nlev)        
+    end type reaction_matrix
 
 end module

@@ -1,18 +1,22 @@
-program cooling_function
+program level_population
 
     use types_and_parameters, only: nlev, energy_lev, vmax, jmax,         &
                                     ntrans, ntemp,                        &
                                     radiative_coeffs, collisional_coeffs, &
+                                    reaction_matrix,                      &
                                     Trad, ini, fin
-
+                                    
     use energy_levels, only: reading_data_energies
-    use radiation, only: reading_data_radiative,                          &
-                         radiative_downwards, radiative_upwards
-    use collisions, only: reading_data_collisions
+    use radiation,     only: reading_data_radiative,                      &
+                             radiative_downwards, radiative_upwards
+    use collisions,    only: reading_data_collisions
 
+    use matrix_construction, only: matrix_builder
+    
     type(energy_lev) :: energy
     type(radiative_coeffs) :: a21, b21, b12, r21, r12
     type(collisional_coeffs) :: rr
+    type(reaction_matrix) :: coll_rad_matrix
 
     call reading_data_energies(energy)
     
@@ -25,6 +29,7 @@ program cooling_function
     call radiative_upwards(energy, Trad, a21, b12, r12)
     !print*, b12%M
     
+    call matrix_builder(a21, b21, r21, b12, r12, rr, coll_rad_matrix)
     
     
     
@@ -87,4 +92,4 @@ program cooling_function
 !    enddo
 ! enddo
 
-end program cooling_function
+end program level_population
