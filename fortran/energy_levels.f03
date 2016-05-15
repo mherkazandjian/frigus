@@ -4,6 +4,7 @@ module energy_levels
        ! and store the energy levels of H2 (rovibrational); 
        ! input data from Stancil
        use types_and_parameters, only: hp, nlev, jmax, vmax, energy_lev
+       use sorting, only: piksrt
 
     contains
 
@@ -12,6 +13,7 @@ module energy_levels
                                                    energy_lev, hp,   &
                                                    ini, fin
                    type(energy_lev) :: e
+                   integer, dimension(1:nlev) :: temp1, temp2
                    
                    open (21, file='Read/H2Xvjlevels.cs', status = 'unknown')
                    open (23, file='Read/lev_labels', status = 'unknown')
@@ -43,6 +45,16 @@ module energy_levels
                         do fin = 1, nlev
                             e%freq(ini, fin) = dabs(e%ene(ini)-e%ene(fin))/hp
                         enddo
+                    enddo
+
+                    ! ordering the levels according to their energies 
+                    ! (for subsequent construction of the matrix in the 
+                    ! linear system of equations to be solved)
+                    call piksrt(nlev, e)
+
+                    do i=1,nlev
+                       write(6,'(i3,2x,2(i2,2x),e10.4)') i, e%vl(i), e%jl(i), &
+                                                            e%ene(i)
                     enddo
 
                     return

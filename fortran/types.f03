@@ -11,9 +11,9 @@ module types_and_parameters
     integer                                     :: vi, ji, vf, jf ! integers for identifying coll transitions
 
     ! GAS DENSITY AND RADIATION TEMPERATURE
-!    integer, parameter                          :: ndensity = 5   ! dimension of the arra of density
+    integer, parameter                          :: ndensity = 1   ! dimension of the arra of density
     real*8, parameter                           :: Trad = 30.d0        ! radiation temperature in kelvin
-!   real*8, parameter, dimension(1:ndensity)    :: nb =              ! baryon density
+    real*8, parameter, dimension(1:ndensity)    :: nb = 1.d14             ! baryon density
     
     ! ENERGY LEVELS
     integer, parameter :: nlev = 301
@@ -29,8 +29,8 @@ module types_and_parameters
     
     type :: energy_lev
         real*8, dimension(:,:), allocatable         :: en         ! per pair (v,j)
-        real*8, dimension(:), allocatable           :: ene        ! labelled according to the order in the file
-        real*8, dimension(:,:), allocatable          :: freq       ! frequencies, obtained as differences between 
+        real*8, dimension(:),   allocatable         :: ene        ! labelled according to the order in the file
+        real*8, dimension(:,:), allocatable         :: freq       ! frequencies, obtained as differences between 
                                                                   !              each couple of energy levels
         integer, allocatable, dimension(:)          :: vl, jl     ! labels for the levels (for the final ordering)
         integer  :: jmax
@@ -61,5 +61,9 @@ module types_and_parameters
     type :: reaction_matrix
         real*8 :: A(1:nlev,1:nlev)        
     end type reaction_matrix
+    
+    type :: population
+        real*8 :: pop(1:nlev)
+    end type population
 
 end module

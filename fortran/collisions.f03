@@ -31,8 +31,8 @@ module collisions
                  ! initializing the arrays
                  rr%reading = 0.d0
                  rr%matrix = 0.d0
-                 rr%temp = (/ (i, i=100,5000,100) /)
-                 ! print*, rr%temp
+                 rr%temp = [ (i, i=100,5000,100) ]
+                 !print*, rr%temp
 
                  
 !                 call reading_data_energies(e)
