@@ -27,17 +27,11 @@ module sorting
             arr%ene(in+1) = arr%ene(in)
             arr%vl(in+1) = arr%vl(in)
             arr%jl(in+1) = arr%jl(in)
-            !print*, 'case 2', i+1, j
-            !temp1(i+1) = arr%vl(i)
-            !temp2(i+1) = arr%jl(i)
          enddo
          in = 0
 10       arr%ene(in+1) = a          !Insert it.
          arr%vl(in+1) = b
          arr%jl(in+1) = c
-         !print*, 'case 1', i+1, j
-         !temp1(i+1) = arr%vl(j)
-         !temp2(i+1) = arr%jl(j)
     enddo
     return
     END

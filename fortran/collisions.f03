@@ -32,8 +32,6 @@ module collisions
                  rr%reading = 0.d0
                  rr%matrix = 0.d0
                  rr%temp = [ (i, i=100,5000,100) ]
-                 !print*, rr%temp
-
                  
 !                 call reading_data_energies(e)
                  
@@ -43,8 +41,10 @@ module collisions
                     read(20,*) 
                  enddo
                  do i=1,ntrans
+                    !print*, i
                     read(20,*) rr%vic(i),rr%jic(i),rr%vfc(i),rr%jfc(i),      &
-                    (rr%reading(rr%vic(i),rr%jic(i),rr%vfc(i),rr%jfc(i),it), it=1,ntemp)
+                    (rr%reading(rr%vic(i),rr%jic(i),rr%vfc(i),rr%jfc(i),it), &
+                     it=1,ntemp)
                     vi=rr%vic(i)
                     ji=rr%jic(i)
                     vf=rr%vfc(i)

@@ -80,18 +80,18 @@ program level_population
 !                      (rr%matrix(rr%couple1c(i),rr%couple2c(i),it)*1.d6)
 !    enddo
 
-! TEST DOWNWARDS TRANSITIONS COEFFICIENTS
-! do ini = 1, nlev
-!    do fin = 1, nlev
-!       write(6,'(2(i3, 2x),5(e24.14))') ini, fin,                         &
-!                                       a21%M(ini, fin), b21%M(ini, fin),  &
-!                                       r21%M(ini, fin),                   &
-!                                       b12%M(ini, fin),                   &
-!                                       r12%M(ini, fin)
-!                                       ! to have them into the same line although for the reverse transition:
-!                                       !b12%M(fin, ini),                   &
-!                                       !r12%M(fin, ini)                                       
-!    enddo
-! enddo
+! TEST RADIATIVE TRANSITIONS COEFFICIENTS
+ do ini = 1, nlev
+    do fin = 1, nlev
+       write(6,'(2(i3, 2x),5(e24.14))') ini, fin,                         &
+                                       a21%M(ini, fin), b21%M(ini, fin),  &
+                                       r21%M(ini, fin),                   &
+                                       !b12%M(ini, fin),                   &
+                                       !r12%M(ini, fin)
+                                       ! to have them into the same line although for the reverse transition:
+                                       b12%M(fin, ini),                   &
+                                       r12%M(fin, ini)                                       
+    enddo
+ enddo
 
 end program level_population

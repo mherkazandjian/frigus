@@ -13,7 +13,6 @@ module energy_levels
                                                    energy_lev, hp,   &
                                                    ini, fin
                    type(energy_lev) :: e
-                   integer, dimension(1:nlev) :: temp1, temp2
                    
                    open (21, file='Read/H2Xvjlevels.cs', status = 'unknown')
                    open (23, file='Read/lev_labels', status = 'unknown')
@@ -52,10 +51,13 @@ module energy_levels
                     ! linear system of equations to be solved)
                     call piksrt(nlev, e)
 
-                    do i=1,nlev
-                       write(6,'(i3,2x,2(i2,2x),e10.4)') i, e%vl(i), e%jl(i), &
-                                                            e%ene(i)
-                    enddo
+                    !do i=1,nlev
+                       !write(6,'(i3,2x,2(i2,2x),e10.4)') i, e%vl(i), e%jl(i), &
+                       !                                     e%ene(i)
+                       !do j=1,nlev
+                       ! write(6,'(e10.4)') e%freq(i, j)
+                       !enddo
+                    !enddo
 
                     return
         end subroutine reading_data_energies

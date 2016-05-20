@@ -22,7 +22,7 @@ module ode_contruction
                integer :: i, j
                
                ydot = 0.d0
-               print*, 'nlev', nlev
+               !print*, 'nlev', nlev
                do it = 1, ntemp
                   do j = 1, nlev
                      do i = 1, nlev

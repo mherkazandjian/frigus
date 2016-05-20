@@ -5,8 +5,8 @@ module matrix_construction
     use types_and_parameters, only: nlev, energy_lev,                     &
                                     radiative_coeffs, collisional_coeffs, &
                                     reaction_matrix, population,          &
-                                    Trad,                                 &
-                                    ini, fin, it, ntemp
+                                    Trad, nb,                             &
+                                    row, col, it, ntemp
 
     contains
 
@@ -19,23 +19,37 @@ module matrix_construction
                type(population)         :: x
                
                 coll_rad_matrix%A = 0.d0
-                print*, 'nlev', nlev
+                !print*, 'nlev', nlev
                 do it = 1, ntemp
-                     do fin = 1, nlev
-                         do ini = 1, nlev
-                            if((energy%ene(ini)-energy%ene(fin)).lt.0.d0) then 
-                                                                  ! according to the ordering in the  
-                                                                  ! energy file downwards => E2 - E1 < 0                           
-                               coll_rad_matrix%A(ini, fin) = coll_rad_matrix%A(ini, fin)  +    &
-                                                             r21%M(ini,fin) * x%pop(ini)  +    &
-                                                             r12%M(ini, fin) * x%pop(ini) +    &
-                                                             nb * rr%matrix(ini, fin, itemp) * x%pop(ini)
-                            else
-                            
-                            endif
+                     do row = 1, nlev
+                         do col = 1, nlev
+!                            if((energy%ene(ini)-energy%ene(fin)).lt.0.d0) then 
+!                                                                  ! according to the ordering in the  
+!                                                                  ! energy file downwards => E2 - E1 < 0                           
+!                               coll_rad_matrix%A(ini, fin) = 0.d0                              &
+!                                                             coll_rad_matrix%A(ini, fin)  +    &
+!                                                             r21%M(ini,fin) * x%pop(ini)  +    &
+!                                                             r12%M(ini, fin) * x%pop(ini) +    &
+!                                                             nb * rr%matrix(ini, fin, it) * x%pop(ini)
+!                            else
+!
+!                            endif
                          enddo
                      enddo
                 enddo
+                ! TEST DOWNWARDS TRANSITIONS COEFFICIENTS
+                ! do ini = 1, nlev
+                !    do fin = 1, nlev
+                !       write(6,'(2(i3, 2x),5(e24.14))') ini, fin,                         &
+                !                                       a21%M(ini, fin), b21%M(ini, fin),  &
+                !                                       r21%M(ini, fin),                   &
+                !                                       b12%M(ini, fin),                   &
+                !                                       r12%M(ini, fin)
+                !              !to have them into the same line although for the reverse transition:
+                !                                       !b12%M(fin, ini),                   &
+                !                                       !r12%M(fin, ini)
+                !    enddo
+                ! enddo
 
     end subroutine matrix_builder
 

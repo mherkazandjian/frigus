@@ -7,7 +7,7 @@ module types_and_parameters
 
     !GENERAL PURPOSE INDEXES DEFITION 
     integer                                     :: i, l, m, n, i0, i1, i2, i3
-    integer                                     :: lower, upper, ini, fin, it
+    integer                                     :: lower, upper, ini, fin, row, col, it
     integer                                     :: vi, ji, vf, jf ! integers for identifying coll transitions
 
     ! GAS DENSITY AND RADIATION TEMPERATURE
@@ -23,7 +23,7 @@ module types_and_parameters
     integer, parameter :: vmax=14
 
     ! COLLISIONAL TRANSITIONS
-    integer, parameter :: vimax = 3, jimax = 18, vfmax = 2, jfmax = 17
+    integer, parameter :: vimax = 3, jimax = 18, vfmax = 3, jfmax = 17
     integer, parameter :: ntemp = 50, ntrans = 1653
 
     
@@ -41,6 +41,7 @@ module types_and_parameters
     type :: radiative_coeffs
         integer, dimension(0:jmax) :: ivmax
         real*8  :: reading(-1:1,0:14,0:14,0:jmax)
+        real*8, allocatable, dimension(:,:,:,:)  :: arranging
         real*8  :: M(1:nlev,1:nlev)
         integer :: ntransrad
         integer, allocatable, dimension(:) :: couple1r, couple2r 

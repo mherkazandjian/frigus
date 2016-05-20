@@ -15,8 +15,6 @@ module radiation
 
       subroutine reading_data_radiative(e, a21)
                  use types_and_parameters, only: jmax, nlev,       &
-                                                 vi, ji,           &
-                                                 vf, jf,           &
                                                  energy_lev
  
                  type(radiative_coeffs) :: a21
@@ -49,13 +47,14 @@ module radiation
                 allocate(a21%couple1r(1:a21%ntransrad),a21%couple2r(1:a21%ntransrad))
                 allocate(a21%vir(1:a21%ntransrad),a21%jir(1:a21%ntransrad))
                 allocate(a21%vfr(1:a21%ntransrad),a21%jfr(1:a21%ntransrad))
+                allocate(a21%arranging(0:vmax, 0:jmax, 0:vmax, 0:jmax))
                 ! print*, a21%ntransrad, (jmax+1)*15*15*3
 ! 
                  do i=1,a21%ntransrad
                      read(22,*)  a21%vir(i),a21%jir(i),a21%vfr(i),a21%jfr(i), &
-                     a21%reading(a21%jfr(i),a21%vfr(i),a21%vir(i),a21%jir(i))
-                 !   write(6,'(4(i2,2x),e10.4)')  vrad(i),jrad(i),vprad(i),jprad(i), &
-                 !              b   
+                     a21%arranging(a21%vir(i),a21%jir(i),a21%vfr(i),a21%jfr(i))
+                     !write(6,'(4(i3,2x),e10.4)')  a21%vir(i),a21%jir(i),a21%vfr(i),a21%jfr(i), &
+                     !a21%arranging(a21%vir(i),a21%jir(i),a21%vfr(i),a21%jfr(i))
                      vi=a21%vir(i)
                      ji=a21%jir(i)
                      vf=a21%vfr(i)
@@ -79,7 +78,8 @@ module radiation
                       ji=a21%jir(i)
                       vf=a21%vfr(i)
                       jf=a21%jfr(i)
-                      a21%M(a21%couple1r(i),a21%couple2r(i)) = a21%reading(jf,vf,vi,ji)
+                      !a21%M(a21%couple1r(i),a21%couple2r(i)) = a21%reading(jf,vf,vi,ji)
+                      a21%M(a21%couple1r(i),a21%couple2r(i)) = a21%arranging(vi,ji,vf,jf)
                   enddo
                 !print*, ivmax
                 return
@@ -163,8 +163,6 @@ module radiation
                  ! input: a21
                  ! output: b21 = c**2/(2*hp*nu)
                  use types_and_parameters, only: hp, c, nlev,  &
-                                                 vi, ji,       &
-                                                 vf, jf,       &
                                                  energy_lev,   &
                                                  ini, fin
 
@@ -187,6 +185,13 @@ module radiation
                                 r21%M(ini, fin) = a21%M(ini, fin) +    &
                                                   b21%M(ini, fin) *    &
                                              planck(energy%freq(ini, fin), Tr)
+                                !write(6,'(a26, 2(i3,2x), (e16.10,2x), a8, 3(e16.10,2x))') 'from radiative downwards: ', &
+                                !                                         ini, fin,                                      &
+                                !                                         b21%M(ini, fin),                               &
+                                !                                         'planck: ',                                    &
+                                !                                         planck(energy%freq(ini, fin), Tr),             &
+                                !                                         r21%M(ini, fin),                               &
+                                !                                         a21%M(ini, fin)
                            endif
                         endif
                     enddo
@@ -196,12 +201,10 @@ module radiation
 
       subroutine radiative_upwards(energy, Tr, a21, b12, r12)
                  use types_and_parameters, only: hp, nlev,   &
-                                                 vi, ji,     &
-                                                 vf, jf,     &
                                                  energy_lev, &
                                                  ini, fin
                  real*8  :: Tr
-                 integer :: g1, g2
+                 real*8  :: g1, g2
                  type(radiative_coeffs) :: a21, b21, b12, r21, r12
                  type(energy_lev) :: energy
                  
@@ -218,14 +221,20 @@ module radiation
                         if((energy%ene(ini)-energy%ene(fin)).gt.0.d0) then  ! according to the ordering in the  
                                                                             ! energy file downwards => E2 - E1 < 0                             
                                 if(energy%jl(ini).ne.0) then
-                                   b12%M(ini, fin) = (energy%jl(fin)/energy%jl(ini))*     &
+                                   g2 = 2.*energy%jl(fin) + 1.
+                                   g1 = 2.*energy%jl(ini) + 1.
+                                   
+                                   b12%M(ini, fin) = (g2/g1)*     &
                                                         b21%M(fin, ini)
                                    r12%M(ini, fin) = b12%M(ini, fin)*                     &
                                                      planck(energy%freq(ini, fin), Tr)
                                 endif
-                                write(7,'(2(i3,2x),3(e24.14))') ini, fin, b12%M(ini, fin), &
-                                                        planck(energy%freq(ini, fin), Tr), &
-                                                                          r12%M(ini, fin)                                
+                                !write(6,'(a24, 2(i3,2x), (e10.4, 2x), a8, 2(e10.4,2x))')                 &
+                                !                                       'from radiative upwards: ', &
+                                !                                        ini, fin, b12%M(ini, fin), &
+                                !                                        'planck: ',                &
+                                !                                planck(energy%freq(ini, fin), Tr), &
+                                !                                        r12%M(ini, fin)
                              endif
                      enddo
                  enddo
@@ -239,18 +248,23 @@ module radiation
     !    computes the planck function:
     !    inputs: frequencies, Trad
          use types_and_parameters, only: c, kb, hp
-         real*8 :: x, y, ni, T
-         x = hp * ni / (kb * T)
-         y = (2.d0*hp*ni**3)/c**2
-         planck = y* 1.0d0 / (dexp(x) - 1.0d0)
+         real*8 :: xx, yy, ni, T
+         xx = hp * ni / (kb * T)
+         yy = (2.d0*hp*ni**3)/c**2
+         if(xx.lt.0.6739d3) then 
+            planck = yy* 1.0d0 / (dexp(xx) - 1.0d0)
+         else
+            planck = 1.d-250
+         endif
+         !write(6,'(a13, 3(e10.4, 2x), a8, e10.4)') 'from planck: ', xx, yy, ni, 'planck  ', planck
          end      
       
-      real function planckOccupation(hp, nu, kb, T)
+      real*8 function planckOccupation(hp, nu, kb, T)
     !    computes the planck function for input parameters.
     !    keywords: nu, T
          !PHYSICAL PARAMETERS
          real*8 :: kb, hp, x, nu, T
-         x = h * nu / (kb * T)
+         x = hp * nu / (kb * T)
          planckOccupation = 1.0d0 / (dexp(x) - 1.0d0)
          end
 
