@@ -50,15 +50,20 @@ module energy_levels
                     ! (for subsequent construction of the matrix in the 
                     ! linear system of equations to be solved)
                     call piksrt(nlev, e)
+                    
+                    e%ene = -e%ene   ! to revert the actual way the energies are given
+                                     ! Emax @ (v=0,j=0) --> Emin @ (v=0,j=0)
 
                     !do i=1,nlev
-                       !write(6,'(i3,2x,2(i2,2x),e10.4)') i, e%vl(i), e%jl(i), &
-                       !                                     e%ene(i)
-                       !do j=1,nlev
-                       ! write(6,'(e10.4)') e%freq(i, j)
-                       !enddo
+                    !   write(6,'(i3,2x,2(i2,2x),e10.4)') i, e%vl(i), e%jl(i), &
+                    !                                        e%ene(i)
+                    !   !do j=1,nlev
+                    !   ! write(6,'(e10.4)') e%freq(i, j)
+                    !   !enddo
                     !enddo
 
+                    
+                    
                     return
         end subroutine reading_data_energies
 

@@ -161,7 +161,7 @@ module radiation
                  ! this subroutine returns the Einstein coefficients
                  ! for downward stimulated transitions
                  ! input: a21
-                 ! output: b21 = c**2/(2*hp*nu)
+                 ! output: b21 = c**2/(2*hp*nu) a21
                  use types_and_parameters, only: hp, c, nlev,  &
                                                  energy_lev,   &
                                                  ini, fin
@@ -174,12 +174,13 @@ module radiation
 
                  b21%M = 0.d0
                  r21%M = 0.d0
-                 
+
                  do ini = 1, nlev
                     do fin = 1, nlev
-                        if((energy%ene(ini)-energy%ene(fin)).lt.0.d0) then  ! according to the ordering in the  
-                                                                            ! energy file downwards => E2 - E1 < 0
-                           if(ini.ne.fin) then
+                        if((energy%ene(ini)-energy%ene(fin)).gt.0.d0) then  ! according to the ordering in the  
+                                                                            ! energy file downwards, 
+                                                                            ! after the inversion "-" 
+                                                                            ! => E1 - E2  > 0 ( =>  E2 - E1 < 0)
                                 b21%M(ini, fin) = c**2/(2.d0*hp*(energy%freq(ini, fin))**3)* &
                                                   a21%M(ini,fin)
                                 r21%M(ini, fin) = a21%M(ini, fin) +    &
@@ -192,7 +193,6 @@ module radiation
                                 !                                         planck(energy%freq(ini, fin), Tr),             &
                                 !                                         r21%M(ini, fin),                               &
                                 !                                         a21%M(ini, fin)
-                           endif
                         endif
                     enddo
                 enddo
@@ -218,15 +218,19 @@ module radiation
                  
                  do ini = 1, nlev
                      do fin = 1, nlev
-                        if((energy%ene(ini)-energy%ene(fin)).gt.0.d0) then  ! according to the ordering in the  
-                                                                            ! energy file downwards => E2 - E1 < 0                             
-                                if(energy%jl(ini).ne.0) then
-                                   g2 = 2.*energy%jl(fin) + 1.
-                                   g1 = 2.*energy%jl(ini) + 1.
-                                   
-                                   b12%M(ini, fin) = (g2/g1)*     &
-                                                        b21%M(fin, ini)
-                                   r12%M(ini, fin) = b12%M(ini, fin)*                     &
+                        ! naming the indexes in the matrices as if this condition 
+                        ! were the alternative ("elseif") of the previous subroutine
+                        if((energy%ene(ini)-energy%ene(fin)).lt.0.d0) then  ! according to the ordering in the  
+                                                                            ! energy file upwards, 
+                                                                            ! after the inversion "-" 
+                                                                            ! => E1 - E2  < 0  (=>  E2 - E1 > 0)
+                                if(energy%jl(fin).ne.0) then
+                                   g2 = 2.*energy%jl(ini) + 1.
+                                   g1 = 2.*energy%jl(fin) + 1.
+
+                                   b12%M(fin, ini) = (g2/g1)*     &
+                                                        b21%M(ini, fin)
+                                   r12%M(fin, ini) = b12%M(fin, ini)*                     &
                                                      planck(energy%freq(ini, fin), Tr)
                                 endif
                                 !write(6,'(a24, 2(i3,2x), (e10.4, 2x), a8, 2(e10.4,2x))')                 &
@@ -256,7 +260,7 @@ module radiation
          else
             planck = 1.d-250
          endif
-         !write(6,'(a13, 3(e10.4, 2x), a8, e10.4)') 'from planck: ', xx, yy, ni, 'planck  ', planck
+         !write(6,'(a13, 3(e10.4, 2x), a8, e10.4, 2x, a2, 2x, e10.4))') 'from planck: ', xx, yy, ni, 'planck  ', planck, 'yy', yy
          end      
       
       real*8 function planckOccupation(hp, nu, kb, T)

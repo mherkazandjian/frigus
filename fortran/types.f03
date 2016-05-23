@@ -9,6 +9,7 @@ module types_and_parameters
     integer                                     :: i, l, m, n, i0, i1, i2, i3
     integer                                     :: lower, upper, ini, fin, row, col, it
     integer                                     :: vi, ji, vf, jf ! integers for identifying coll transitions
+    real*8                                      :: xm, ym
 
     ! GAS DENSITY AND RADIATION TEMPERATURE
     integer, parameter                          :: ndensity = 1   ! dimension of the arra of density
@@ -26,7 +27,7 @@ module types_and_parameters
     integer, parameter :: vimax = 3, jimax = 18, vfmax = 3, jfmax = 17
     integer, parameter :: ntemp = 50, ntrans = 1653
 
-    
+
     type :: energy_lev
         real*8, dimension(:,:), allocatable         :: en         ! per pair (v,j)
         real*8, dimension(:),   allocatable         :: ene        ! labelled according to the order in the file
@@ -60,7 +61,7 @@ module types_and_parameters
     end type collisional_coeffs
 
     type :: reaction_matrix
-        real*8 :: A(1:nlev,1:nlev)        
+        real*8 :: A(1:nlev,1:nlev)
     end type reaction_matrix
     
     type :: population

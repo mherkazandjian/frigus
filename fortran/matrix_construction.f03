@@ -2,66 +2,64 @@ module matrix_construction
 
     ! this module evaluates the terms that go in the matrix that contains all the collisional 
     ! and radiative contribution for the formation/destruction of each level 
-    use types_and_parameters, only: nlev, energy_lev,                     &
+    use types_and_parameters, only: nlev,                                 &
                                     radiative_coeffs, collisional_coeffs, &
                                     reaction_matrix, population,          &
                                     Trad, nb,                             &
-                                    row, col, it, ntemp
+                                    row, col, fin, it, ntemp, xm
 
     contains
 
-    subroutine matrix_builder(energy, a21, b21, r21, b12, r12, rr, coll_rad_matrix)
+    subroutine matrix_builder(rad, rr, coll_rad_matrix)
 
-               type(energy_lev)       :: energy
-               type(radiative_coeffs) :: a21, b21, b12, r21, r12
+               type(radiative_coeffs) :: rad
                type(collisional_coeffs) :: rr
                type(reaction_matrix)    :: coll_rad_matrix
-               type(population)         :: x
                
-                coll_rad_matrix%A = 0.d0
-                !print*, 'nlev', nlev
-                do it = 1, ntemp
-                     do row = 1, nlev
-                         do col = 1, nlev
-!                            if((energy%ene(ini)-energy%ene(fin)).lt.0.d0) then 
-!                                                                  ! according to the ordering in the  
-!                                                                  ! energy file downwards => E2 - E1 < 0                           
-!                               coll_rad_matrix%A(ini, fin) = 0.d0                              &
-!                                                             coll_rad_matrix%A(ini, fin)  +    &
-!                                                             r21%M(ini,fin) * x%pop(ini)  +    &
-!                                                             r12%M(ini, fin) * x%pop(ini) +    &
-!                                                             nb * rr%matrix(ini, fin, it) * x%pop(ini)
-!                            else
-!
-!                            endif
-                         enddo
+               coll_rad_matrix%A = 0.d0
+               
+               do it = 1, ntemp
+                  do row = 1, nlev
+                     do col = 1, nlev
+                        if(row.eq.col) then 
+                             do fin = 1, nlev
+                                if(row.ne.fin) then
+!                                  write(6,'(a2, i3, a1, i3, a6, i3, a1, i3, a1)')                    &
+!                                        'M(', row, ',', fin, ') = M(', row, ',', fin, ')'
+!                                      if(row.lt.fin) then
+!                                      write(6,'a5, i3, a1, i3, a5, i3, a1, i3, a4')                  &
+!                                        '-r12(', row, ',', fin, ') -c(',fin,',',row,')*nb'                                 
+                                 coll_rad_matrix%A(row,col) = coll_rad_matrix%A(row, col)   &
+                                                            -rad%M(row, fin)                &
+                                                            -rr%matrix(row, fin, it) * nb(1)
+                                  else
+                                 coll_rad_matrix%A(row,col) = coll_rad_matrix%A(row, col)   &
+                                                            + 0.d0
+                                endif
+                             enddo
+                        else   ! the upwards and downwards transitions are already 
+                               ! implemented in the proper way in the rr and rad matrix 
+                               ! according to the indexes
+                             coll_rad_matrix%A(row,col) = rad%M(row, col) + rr%matrix(row, col, it)*nb(1)
+!                        elseif(row.lt.col) then  ! upper triangular matrix -> downward transitions
+!                                 coll_rad_matrix%A(row,col) = rad%M(row, col) + rr%matrix(row, col, it)*nb(1)
+!                        elseif(row.gt.col) then
+!                                 coll_rad_matrix%A(row,col) = rad%M(row, col) + rr%matrix(row, col, it)*nb(1)
+                        endif
                      enddo
-                enddo
-                ! TEST DOWNWARDS TRANSITIONS COEFFICIENTS
-                ! do ini = 1, nlev
-                !    do fin = 1, nlev
-                !       write(6,'(2(i3, 2x),5(e24.14))') ini, fin,                         &
-                !                                       a21%M(ini, fin), b21%M(ini, fin),  &
-                !                                       r21%M(ini, fin),                   &
-                !                                       b12%M(ini, fin),                   &
-                !                                       r12%M(ini, fin)
-                !              !to have them into the same line although for the reverse transition:
-                !                                       !b12%M(fin, ini),                   &
-                !                                       !r12%M(fin, ini)
-                !    enddo
-                ! enddo
-
+                  enddo
+               enddo
     end subroutine matrix_builder
 
-!     subroutine initialize_level_population(x)
-!         type(population) :: x
-!         
-!         do i = 1, nlev-1
-!            x%pop(i) = 1.d-3
-!         enddo
-!         
-!         x%pop(nlev) = 1.d0 - sum(x%pop, dim = 3)
-!         
-!     end subroutine initialize_level_population
+     subroutine initialize_level_population(x)
+         type(population) :: x
+         
+         do i = 1, nlev-1
+            x%pop(i) = 1.d-3
+         enddo
+         
+         x%pop(nlev) = 1.d0 - sum(x%pop)
+         
+     end subroutine initialize_level_population
     
 end module matrix_construction

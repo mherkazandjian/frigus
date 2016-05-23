@@ -5,20 +5,22 @@ program level_population
                                     radiative_coeffs, collisional_coeffs, &
                                     reaction_matrix,                      &
                                     population,                           &
-                                    Trad, ini, fin
+                                    Trad, nb, ini, fin
                                     
     use energy_levels, only: reading_data_energies
     use radiation,     only: reading_data_radiative,                      &
                              radiative_downwards, radiative_upwards
     use collisions,    only: reading_data_collisions
 
-    use matrix_construction, only: matrix_builder
+    use linear_algebra, only: sparsity, sparsity_calc
+    
+    use matrix_construction, only: matrix_builder, initialize_level_population
     
     type(energy_lev) :: energy
-    type(radiative_coeffs) :: a21, b21, b12, r21, r12
+    type(radiative_coeffs) :: a21, b21, b12, r21, r12, rad
     type(collisional_coeffs) :: rr
     type(reaction_matrix)  :: coll_rad_matrix
-    type(population) :: pop
+    type(population) :: y
 
     call reading_data_energies(energy)
     
@@ -29,11 +31,64 @@ program level_population
     call radiative_downwards(energy, Trad, a21, b21, r21)
     
     call radiative_upwards(energy, Trad, a21, b12, r12)
-    !print*, b12%M
+
+    ! building the total radiative matrix, including both stimulated and spontaneous
+    ! transitions; according to the convention adopted:
+    !     downward transitions -> upper triangular matrix
+    !     upward transitions   -> lower triangular matrix
     
-    !call matrix_builder(energy, a21, b21, r21, b12, r12, rr, coll_rad_matrix)
+    rad%M = r21%M + r12%M
     
+    call matrix_builder(rad, rr, coll_rad_matrix)
     
+    call initialize_level_population(y)
+    
+    call sparsity_calc(coll_rad_matrix, sparsity)
+    
+    print*, sparsity
+!   integer ( kind = 4 ), parameter :: n = 25
+!   integer ( kind = 4 ), parameter :: ml = 1
+!   integer ( kind = 4 ), parameter :: mu = 1
+! 
+!   integer ( kind = 4 ), parameter :: lda = 2 * ml + mu + 1
+! 
+!   real ( kind = 8 ) a(lda,n)
+!   real ( kind = 8 ) b(n)
+!   integer ( kind = 4 ) info
+!   integer ( kind = 4 ) ipiv(n)
+!   integer ( kind = 4 ) m
+! 
+! !  Assign values to matrix A and right hand side b.
+!   b(1) = 1.0D+00
+!   b(2:n-1) = 0.0D+00
+!   b(n) = 1.0D+00
+! !
+! !  Zero out the matrix.
+! !
+!   a(1:lda,1:n) = 0.0D+00
+! 
+!   m = ml + mu + 1
+! !
+! !  Superdiagonal,
+! !  Diagonal,
+! !  Subdiagonal.
+! !
+!   a(m-1,2:n) = -1.0D+00
+!   a(m,1:n) = 2.0D+00
+!   a(m+1,1:n-1) = -1.0D+00
+! !
+! !  Factor the matrix.
+! !
+!   write ( *, '(a)' ) ' '
+!   write ( *, '(a,i8)' ) '  Bandwidth is ', m
+!   write ( *, '(a)' ) ' '
+! 
+!   call dgbtrf ( n, n, ml, mu, a, lda, ipiv, info )
+
+    
+!    call dgbtrs('N', nlev, 0, 0, 1, coll_rad_matrix, 1, 1, y%pop, nlev, INFO)
+    
+!    print*, info
     
 ! TEST READING ENERGY LEVELS
 !    call reading_data(e)
@@ -81,17 +136,35 @@ program level_population
 !    enddo
 
 ! TEST RADIATIVE TRANSITIONS COEFFICIENTS
- do ini = 1, nlev
-    do fin = 1, nlev
-       write(6,'(2(i3, 2x),5(e24.14))') ini, fin,                         &
-                                       a21%M(ini, fin), b21%M(ini, fin),  &
-                                       r21%M(ini, fin),                   &
-                                       !b12%M(ini, fin),                   &
-                                       !r12%M(ini, fin)
-                                       ! to have them into the same line although for the reverse transition:
-                                       b12%M(fin, ini),                   &
-                                       r12%M(fin, ini)                                       
-    enddo
- enddo
+!  do ini = 1, nlev
+!     do fin = 1, nlev
+!        !if(a21%M(ini, fin).ne.0.d0)                                        &
+!        write(6,'(2(i3, 2x), 10(e14.7))') ini, fin,                         &
+!                                        energy%ene(ini), energy%ene(fin),   &
+!                                        a21%M(ini, fin),                   &
+!                                        b21%M(ini, fin),                   &
+!                                        r21%M(ini, fin),                   &
+!                                        b12%M(ini, fin),                   &
+!                                        r12%M(ini, fin),                   &
+!                                        ! to have them into the same line although for the reverse transition:
+!                                        b12%M(fin, ini),                   &
+!                                        r12%M(fin, ini),                   &
+!                                        rad%M(ini, fin)
+!     enddo
+!  enddo
+
+! TEST MATRIX LINEAR SYSTEM
+!   do ini = 1, nlev
+!        write(6,'(a11, i3, e14.7)') 'population:', ini, y%pop(ini)
+!   enddo
+!   do ini = 1, nlev  
+!      do fin = 1, nlev
+!         !if(a21%M(ini, fin).ne.0.d0)                                        &
+!         write(6,'(2(i3, 2x), 4(e20.7))') ini, fin,                         &
+!                                         energy%ene(ini), energy%ene(fin),   &
+!                                         rad%M(ini, fin),                    &
+!                                         coll_rad_matrix%A(ini, fin)
+!      enddo
+!   enddo
 
 end program level_population
