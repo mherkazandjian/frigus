@@ -1,4 +1,5 @@
 FFLAGS_gnu = -Wall -fcheck=all -g -fbacktrace -fbounds-check -ffpe-trap=zero,overflow,underflow 
+
 FFLAGS_intel = -extend_source 132 
 FC     = gfortran
 

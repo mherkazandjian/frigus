@@ -5,7 +5,7 @@ module level_population
                                     radiative_coeffs, collisional_coeffs, &
                                     reaction_matrix,                      &
                                     population,                           &
-                                    Trad, nb, ini, fin
+                                    Trad, nb, ini, fin, it
                                     
     use energy_levels, only: reading_data_energies
     use radiation,     only: reading_data_radiative,                      &
@@ -45,7 +45,9 @@ module level_population
 
         rad%M = r21%M + r12%M
 
-        call matrix_builder(rad, rr, coll_rad_matrix)
+        it = 1
+        
+        call matrix_builder(rad, rr, it, coll_rad_matrix)
 
         call initialize_level_population(y)
 

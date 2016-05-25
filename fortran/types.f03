@@ -66,6 +66,7 @@ module types_and_parameters
     
     type :: population
         real*8 :: pop(1:nlev)
+        real*8 :: pop_t(1:nlev,1:ntemp)
     end type population
 
 end module
