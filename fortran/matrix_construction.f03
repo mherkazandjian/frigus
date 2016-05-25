@@ -37,6 +37,10 @@ module matrix_construction
                                                             + 0.d0
                                 endif
                              enddo
+                        elseif(row.eq.nlev) then
+                             do fin = 1, nlev
+                                coll_rad_matrix%A(row,fin) = 1.d0
+                             enddo                        
                         else   ! the upwards and downwards transitions are already 
                                ! implemented in the proper way in the rr and rad matrix 
                                ! according to the indexes
@@ -55,10 +59,10 @@ module matrix_construction
          type(population) :: x
          
          do i = 1, nlev-1
-            x%pop(i) = 1.d-3
+            x%pop(i) = 0.d0 !1.d-3
          enddo
          
-         x%pop(nlev) = 1.d0 - sum(x%pop)
+         x%pop(nlev) = 1.d0 !1.d0 - sum(x%pop)
          
      end subroutine initialize_level_population
     

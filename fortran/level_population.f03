@@ -1,7 +1,7 @@
 program level_population
 
     use types_and_parameters, only: nlev, energy_lev, vmax, jmax,         &
-                                    ntrans, ntemp,                        &
+                                    ntrans, ntemp, i,                      &
                                     radiative_coeffs, collisional_coeffs, &
                                     reaction_matrix,                      &
                                     population,                           &
@@ -12,7 +12,8 @@ program level_population
                              radiative_downwards, radiative_upwards
     use collisions,    only: reading_data_collisions
 
-    use linear_algebra, only: sparsity, sparsity_calc
+    use linear_algebra, only: sparsity_calc,                              &
+                              ndim, info, lda, ldb, nrhs, ipiv
     
     use matrix_construction, only: matrix_builder, initialize_level_population
     
@@ -20,7 +21,7 @@ program level_population
     type(radiative_coeffs) :: a21, b21, b12, r21, r12, rad
     type(collisional_coeffs) :: rr
     type(reaction_matrix)  :: coll_rad_matrix
-    type(population) :: y
+    type(population) :: x, y
 
     call reading_data_energies(energy)
     
@@ -36,59 +37,25 @@ program level_population
     ! transitions; according to the convention adopted:
     !     downward transitions -> upper triangular matrix
     !     upward transitions   -> lower triangular matrix
-    
-    rad%M = r21%M + r12%M
-    
-    call matrix_builder(rad, rr, coll_rad_matrix)
-    
-    call initialize_level_population(y)
-    
-    call sparsity_calc(coll_rad_matrix, sparsity)
-    
-    print*, sparsity
-!   integer ( kind = 4 ), parameter :: n = 25
-!   integer ( kind = 4 ), parameter :: ml = 1
-!   integer ( kind = 4 ), parameter :: mu = 1
-! 
-!   integer ( kind = 4 ), parameter :: lda = 2 * ml + mu + 1
-! 
-!   real ( kind = 8 ) a(lda,n)
-!   real ( kind = 8 ) b(n)
-!   integer ( kind = 4 ) info
-!   integer ( kind = 4 ) ipiv(n)
-!   integer ( kind = 4 ) m
-! 
-! !  Assign values to matrix A and right hand side b.
-!   b(1) = 1.0D+00
-!   b(2:n-1) = 0.0D+00
-!   b(n) = 1.0D+00
-! !
-! !  Zero out the matrix.
-! !
-!   a(1:lda,1:n) = 0.0D+00
-! 
-!   m = ml + mu + 1
-! !
-! !  Superdiagonal,
-! !  Diagonal,
-! !  Subdiagonal.
-! !
-!   a(m-1,2:n) = -1.0D+00
-!   a(m,1:n) = 2.0D+00
-!   a(m+1,1:n-1) = -1.0D+00
-! !
-! !  Factor the matrix.
-! !
-!   write ( *, '(a)' ) ' '
-!   write ( *, '(a,i8)' ) '  Bandwidth is ', m
-!   write ( *, '(a)' ) ' '
-! 
-!   call dgbtrf ( n, n, ml, mu, a, lda, ipiv, info )
 
+    rad%M = r21%M + r12%M
+
+    call matrix_builder(rad, rr, coll_rad_matrix)
+
+    call initialize_level_population(y)
+
+    x%pop = y%pop
+
+    print*, 'before', x%pop
     
+    call dgesv(ndim, nrhs, coll_rad_matrix, lda, ipiv, x, ldb, info)
+
+    do i = 1, nlev
+       write(6,'(3(i3), e14.7)') i, energy%vl(i), energy%jl(i), x%pop(i)
+    enddo
 !    call dgbtrs('N', nlev, 0, 0, 1, coll_rad_matrix, 1, 1, y%pop, nlev, INFO)
     
-!    print*, info
+    !print*, info
     
 ! TEST READING ENERGY LEVELS
 !    call reading_data(e)
