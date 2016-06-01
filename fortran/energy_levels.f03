@@ -87,24 +87,18 @@ module energy_levels
                             e%freq_lique(ini, fin) = dabs(e%ene_lique(ini)-e%ene_lique(fin))/hp
                         enddo
                     enddo
-                    
-                    
-                    
-                    
-                    
-                    
 
-                    ! ordering the levels according to their energies 
-                    ! (for subsequent construction of the matrix in the 
-                    ! linear system of equations to be solved)
-                     call piksrt(nlev, nlev_lique, e)
-                    
                      e%ene = -e%ene   ! to revert the actual way the energies are given
                                      ! Emax @ (v=0,j=0) --> Emin @ (v=0,j=0)
 
+                                     
+                    ! ordering the levels according to their energies 
+                    ! (for subsequent construction of the matrix in the 
+                    ! linear system of equations to be solved)
+                     call piksrt(nlev, nlev_lique, e)                                     
 
                      do i=1,nlev                     
-                        write(23,'(3(i3,2x))') i, e%vl(i),e%jl(i)
+                        write(23,'(3(i3,2x))') i, e%vl(i), e%jl(i)
                      enddo
                      do i=1,nlev_lique
                         write(24,'(3(i3,2x))') i, e%vl_lique(i), e%jl_lique(i)

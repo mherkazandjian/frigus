@@ -20,52 +20,57 @@ module level_population
 
     contains
     
-    subroutine lev_pop(energy, a21, x)
+    subroutine lev_pop(energy, a21, rr, x)
     
         type(energy_lev) :: energy
         type(radiative_coeffs) :: a21, b21, b12, r21, r12, rad
         type(collisional_coeffs) :: rr
-        type(reaction_matrix)  :: coll_rad_matrix
+        !type(reaction_matrix)  :: coll_rad_matrix
         type(population) :: x, y
 
         call reading_data_energies(energy)
 
-        call reading_data_radiative(energy, a21)
+        !call reading_data_radiative(energy, a21)
     
         call reading_data_collisions(energy, rr)
     
-        call radiative_downwards(energy, Trad, a21, b21, r21)
+        !call radiative_downwards(energy, Trad, a21, b21, r21)
     
-        call radiative_upwards(energy, Trad, a21, b12, r12)
+        !call radiative_upwards(energy, Trad, a21, b12, r12)
 
-        ! building the total radiative matrix, including both stimulated and spontaneous
-        ! transitions; according to the convention adopted:
-        !     downward transitions -> upper triangular matrix
-        !     upward transitions   -> lower triangular matrix
-
-        rad%M = r21%M + r12%M
-
-        it = 1
-        
-        call matrix_builder(rad, rr, it, coll_rad_matrix)
-
-        call initialize_level_population(y)
-
-        x%pop = y%pop
-
-        print*, 'before', x%pop
-    
-        call dgesv(ndim, nrhs, coll_rad_matrix, lda, ipiv, x, ldb, info)
-
-        do i = 1, nlev
-            write(6,'(3(i3), e14.7)') i, energy%vl(i), energy%jl(i), x%pop(i)
-        enddo
+!         ! building the total radiative matrix, including both stimulated and spontaneous
+!         ! transitions; according to the convention adopted:
+!         !     downward transitions -> upper triangular matrix
+!         !     upward transitions   -> lower triangular matrix
+! 
+!         rad%M = r21%M + r12%M
+! 
+!         it = 1
+!         
+!         call matrix_builder(rad, rr, it, coll_rad_matrix)
+! 
+!         call initialize_level_population(y)
+! 
+!         x%pop = y%pop
+! 
+!         print*, 'before', x%pop
+!     
+!         call dgesv(ndim, nrhs, coll_rad_matrix, lda, ipiv, x, ldb, info)
+! 
+!         do i = 1, nlev
+!             write(6,'(3(i3), e14.7)') i, energy%vl(i), energy%jl(i), x%pop(i)
+!         enddo
      
         return
     end subroutine lev_pop
     
     
-    subroutine tests()
+    subroutine tests(rr)
+        !type(energy_lev) :: energy
+        !type(radiative_coeffs) :: a21, b21, b12, r21, r12, rad
+        type(collisional_coeffs) :: rr
+        !type(reaction_matrix)  :: coll_rad_matrix
+        !type(population) :: x, y    
     ! TEST READING ENERGY LEVELS
     !    call reading_data(e)
     !    do i = 0, vmax
@@ -99,17 +104,18 @@ module level_population
     ! TEST COLLISIONAL COEFFICIENTS
     ! check of the coefficients compared to the read data by François + 
     ! detailed balance
-    !    do i=1, ntrans
-    !       do it=1, ntemp
-    !          write(6, '(6(i3,2x), 4(e14.5))') rr%couple1c(i),rr%couple2c(i),   &
-    !                                    rr%vic(i),rr%jic(i),rr%vfc(i),rr%jfc(i),&
-    !                                    rr%temp(it),                            &
-    !                     rr%matrix(rr%couple1c(i),rr%couple2c(i),it)*1.d6,      &
-    !                     rr%matrix(rr%couple2c(i),rr%couple1c(i),it)*1.d6,      &
-    !                          (rr%matrix(rr%couple1c(i),rr%couple2c(i),it)-     &
-    !                      rr%matrix(rr%couple2c(i),rr%couple1c(i),it))*1.d6/    &
-    !                      (rr%matrix(rr%couple1c(i),rr%couple2c(i),it)*1.d6)
-    !    enddo
+        do i=1, ntrans
+           do it=1, ntemp
+              write(6, '(6(i3,2x), 4(e14.5))') rr%couple1c(i),rr%couple2c(i),   &
+                                        rr%vic(i),rr%jic(i),rr%vfc(i),rr%jfc(i),&
+                                        rr%temp(it),                            &
+                         rr%matrix_lique(rr%couple1c(i),rr%couple2c(i),it)*1.d6,      &
+                         rr%matrix_lique(rr%couple2c(i),rr%couple1c(i),it)*1.d6,      &
+                              (rr%matrix_lique(rr%couple1c(i),rr%couple2c(i),it)-     &
+                          rr%matrix_lique(rr%couple2c(i),rr%couple1c(i),it))*1.d6/    &
+                          (rr%matrix_lique(rr%couple1c(i),rr%couple2c(i),it)*1.d6)
+            enddo
+        enddo
 
     ! TEST RADIATIVE TRANSITIONS COEFFICIENTS
     !  do ini = 1, nlev
