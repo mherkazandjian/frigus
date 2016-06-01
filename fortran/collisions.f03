@@ -63,10 +63,10 @@ module collisions
                      enddo
                  enddo
 
-                do i=1,ntrans
-                   write(6,'(6(i3,2x))') rr%vic(i),rr%jic(i),rr%vfc(i),rr%jfc(i),      &
-                           rr%couple1c(i),rr%couple2c(i)
-                enddo
+                !do i=1,ntrans
+                !   write(6,'(6(i3,2x))') rr%vic(i),rr%jic(i),rr%vfc(i),rr%jfc(i),      &
+                !           rr%couple1c(i),rr%couple2c(i)
+                !enddo
                  do i=1,ntrans
                     vi=rr%vic(i)
                     ji=rr%jic(i)

@@ -13,7 +13,7 @@ program cooling
     
      call lev_pop(energy, a21, rr, x)
      
-     call tests(rr)
+     !call tests(energy, rr)
      
      
 end program cooling

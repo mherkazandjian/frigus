@@ -5,11 +5,12 @@ module level_population
                                     radiative_coeffs, collisional_coeffs, &
                                     reaction_matrix,                      &
                                     population,                           &
-                                    Trad, nb, ini, fin, it
+                                    Trad, nb, ini, fin, it,               &
+                                    nlev_lique
                                     
     use energy_levels, only: reading_data_energies
-    use radiation,     only: reading_data_radiative,                      &
-                             radiative_downwards, radiative_upwards
+    use radiation,     only: reading_data_radiative!,                      &
+                             !radiative_downwards, radiative_upwards
     use collisions,    only: reading_data_collisions
 
     use linear_algebra, only: sparsity_calc,                              &
@@ -30,7 +31,7 @@ module level_population
 
         call reading_data_energies(energy)
 
-        !call reading_data_radiative(energy, a21)
+        call reading_data_radiative(energy, a21)
     
         call reading_data_collisions(energy, rr)
     
@@ -65,9 +66,9 @@ module level_population
     end subroutine lev_pop
     
     
-    subroutine tests(rr)
-        !type(energy_lev) :: energy
-        !type(radiative_coeffs) :: a21, b21, b12, r21, r12, rad
+    subroutine tests(energy, rr)
+        type(energy_lev) :: energy
+        type(radiative_coeffs) :: a21!, b21, b12, r21, r12, rad
         type(collisional_coeffs) :: rr
         !type(reaction_matrix)  :: coll_rad_matrix
         !type(population) :: x, y    
@@ -104,26 +105,26 @@ module level_population
     ! TEST COLLISIONAL COEFFICIENTS
     ! check of the coefficients compared to the read data by François + 
     ! detailed balance
-        do i=1, ntrans
-           do it=1, ntemp
-              write(6, '(6(i3,2x), 4(e14.5))') rr%couple1c(i),rr%couple2c(i),   &
-                                        rr%vic(i),rr%jic(i),rr%vfc(i),rr%jfc(i),&
-                                        rr%temp(it),                            &
-                         rr%matrix_lique(rr%couple1c(i),rr%couple2c(i),it)*1.d6,      &
-                         rr%matrix_lique(rr%couple2c(i),rr%couple1c(i),it)*1.d6,      &
-                              (rr%matrix_lique(rr%couple1c(i),rr%couple2c(i),it)-     &
-                          rr%matrix_lique(rr%couple2c(i),rr%couple1c(i),it))*1.d6/    &
-                          (rr%matrix_lique(rr%couple1c(i),rr%couple2c(i),it)*1.d6)
-            enddo
-        enddo
+    !    do i=1, ntrans
+    !       do it=1, ntemp
+    !          write(6, '(6(i3,2x), 4(e14.5))') rr%couple1c(i),rr%couple2c(i),   &
+    !                                    rr%vic(i),rr%jic(i),rr%vfc(i),rr%jfc(i),&
+    !                                    rr%temp(it),                            &
+    !                     rr%matrix_lique(rr%couple1c(i),rr%couple2c(i),it)*1.d6,      &
+    !                     rr%matrix_lique(rr%couple2c(i),rr%couple1c(i),it)*1.d6,      &
+    !                          (rr%matrix_lique(rr%couple1c(i),rr%couple2c(i),it)-     &
+    !                      rr%matrix_lique(rr%couple2c(i),rr%couple1c(i),it))*1.d6/    &
+    !                      (rr%matrix_lique(rr%couple1c(i),rr%couple2c(i),it)*1.d6)
+    !        enddo
+    !    enddo
 
     ! TEST RADIATIVE TRANSITIONS COEFFICIENTS
-    !  do ini = 1, nlev
-    !     do fin = 1, nlev
+      do ini = 1, nlev_lique
+         do fin = 1, nlev_lique
     !        !if(a21%M(ini, fin).ne.0.d0)                                        &
-    !        write(6,'(2(i3, 2x), 10(e14.7))') ini, fin,                         &
-    !                                        energy%ene(ini), energy%ene(fin),   &
-    !                                        a21%M(ini, fin),                   &
+            write(6,'(2(i3, 2x), 5(e14.7))')  ini, fin,                                     &
+                                            energy%ene_lique(ini), energy%ene_lique(fin),   &
+                                            a21%M_lique(ini, fin)!,                   &
     !                                        b21%M(ini, fin),                   &
     !                                        r21%M(ini, fin),                   &
     !                                        b12%M(ini, fin),                   &
@@ -132,8 +133,8 @@ module level_population
     !                                        b12%M(fin, ini),                   &
     !                                        r12%M(fin, ini),                   &
     !                                        rad%M(ini, fin)
-    !     enddo
-    !  enddo
+         enddo
+      enddo
 
     ! TEST MATRIX LINEAR SYSTEM
     !   do ini = 1, nlev
