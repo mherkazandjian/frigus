@@ -32,7 +32,11 @@ levels = read_levels.read_levels_lique('Read/H2Xvjlevels_francois_mod.cs')
 # for level in levels:
 #     print('{:<3}{:<3}{:<10}'.format(level['v'], level['j'], level['E']))
 
+# read the einstein coefficients for the H2 transitions
+A = read_ei.read_einstein()
 pdb.set_trace()
+
+# read the Einstein coefficients
 nc = 1.e9
 '''density of the colliding species, in units of 1.e3 cm-3 as in Lipovka'''
 
@@ -42,8 +46,6 @@ en_H2 = read_levels.read_levels("Read/H2Xvjlevels.cs")
 # read the collisional rates for H2 with H
 cr, T, ini, fin, vj_unique = read_cr.read_coeff("Read/Rates_H_H2.dat")
 
-# read the einstein coefficients for the H2 transitions
-A = read_ei.read_einstein()
 
 # creating the array for the radiation temperatures;
 # at the moment, same size of tkin but constant value @ 2.73
