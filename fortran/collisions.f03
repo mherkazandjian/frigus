@@ -16,11 +16,11 @@ module collisions
 
       subroutine reading_data_collisions(e, rr)
                  use energy_levels, only: reading_data_energies
-                 use types_and_parameters, only: it, nlev,       &
-                                                 vimax, jimax,   &
-                                                 vfmax, jfmax,   &
-                                                 ntemp, ntrans,  &
-                                                 vi, ji, vf, jf, &
+                 use types_and_parameters, only: it, nlev, nlev_lique,  &
+                                                 vimax, jimax,          &
+                                                 vfmax, jfmax,          &
+                                                 ntemp, ntrans,         &
+                                                 vi, ji, vf, jf,        &
                                                  kb
  
                  type(collisional_coeffs) :: rr                   ! reaction rate
@@ -31,12 +31,8 @@ module collisions
                  ! initializing the arrays
                  rr%reading = 0.d0
                  rr%matrix = 0.d0
-                 rr%temp = (/ (i, i=100,5000,100) /)
-                 ! print*, rr%temp
+                 rr%temp = [ (i, i=100,5000,100) ]
 
-                 
-!                 call reading_data_energies(e)
-                 
                  open (20, file='Read/Rates_H_H2.dat', status = 'unknown')
 
                  do i=1,10 
@@ -44,47 +40,46 @@ module collisions
                  enddo
                  do i=1,ntrans
                     read(20,*) rr%vic(i),rr%jic(i),rr%vfc(i),rr%jfc(i),      &
-                    (rr%reading(rr%vic(i),rr%jic(i),rr%vfc(i),rr%jfc(i),it), it=1,ntemp)
+                    (rr%reading(rr%vic(i),rr%jic(i),rr%vfc(i),rr%jfc(i),it), &
+                     it=1,ntemp)
                     vi=rr%vic(i)
                     ji=rr%jic(i)
                     vf=rr%vfc(i)
                     jf=rr%jfc(i)
-                     do l=1,nlev
-                         if(vi.eq.e%vl(l)) then
-                             if(ji.eq.e%jl(l)) then
+                     do l=1, nlev_lique
+                         if(vi.eq.e%vl_lique(l)) then
+                             if(ji.eq.e%jl_lique(l)) then
                                 rr%couple1c(i) = l
                              endif
                          endif
-                         if(vf.eq.e%vl(l)) then
-                             if(jf.eq.e%jl(l)) then
+                         if(vf.eq.e%vl_lique(l)) then
+                             if(jf.eq.e%jl_lique(l)) then
                                 rr%couple2c(i) = l
                              endif
                          endif
                      enddo
                  enddo
 
-!                do i=1,ntrans
-!                   print*, rr%couple1c(i),rr%couple2c(i)
-!                enddo
+                !do i=1,ntrans
+                !   write(6,'(6(i3,2x))') rr%vic(i),rr%jic(i),rr%vfc(i),rr%jfc(i),      &
+                !           rr%couple1c(i),rr%couple2c(i)
+                !enddo
                  do i=1,ntrans
                     vi=rr%vic(i)
                     ji=rr%jic(i)
                     vf=rr%vfc(i)
                     jf=rr%jfc(i)
                     dE = abs(e%en(vi,ji)-e%en(vf,jf))
-!                    print*, vi,ji,vf,jf,dE
                      do it=1,ntemp
-                        rr%matrix(rr%couple1c(i),rr%couple2c(i),it) = &
+                        rr%matrix_lique(rr%couple1c(i),rr%couple2c(i),it) = &
                                        rr%reading(vi,ji,vf,jf,it)
-                        rr%matrix(rr%couple2c(i),rr%couple1c(i),it) = &
+                        rr%matrix_lique(rr%couple2c(i),rr%couple1c(i),it) = &
                           dexp(-dE/(kb*rr%temp(it))) * rr%reading(vi,ji,vf,jf,it)
                      enddo
                  enddo
-!                 print*, kb
-
 
                  !units conversion: cm3 s-1 -> m3 s-1
-                 rr%matrix = rr%matrix*1.d-6
+                 rr%matrix_lique = rr%matrix_lique*1.d-6
  
       end subroutine reading_data_collisions
 
