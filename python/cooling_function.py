@@ -23,9 +23,16 @@ from population import reduce_vj_repr, coolingFunction, fit_glover
 import matplotlib.pyplot as plt
 
 from numpy import zeros
-from IPython.core.debugger import Tracer
+import pdb
 from numpy import log10, unique
 
+# read the energy levels (v, j, energy)
+levels = read_levels.read_levels_lique('Read/H2Xvjlevels_francois_mod.cs')
+# print('{:3}{:3}{:10}'.format('v', 'j', 'E(eV)'))
+# for level in levels:
+#     print('{:<3}{:<3}{:<10}'.format(level['v'], level['j'], level['E']))
+
+pdb.set_trace()
 nc = 1.e9
 '''density of the colliding species, in units of 1.e3 cm-3 as in Lipovka'''
 

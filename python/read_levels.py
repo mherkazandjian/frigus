@@ -2,7 +2,7 @@
 """
 
 """
-
+from __future__ import print_function
 import numpy 
 from numpy import loadtxt, genfromtxt
 import pylab
@@ -64,3 +64,46 @@ def read_levels(fname):
 #        enh2[vi,ji]  =  enh2[vi,ji] - depth
 
     return enh2
+
+
+def read_levels_lique(fname):
+    """
+    read the energy levels from the file "H2Xvjlevels_francios_mod.cs" that is
+    recovered from ABC. The file has (should have) the following format.
+
+      ----------------------------------------------------------------------
+      Channel   a       v       j       k       Energy (eV)
+      ----------------------------------------------------------------------
+       92       2       0       0       0         0.27034
+       93       2       0       1       0         0.28504
+
+    :param fname: The paths to the ascii file containing the levels
+     information. The file should have the following format:
+    :return: numpy array array of N rows, the v and j levels and their
+     corresponding energy. The elements of the array are stored in increasing
+     order in the energy.
+
+    .. code-block:: python
+
+        levels = read_levels('/path/to/H2Xvjlevels_francios_mod.cs')
+
+        print('{:3}{:3}{:10}'.format('v', 'j', 'E(eV)'))
+        for level in levels:
+           print('{:3}{:3}{:10}'.format(level['v'], level['j'], level['E']))
+    """
+    data_read = numpy.loadtxt(fname, skiprows=3)
+
+    # get the sorting indices list from the last column (energy)
+    inds = numpy.argsort(data_read[:, -1])
+
+    v, j, energies = data_read[inds, 2], data_read[inds, 3], data_read[inds, 5]
+
+    data = numpy.zeros(inds.shape, dtype=[('v', 'i4'),
+                                          ('j', 'i4'),
+                                          ('E', 'f8')])
+
+    data['v'] = v
+    data['j'] = j
+    data['E'] = energies
+
+    return data
