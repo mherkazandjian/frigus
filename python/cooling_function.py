@@ -1,8 +1,18 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sat Nov 21 23:45:39 2015
+Calculates the cooling function of H2 colliding with H using collisional data
+by F. Lique.
 
-@author: carla
+In calculating the cooling function, the required data are:
+
+  - energy levels of H2 (vibrational and rotational)
+  - collisional coefficients of H2 with H (K_ij)
+  - radiative coefficients (A_ij, B_ij, B_ji)
+
+Limitations
+
+  - The smallest data set of (A, B, K) determines the number of states to be
+    inserted in the model.
 """
 
 import read_ei

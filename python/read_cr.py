@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Jan 28 01:51:39 2015
-
-@author: carla
+Read the collisional rates (collision coefficients)
 """
 
 import numpy

@@ -1,24 +1,26 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Jan 21 18:03:31 2015
+radiation temperature and gas temperature as a function of redshift/cosmic time.
 
-@author: carla
+The data of the gas temperature is read from a pre-computed file
+ (Read/temp_gas.txt) computed by C. Coppola.
 """
 
 import pylab
 import numpy
-from   numpy import *
-from   scipy.constants import *
+from numpy import *
+from scipy.constants import *
 
 from scipy import interpolate
 
+
 def gen_T_g_interpolation_function():
-    '''contrunct the interpolation function for the gas temperature'''
-    temperature  = loadtxt("Read/temp_gas.txt")  
-    z_read       = temperature[:,0]
-    tg_read      = temperature[:,1]
+    """contrunct the interpolation function for the gas temperature"""
+    temperature = loadtxt("Read/temp_gas.txt")
+    z_read = temperature[:, 0]
+    tg_read = temperature[:, 1]
     
-    #itg   = interpolate.splrep(z_read,tg_read,s=0) 
+    # itg = interpolate.splrep(z_read, tg_read, s=0)
     
     log10_T_g = interpolate.interp1d(z_read, numpy.log10(tg_read))
 
@@ -26,14 +28,16 @@ def gen_T_g_interpolation_function():
 
 log10_T_g = gen_T_g_interpolation_function()
 
+
 def T_r(z):
-    ''' given the redshift, it returns the radiation temperature'''
+    """ given the redshift, it returns the radiation temperature"""
     tr=2.726*(1.0+z)
     return tr
 
+
 def T_g(z):
-    ''' given the redshift, it returns the gas temperature'''
-    #tg  = interpolate.splev(z,itg,der=0)
+    """ given the redshift, it returns the gas temperature"""
+    # tg  = interpolate.splev(z,itg,der=0)
 
     # .. todo:: 
     # there shuould be a check that the interpolated temperature is not negative
@@ -45,9 +49,9 @@ if __name__ == "__main__":
 
     print 'testing the temperature interpolation'
 
-    temperature  = loadtxt("Read/temp_gas.txt")  
-    z_read       = temperature[:,0]
-    tg_read      = temperature[:,1]
+    temperature = loadtxt("Read/temp_gas.txt")
+    z_read = temperature[:,0]
+    tg_read = temperature[:,1]
 
     pylab.xlim([-1, 4000])
     #pylab.xscale('log')

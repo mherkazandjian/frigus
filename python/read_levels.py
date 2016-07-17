@@ -1,24 +1,27 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Jan 28 01:51:39 2015
 
-@author: carla
 """
 
 import numpy 
 from numpy import loadtxt, genfromtxt
 import pylab
 
-def read_levels( fname ):
-    '''parse the  data of
-     
-    :rtype : object
-            http://www.physast.uga.edu/ugamop/energies/H2Xvjlevels
-            
-    to numpy arrays and provide utilities to get information from the data.       
-        # Rovibrational energy levels for H_2
-      # v  J        -binding energy
-      #           a.u.            cm-1   
+
+def read_levels(fname):
+    """parse the  data of
+
+    :param fname: The name of the ascii file containing the levels information.
+     (see below for an example of the content of the file). The file can be
+     found at http://www.physast.uga.edu/ugamop/energies/H2Xvjlevels
+    :return: A numpy matrix of shape (vmax + 1, jmax + 1) where vmax and jmax
+      are the maximum vibrational and rotational transition quantum numbers
+      mentioned in the file "fname".
+
+    to numpy arrays and provide utilities to get information from the data.
+      # Rovibrational energy levels for H_2
+      # v   J        -binding energy
+      #           a.u.            cm-1
         0   0  0.16456626E+00  0.36118114E+05
         0   1  0.16402653E+00  0.35999657E+05
         0   2  0.16295202E+00  0.35763830E+05
@@ -35,27 +38,27 @@ def read_levels( fname ):
        14   1  0.57867630E-03  0.12700475E+03
        14   2  0.42998862E-03  0.94371580E+02
        14   3  0.22670691E-03  0.49756409E+02
-    '''
+    """
 
-    v, j, a , energies  = loadtxt( fname, unpack = True )  
+    v, j, a, energies = loadtxt(fname, unpack=True)
 
     v, j = numpy.int32(v), numpy.int32(j)
 
-    #conversion of the energies from cm-1 -> Joule
-    energies  = energies*1.98630e-23
+    # conversion of the energies from cm-1 -> Joule
+    energies *= 1.98630e-23
 
     nv_max, nj_max = v.max(), j.max()
 
-    enh2 = numpy.zeros( (nv_max+1,nj_max+1), 'f8' )
+    enh2 = numpy.zeros((nv_max+1, nj_max+1), 'f8')
 
-
-#    bottom = 2179.0*1.98630e-23 # having v=0 as 0 for the energies, the bottom of the well
-                                # is at -2179.0 cm-1 + convertion into Joule
+    # having v=0 as 0 for the energies, the bottom of the well
+    # is at -2179.0 cm-1 + convention into Joule
+    # bottom = 2179.0*1.98630e-23
 
     # filling the matrix enh2 with the values read from the text file
     for i in range(len(v)):
         vi, ji = v[i], j[i]
-        enh2[vi,ji] = energies[i]
+        enh2[vi, ji] = energies[i]
 
 #        depth = enh2[0,0] + bottom
 #        enh2[vi,ji]  =  enh2[vi,ji] - depth
