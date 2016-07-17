@@ -6,7 +6,7 @@ module level_population
                                     reaction_matrix,                      &
                                     population,                           &
                                     Trad, nb, ini, fin, it,               &
-                                    nlev_lique
+                                    nlev_lique, vi, vf, ji, jf
                                     
     use energy_levels, only: reading_data_energies
     use radiation,     only: reading_data_radiative!,                      &
@@ -66,7 +66,7 @@ module level_population
     end subroutine lev_pop
     
     
-    subroutine tests(energy, rr)
+    subroutine tests(energy, rr, a21)
         type(energy_lev) :: energy
         type(radiative_coeffs) :: a21!, b21, b12, r21, r12, rad
         type(collisional_coeffs) :: rr
@@ -119,12 +119,12 @@ module level_population
     !    enddo
 
     ! TEST RADIATIVE TRANSITIONS COEFFICIENTS
-      do ini = 1, nlev_lique
-         do fin = 1, nlev_lique
+    !  do ini = 1, nlev_lique
+    !     do fin = 1, nlev_lique
     !        !if(a21%M(ini, fin).ne.0.d0)                                        &
-            write(6,'(2(i3, 2x), 5(e14.7))')  ini, fin,                                     &
-                                            energy%ene_lique(ini), energy%ene_lique(fin),   &
-                                            a21%M_lique(ini, fin)!,                   &
+    !        write(6,'(2(i3, 2x), 5(e14.7))')  ini, fin,                                     &
+    !                                        energy%ene_lique(ini), energy%ene_lique(fin),   &
+    !                                        a21%M_lique(ini, fin)!,                   &
     !                                        b21%M(ini, fin),                   &
     !                                        r21%M(ini, fin),                   &
     !                                        b12%M(ini, fin),                   &
@@ -133,8 +133,8 @@ module level_population
     !                                        b12%M(fin, ini),                   &
     !                                        r12%M(fin, ini),                   &
     !                                        rad%M(ini, fin)
-         enddo
-      enddo
+    !     enddo
+    !  enddo
 
     ! TEST MATRIX LINEAR SYSTEM
     !   do ini = 1, nlev
@@ -149,6 +149,49 @@ module level_population
     !                                         coll_rad_matrix%A(ini, fin)
     !      enddo
     !   enddo
+
+    ! TEST NUMBER OF TRANSITIONS IN COMMON AMONG RADIATIVE AND COLLISIONAL ONES  
+    
+     do i = 1, nlev_lique
+        do j = 1, nlev_lique
+            if(a21%couple1r(i).eq.rr%couple1c(j)) then
+               if(a21%couple2r(j).eq.rr%couple2c(j)) then            
+           write(6,'(a10, 6(i3, x), a12, 6(i3, x) )')                                                     &
+                         'radiative:',                                                                    &
+                         a21%couple1r(i), a21%couple2r(j), a21%vir(i), a21%jir(i), a21%vfr(j),a21%jfr(j), &
+                         'collisional:',                                                                  &
+                         rr%couple1c(i), rr%couple2c(j), rr%vic(i), rr%jic(i), rr%vfc(j),rr%jfc(j)
+!            if(a21%M_lique(i, j).ne.0.d0) then
+!               if(rr%matrix_lique(i, j, 1).ne.0.d0) then
+!            write(6,'(6(i3, 2x), 2(e14.7, 2x))')                       &
+!                          a21%couple1r(i), a21%couple2r(j),              &
+!                          a21%vir(i),a21%jir(i),                         &
+!                          a21%vfr(j),a21%jfr(j),                         &
+!                          a21%M_lique(i, j),                           &
+!                          rr%matrix_lique(i, j, 1)
+              endif
+           endif
+        enddo
+    enddo
+!                    do i=1,a21%ntransrad
+!                        vi=a21%vir(i)
+!                        ji=a21%jir(i)
+!                        vf=a21%vfr(i)
+!                        jf=a21%jfr(i)
+!                        !!if(a21%couple1r(i).ne.0) then
+!                        !! if(a21%couple2r(i).ne.0) then
+!                        !! if(energy%en(vi,ji).lt.energy%en(vf,jf)) then
+!                        write(6,'(6(i3, 2x), 2(e14.7, 2x))')                         &
+!                                      a21%couple1r(i),a21%couple2r(i),               &
+!                                      a21%vir(i),a21%jir(i),                         &
+!                                      a21%vfr(i),a21%jfr(i),                         &
+!                                      a21%M_lique(a21%couple1r(i),a21%couple2r(i)),  &
+!                                      a21%arranging(vi,ji,vf,jf)
+!                        ! !endif
+!                        ! !endif
+!                        !!endif
+!                    enddo
+
     return
     end subroutine tests
 

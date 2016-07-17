@@ -12,8 +12,10 @@ program cooling
     type(population) :: x
     
      call lev_pop(energy, a21, rr, x)
-     
-     !call tests(energy, rr)
+
+     print*, a21%ntransrad
+
+     call tests(energy, rr, a21)
      
      
 end program cooling

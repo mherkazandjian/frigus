@@ -2,12 +2,14 @@ module radiation
     
     use energy_levels
     use types_and_parameters, only: jmax, vi, ji, vf, jf, &
+                                    collisional_coeffs,   &
                                     radiative_coeffs, energy_lev
 
     ! in this module the reading, indexes arrangement and calculations of
     ! stimulated coefficients are performed, starting from the data by
     ! Wolniewicz et al 1998
-
+    
+    type(collisional_coeffs) :: rr ! in order to have the same ordering of levels as in the collisional coeffs
     type(radiative_coeffs) :: a21, b21, b12
     type(energy_lev) :: e
     
@@ -23,7 +25,7 @@ module radiation
 
 
                  a21%reading = 0.d0
-                 a21%M = 0.d0
+                 a21%M_lique = 0.d0
                  
                  call tableh2(a21%reading, ivmax)
 
@@ -44,12 +46,12 @@ module radiation
                     enddo
                 enddo
                 rewind(25)
-                allocate(a21%couple1r(1:a21%ntransrad),a21%couple2r(1:a21%ntransrad))
-                allocate(a21%vir(1:a21%ntransrad),a21%jir(1:a21%ntransrad))
-                allocate(a21%vfr(1:a21%ntransrad),a21%jfr(1:a21%ntransrad))
+                allocate(a21%couple1r(1:a21%ntransrad), a21%couple2r(1:a21%ntransrad))
+                allocate(a21%vir(1:a21%ntransrad), a21%jir(1:a21%ntransrad))
+                allocate(a21%vfr(1:a21%ntransrad), a21%jfr(1:a21%ntransrad))
                 allocate(a21%arranging(0:vmax, 0:jmax, 0:vmax, 0:jmax))
                 print*, a21%ntransrad, (jmax+1)*15*15*3
-! 
+
                  do i=1,a21%ntransrad
                      read(25,*)  a21%vir(i),a21%jir(i),a21%vfr(i),a21%jfr(i), &
                      a21%arranging(a21%vir(i),a21%jir(i),a21%vfr(i),a21%jfr(i))
@@ -82,68 +84,70 @@ module radiation
                       ji=a21%jir(i)
                       vf=a21%vfr(i)
                       jf=a21%jfr(i)
-                      !a21%M(a21%couple1r(i),a21%couple2r(i)) = a21%reading(jf,vf,vi,ji)
+                      !!a21%M(a21%couple1r(i),a21%couple2r(i)) = a21%reading(jf,vf,vi,ji)
                       a21%M_lique(a21%couple1r(i),a21%couple2r(i)) = a21%arranging(vi,ji,vf,jf)
                       !if(a21%couple1r(i).ne.0) then
-                       !if(a21%couple2r(i).ne.0) then
-                       if(e%en(vi,ji).lt.e%en(vf,jf)) then
-                      write(6,'(6(i3, 2x), 2(e14.7, 2x))')                         &
-                                    a21%couple1r(i),a21%couple2r(i),               &
-                                    a21%vir(i),a21%jir(i),                         &
-                                    a21%vfr(i),a21%jfr(i),                         &
-                                    a21%M_lique(a21%couple1r(i),a21%couple2r(i)),  &
-                                    a21%arranging(vi,ji,vf,jf)
-                       endif
-                       !endif
+                      ! if(a21%couple2r(i).ne.0) then
+                      ! if(e%en(vi,ji).lt.e%en(vf,jf)) then
+                      !write(6,'(6(i3, 2x), 2(e14.7, 2x))')                         &
+                      !              a21%couple1r(i),a21%couple2r(i),               &
+                      !              a21%vir(i),a21%jir(i),                         &
+                      !              a21%vfr(i),a21%jfr(i),                         &
+                      !              a21%M_lique(a21%couple1r(i),a21%couple2r(i)),  &
+                      !              a21%arranging(vi,ji,vf,jf)
+                      ! endif
+                      ! endif
                       !endif
                   enddo
                 !print*, ivmax
                 return
       end subroutine reading_data_radiative
 
+       subroutine radiative_downwards(energy, Tr, a21, b21, r21)
+                  ! this subroutine returns the Einstein coefficients
+                  ! for downward stimulated transitions
+                  ! input: a21
+                  ! output: b21 = c**2/(2*hp*nu) a21
+                  use types_and_parameters, only: hp, c, nlev, nlev_lique,  &
+                                                  energy_lev,   &
+                                                  ini, fin
+ 
+                  type(radiative_coeffs) :: a21, b21, r21
+                  type(energy_lev) :: energy
+ 
+                  real*8 :: Tr
+ 
+ 
+                  b21%M_lique = 0.d0
+                  r21%M_lique = 0.d0
+ 
+                  do ini = 1, nlev_lique
+                     do fin = 1, nlev_lique
+                         if((energy%ene_lique(ini)-energy%ene_lique(fin)).gt.0.d0) then  
+                                                                             ! gt in the case of stancil
+                                                                             ! [according to the ordering in the  
+                                                                             ! energy file downwards, 
+                                                                             ! after the inversion "-" 
+                                                                             ! => E1 - E2  > 0 ( =>  E2 - E1 < 0)]
+                                 b21%M_lique(ini, fin) = c**2/(2.d0*hp*(energy%freq_lique(ini, fin))**3)* &
+                                                   a21%M_lique(ini,fin)
+                                 r21%M_lique(ini, fin) = a21%M_lique(ini, fin) +    &
+                                                   b21%M_lique(ini, fin) *    &
+                                              planck(energy%freq_lique(ini, fin), Tr)
+                    !write(6,'(a26, 2(i3,2x), (e16.10,2x), a8, 3(e16.10,2x))') 'from radiative downwards: ', &
+                    !                                         ini, fin,                                      &
+                    !                                         b21%M(ini, fin),                               &
+                    !                                         'planck: ',                                    &
+                    !                                         planck(energy%freq(ini, fin), Tr),             &
+                    !                                         r21%M(ini, fin),                               &
+                    !                                         a21%M(ini, fin)
+                         endif
+                     enddo
+                 enddo
+                 return
+       end subroutine radiative_downwards 
 
-!       subroutine radiative_downwards(energy, Tr, a21, b21, r21)
-!                  ! this subroutine returns the Einstein coefficients
-!                  ! for downward stimulated transitions
-!                  ! input: a21
-!                  ! output: b21 = c**2/(2*hp*nu) a21
-!                  use types_and_parameters, only: hp, c, nlev,  &
-!                                                  energy_lev,   &
-!                                                  ini, fin
-! 
-!                  type(radiative_coeffs) :: a21, b21, r21
-!                  type(energy_lev) :: energy
-! 
-!                  real*8 :: Tr
-! 
-! 
-!                  b21%M = 0.d0
-!                  r21%M = 0.d0
-! 
-!                  do ini = 1, nlev
-!                     do fin = 1, nlev
-!                         if((energy%ene(ini)-energy%ene(fin)).gt.0.d0) then  ! according to the ordering in the  
-!                                                                             ! energy file downwards, 
-!                                                                             ! after the inversion "-" 
-!                                                                             ! => E1 - E2  > 0 ( =>  E2 - E1 < 0)
-!                                 b21%M(ini, fin) = c**2/(2.d0*hp*(energy%freq(ini, fin))**3)* &
-!                                                   a21%M(ini,fin)
-!                                 r21%M(ini, fin) = a21%M(ini, fin) +    &
-!                                                   b21%M(ini, fin) *    &
-!                                              planck(energy%freq(ini, fin), Tr)
-!                                 !write(6,'(a26, 2(i3,2x), (e16.10,2x), a8, 3(e16.10,2x))') 'from radiative downwards: ', &
-!                                 !                                         ini, fin,                                      &
-!                                 !                                         b21%M(ini, fin),                               &
-!                                 !                                         'planck: ',                                    &
-!                                 !                                         planck(energy%freq(ini, fin), Tr),             &
-!                                 !                                         r21%M(ini, fin),                               &
-!                                 !                                         a21%M(ini, fin)
-!                         endif
-!                     enddo
-!                 enddo
-!                 return
-!       end subroutine radiative_downwards 
-! 
+       
 !       subroutine radiative_upwards(energy, Tr, a21, b12, r12)
 !                  use types_and_parameters, only: hp, nlev,   &
 !                                                  energy_lev, &
