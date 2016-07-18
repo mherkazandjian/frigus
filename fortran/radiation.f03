@@ -39,7 +39,7 @@ module radiation
                             do i3=-1,1
                                if(a21%reading(i3,i2,i1,i0).ne.0.d0) then
                                a21%ntransrad = a21%ntransrad + 1
-                                write(25,'(4(i2,2x),e10.4)') i1,i0,i2,i0+2*i3,a21%reading(i3,i2,i1,i0)
+                                write(25,'(4(i2,2x),e14.7)') i1,i0,i2,i0+2*i3,a21%reading(i3,i2,i1,i0)
                                endif
                             enddo
                         enddo

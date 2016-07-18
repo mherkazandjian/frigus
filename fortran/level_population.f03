@@ -96,13 +96,25 @@ module level_population
     !    enddo
     
     ! TEST EINSTEIN COEFFICIENTS AND TRANSITIONS
-      do i=1,a21%ntransrad
-         write(6,'(4(i2,2x),e14.5)') a21%vir(i), a21%jir(i), &
-                                     a21%vfr(i), a21%jfr(i), &
-                       a21%M(a21%couple1r(i),a21%couple2r(i))
-      enddo
-      print*, 'SUM(a21%M)', SUM(a21%M)
-      print*, 'max(a21%M)', maxval(a21%M)
+    !  do i = 0, vmax-1
+    !     do l = 0, jmax-1
+    !        do m = 0, vmax-1
+    !           do n = 0, jmax-1
+    !           if(a21%arranging(i, l, m, n).ne.0.d0) then
+    !     write(6,'(4(i2,2x),e20.7)') i, l, m, n, &
+    !                   a21%arranging(i, l, m, n)
+    !            endif
+    !            enddo
+    !        enddo
+    !    enddo
+    !  enddo
+      !do i = 1, a21%ntransrad
+      !   write(6,'(4(i2,2x),e14.5)') a21%vir(i), a21%jir(j), &
+      !                               a21%vfr(l), a21%jfr(m), &
+      !                 a21%M(a21%couple1r(i),a21%couple2r(i))
+      !enddo      
+      !print*, 'SUM(a21%M)', SUM(a21%M)
+      !print*, 'max(a21%M)', maxval(a21%M)
       
       
     ! TEST COLLISIONAL COEFFICIENTS
@@ -120,7 +132,8 @@ module level_population
     !                      (rr%matrix_lique(rr%couple1c(i),rr%couple2c(i),it)*1.d6)
     !        enddo
     !    enddo
-
+    print*, 'sum_collisional', sum(rr&matrix_lique)
+    
     ! TEST RADIATIVE TRANSITIONS COEFFICIENTS
     !  do ini = 1, nlev_lique
     !     do fin = 1, nlev_lique
