@@ -39,7 +39,7 @@ module radiation
                             do i3=-1,1
                                if(a21%reading(i3,i2,i1,i0).ne.0.d0) then
                                a21%ntransrad = a21%ntransrad + 1
-                                write(25,'(4(i2,2x),e10.4)') i1,i0,i2,i0+i3,a21%reading(i3,i2,i1,i0)
+                                write(25,'(4(i2,2x),e10.4)') i1,i0,i2,i0+2*i3,a21%reading(i3,i2,i1,i0)
                                endif
                             enddo
                         enddo
@@ -61,16 +61,16 @@ module radiation
                      ji=a21%jir(i)
                      vf=a21%vfr(i)
                      jf=a21%jfr(i)
-                     do ll=1,nlev_lique
-                         if(vi.eq.e%vl_lique(ll)) then
-                           if(ji.eq.e%jl_lique(ll)) then
+                     do ll=1,nlev
+                         if(vi.eq.e%vl(ll)) then
+                           if(ji.eq.e%jl(ll)) then
                              a21%couple1r(i) = ll
                            endif
                          !else
                          !    a21%couple1r(i) = 0
                          endif
-                         if(vf.eq.e%vl_lique(ll)) then
-                           if(jf.eq.e%jl_lique(ll)) then
+                         if(vf.eq.e%vl(ll)) then
+                           if(jf.eq.e%jl(ll)) then
                              a21%couple2r(i) = ll
                              endif
                          !else
@@ -85,7 +85,7 @@ module radiation
                       vf=a21%vfr(i)
                       jf=a21%jfr(i)
                       !!a21%M(a21%couple1r(i),a21%couple2r(i)) = a21%reading(jf,vf,vi,ji)
-                      a21%M_lique(a21%couple1r(i),a21%couple2r(i)) = a21%arranging(vi,ji,vf,jf)
+                      a21%M(a21%couple1r(i),a21%couple2r(i)) = a21%arranging(vi,ji,vf,jf)
                       !if(a21%couple1r(i).ne.0) then
                       ! if(a21%couple2r(i).ne.0) then
                       ! if(e%en(vi,ji).lt.e%en(vf,jf)) then

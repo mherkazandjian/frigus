@@ -96,12 +96,15 @@ module level_population
     !    enddo
     
     ! TEST EINSTEIN COEFFICIENTS AND TRANSITIONS
-    !  do i=1,a21%ntransrad
-    !     write(6,'(4(i2,2x),e14.5)') a21%vir(i), a21%jir(i), &
-    !                                 a21%vfr(i), a21%jfr(i), &
-    !                   a21%M(a21%couple1r(i),a21%couple2r(i))
-    !  enddo
-    
+      do i=1,a21%ntransrad
+         write(6,'(4(i2,2x),e14.5)') a21%vir(i), a21%jir(i), &
+                                     a21%vfr(i), a21%jfr(i), &
+                       a21%M(a21%couple1r(i),a21%couple2r(i))
+      enddo
+      print*, 'SUM(a21%M)', SUM(a21%M)
+      print*, 'max(a21%M)', maxval(a21%M)
+      
+      
     ! TEST COLLISIONAL COEFFICIENTS
     ! check of the coefficients compared to the read data by François + 
     ! detailed balance
