@@ -132,7 +132,9 @@ module level_population
     !                      (rr%matrix_lique(rr%couple1c(i),rr%couple2c(i),it)*1.d6)
     !        enddo
     !    enddo
-    print*, 'sum_collisional', sum(rr&matrix_lique)
+    print*, 'sum_collisional: ', sum(rr%matrix_lique)
+    print*, 'max_collisional: ', maxval(rr%matrix_lique)
+    print*, 'min_collisional: ', minval(rr%matrix_lique)    
     
     ! TEST RADIATIVE TRANSITIONS COEFFICIENTS
     !  do ini = 1, nlev_lique
