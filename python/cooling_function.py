@@ -14,7 +14,7 @@ Limitations
   - The smallest data set of (A, B, K) determines the number of states to be
     inserted in the model.
 """
-
+import os
 import read_ei
 import read_cr
 import read_levels
@@ -26,25 +26,32 @@ from numpy import zeros
 import pdb
 from numpy import log10, unique
 
-# read the energy levels (v, j, energy)
+# density of the colliding species H (unit = m^3/s)
+nc = 1.e9
+
+# read the energy levels (v, j, energy (unit = eV) )
 levels = read_levels.read_levels_lique('Read/H2Xvjlevels_francois_mod.cs')
+
 # print('{:3}{:3}{:10}'.format('v', 'j', 'E(eV)'))
 # for level in levels:
 #     print('{:<3}{:<3}{:<10}'.format(level['v'], level['j'], level['E']))
 
-# read the einstein coefficients for the H2 transitions
+# read the einstein coefficients (unit = 1/s) for the H2 transitions
+# A[v', j', v'', j'']
 A = read_ei.read_einstein()
-pdb.set_trace()
-
-# read the Einstein coefficients
-nc = 1.e9
-'''density of the colliding species, in units of 1.e3 cm-3 as in Lipovka'''
-
-# read the energy levels of H2
-en_H2 = read_levels.read_levels("Read/H2Xvjlevels.cs")
+# with open(os.path.expanduser('~/tmp/sandbox/A.out'), 'w') as fobj:
+#     for vp in xrange(A.shape[0]):
+#         for jp in xrange(A.shape[1]):
+#             for vpp in xrange(A.shape[2]):
+#                 for jpp in xrange(A.shape[3]):
+#                     if A[vp, jp, vpp, jpp] > 1e-15:
+#                         fobj.write('{:<3} {:<3} {:<3} {:<3} {:.7e}\n'.format(
+#                         vp, jp, vpp, jpp, A[vp, jp, vpp, jpp]
+#                         ))
 
 # read the collisional rates for H2 with H
 cr, T, ini, fin, vj_unique = read_cr.read_coeff("Read/Rates_H_H2.dat")
+pdb.set_trace()
 
 
 # creating the array for the radiation temperatures;
