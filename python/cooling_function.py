@@ -27,7 +27,8 @@ import pdb
 from numpy import log10, unique
 
 # read the energy levels (v, j, energy)
-levels = read_levels.read_levels_lique('Read/H2Xvjlevels_francois_mod.cs')
+energy_levels = read_levels.read_levels_lique(
+                       'Read/H2Xvjlevels_francois_mod.cs')
 # en_H2 = read_levels.read_levels("Read/H2Xvjlevels.cs")
 
 # print('{:3}{:3}{:10}'.format('v', 'j', 'E(eV)'))
@@ -44,7 +45,14 @@ nc = 1.e9
 
 
 # read the collisional rates for H2 with H
-cr, T, ini, fin, vj_unique = read_cr.read_coeff("Read/Rates_H_H2.dat")
+cr_upper_2_lower, T, ini, fin, vj_unique = read_cr.read_collision_coefficients(
+                                                      "Read/Rates_H_H2.dat")
+
+cr = read_cr.compute_lower_to_upper_collision_coefficients(cr_upper_2_lower,
+                                                           ini,
+                                                           fin,
+                                                           T,
+                                                           energy_levels)
 pdb.set_trace()
 
 
