@@ -22,22 +22,34 @@ import population
 from population import reduce_vj_repr, coolingFunction, fit_glover
 import matplotlib.pyplot as plt
 
+import numpy
 from numpy import zeros
 import pdb
 from numpy import log10, unique
 
+#
 # read the energy levels (v, j, energy)
+#
 energy_levels = read_levels.read_levels_lique(
                        'Read/H2Xvjlevels_francois_mod.cs')
 # en_H2 = read_levels.read_levels("Read/H2Xvjlevels.cs")
-
 # print('{:3}{:3}{:10}'.format('v', 'j', 'E(eV)'))
 # for level in levels:
 #     print('{:<3}{:<3}{:<10}'.format(level['v'], level['j'], level['E']))
 
-
+#
 # read the einstein coefficients for the H2 transitions
-A = read_ei.read_einstein()
+#
+A, A_info_nnz = read_ei.read_einstein()
+
+#
+# reduce the Einstien coefficents to a 2D matrix (construct the A matrix)
+#
+A_reduced_slow = population.reduce_einstein_coefficients_slow(A_info_nnz,
+                                                              energy_levels)
+pdb.set_trace()
+
+A_reduced = population.reduce_einstein_coefficients(A, energy_levels)
 
 # read the Einstein coefficients
 nc = 1.e9
@@ -53,7 +65,7 @@ cr = read_cr.compute_lower_to_upper_collision_coefficients(cr_upper_2_lower,
                                                            fin,
                                                            T,
                                                            energy_levels)
-pdb.set_trace()
+
 
 
 # creating the array for the radiation temperatures;
