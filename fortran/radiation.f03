@@ -17,7 +17,7 @@ module radiation
 
       subroutine reading_data_radiative(e, a21)
                  use types_and_parameters, only: jmax, nlev, nlev_lique,      &
-                                                 energy_lev
+                                                 energy_lev, ini, fin
  
                  type(radiative_coeffs) :: a21
                  type(energy_lev) :: e 
@@ -50,42 +50,22 @@ module radiation
                 allocate(a21%vir(1:a21%ntransrad), a21%jir(1:a21%ntransrad))
                 allocate(a21%vfr(1:a21%ntransrad), a21%jfr(1:a21%ntransrad))
                 allocate(a21%arranging(0:vmax, 0:jmax, 0:vmax, 0:jmax))
-                print*, a21%ntransrad, (jmax+1)*15*15*3
+                !print*, a21%ntransrad, (jmax+1)*15*15*3
 
                  do i=1,a21%ntransrad
                      read(25,*)  a21%vir(i),a21%jir(i),a21%vfr(i),a21%jfr(i), &
                      a21%arranging(a21%vir(i),a21%jir(i),a21%vfr(i),a21%jfr(i))
-                     !write(6,'(4(i3,2x),e10.4)')  a21%vir(i),a21%jir(i),a21%vfr(i),a21%jfr(i), &
-                     !a21%arranging(a21%vir(i),a21%jir(i),a21%vfr(i),a21%jfr(i))
-                     vi=a21%vir(i)
-                     ji=a21%jir(i)
-                     vf=a21%vfr(i)
-                     jf=a21%jfr(i)
-                     do ll=1,nlev
-                         if(vi.eq.e%vl(ll)) then
-                           if(ji.eq.e%jl(ll)) then
-                             a21%couple1r(i) = ll
-                           endif
-                         !else
-                         !    a21%couple1r(i) = 0
-                         endif
-                         if(vf.eq.e%vl(ll)) then
-                           if(jf.eq.e%jl(ll)) then
-                             a21%couple2r(i) = ll
-                             endif
-                         !else
-                         !    a21%couple2r(i) = 0
-                         endif
-                     enddo
                  enddo
 
-                  do i=1,a21%ntransrad
-                      vi=a21%vir(i)
-                      ji=a21%jir(i)
-                      vf=a21%vfr(i)
-                      jf=a21%jfr(i)
-                      !!a21%M(a21%couple1r(i),a21%couple2r(i)) = a21%reading(jf,vf,vi,ji)
-                      a21%M(a21%couple1r(i),a21%couple2r(i)) = a21%arranging(vi,ji,vf,jf)
+                do ini = 1, nlev_lique
+                   do fin = 1, nlev_lique
+                            vi = e%vl_lique(ini)
+                            ji = e%jl_lique(ini)
+                            vf = e%vl_lique(fin)
+                            jf = e%jl_lique(fin)
+                      a21%M_lique(ini, fin) = a21%arranging(vi,ji,vf,jf)
+                   enddo
+                 enddo
                       !if(a21%couple1r(i).ne.0) then
                       ! if(a21%couple2r(i).ne.0) then
                       ! if(e%en(vi,ji).lt.e%en(vf,jf)) then
@@ -98,8 +78,6 @@ module radiation
                       ! endif
                       ! endif
                       !endif
-                  enddo
-                !print*, ivmax
                 return
       end subroutine reading_data_radiative
 

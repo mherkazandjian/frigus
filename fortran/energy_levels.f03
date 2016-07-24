@@ -100,6 +100,8 @@ module energy_levels
                      do i=1,nlev                     
                         write(23,'(3(i3,2x))') i, e%vl(i), e%jl(i)
                      enddo
+
+                     write(24,'(a5, 2x, 2(a1,4x))') 'label', 'v' , 'j'
                      do i=1,nlev_lique
                         write(24,'(3(i3,2x))') i, e%vl_lique(i), e%jl_lique(i)
                      enddo

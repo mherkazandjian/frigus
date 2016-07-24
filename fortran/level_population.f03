@@ -67,6 +67,7 @@ module level_population
     
     
     subroutine tests(energy, rr, a21)
+        real*8 :: diagonal
         type(energy_lev) :: energy
         type(radiative_coeffs) :: a21!, b21, b12, r21, r12, rad
         type(collisional_coeffs) :: rr
@@ -136,13 +137,14 @@ module level_population
     print*, 'max_collisional: ', maxval(rr%matrix_lique)
     print*, 'min_collisional: ', minval(rr%matrix_lique)    
     
+    diagonal = 0.d0
     ! TEST RADIATIVE TRANSITIONS COEFFICIENTS
-    !  do ini = 1, nlev_lique
-    !     do fin = 1, nlev_lique
+      do ini = 1, nlev_lique
+         do fin = 1, nlev_lique
     !        !if(a21%M(ini, fin).ne.0.d0)                                        &
-    !        write(6,'(2(i3, 2x), 5(e14.7))')  ini, fin,                                     &
-    !                                        energy%ene_lique(ini), energy%ene_lique(fin),   &
-    !                                        a21%M_lique(ini, fin)!,                   &
+            write(6,'(2(i3, 2x), 3(e14.7))')  ini, fin,                                     &
+                                            energy%ene_lique(ini), energy%ene_lique(fin),   &
+                                            a21%M_lique(ini, fin)!,                   &
     !                                        b21%M(ini, fin),                   &
     !                                        r21%M(ini, fin),                   &
     !                                        b12%M(ini, fin),                   &
@@ -151,8 +153,11 @@ module level_population
     !                                        b12%M(fin, ini),                   &
     !                                        r12%M(fin, ini),                   &
     !                                        rad%M(ini, fin)
-    !     enddo
-    !  enddo
+            if(ini.le.fin) diagonal = diagonal + a21%M_lique(ini, fin)    
+         enddo
+      enddo
+      print*, sum(a21%M_lique), diagonal
+    
 
     ! TEST MATRIX LINEAR SYSTEM
     !   do ini = 1, nlev
