@@ -45,9 +45,9 @@ def read_einstein():
         .. warning:: this function modifies the values of A
 
         in the snippet below:
-        - the first row is the final vibrational level v''
+        - the first row is initial vibrational level v'
         - the first column is the initial rotational level j'
-        - the second column is the initial vibrational level v'
+        - the second column is the final vibrational level v''
         - the final rational level can be obtained from j' (the first column)
           by adding 'delta_j'
 
