@@ -66,52 +66,41 @@ module radiation
                       a21%M_lique(ini, fin) = a21%arranging(vi,ji,vf,jf)
                    enddo
                  enddo
-                      !if(a21%couple1r(i).ne.0) then
-                      ! if(a21%couple2r(i).ne.0) then
-                      ! if(e%en(vi,ji).lt.e%en(vf,jf)) then
-                      !write(6,'(6(i3, 2x), 2(e14.7, 2x))')                         &
-                      !              a21%couple1r(i),a21%couple2r(i),               &
-                      !              a21%vir(i),a21%jir(i),                         &
-                      !              a21%vfr(i),a21%jfr(i),                         &
-                      !              a21%M_lique(a21%couple1r(i),a21%couple2r(i)),  &
-                      !              a21%arranging(vi,ji,vf,jf)
-                      ! endif
-                      ! endif
-                      !endif
                 return
       end subroutine reading_data_radiative
 
-       subroutine radiative_downwards(energy, Tr, a21, b21, r21)
+       subroutine radiative_downwards(e, Tr, a21, b21, r21)
                   ! this subroutine returns the Einstein coefficients
                   ! for downward stimulated transitions
                   ! input: a21
                   ! output: b21 = c**2/(2*hp*nu) a21
                   use types_and_parameters, only: hp, c, nlev, nlev_lique,  &
-                                                  energy_lev,   &
+                                                  energy_lev,               &
                                                   ini, fin
  
                   type(radiative_coeffs) :: a21, b21, r21
-                  type(energy_lev) :: energy
+                  type(energy_lev) :: e
  
                   real*8 :: Tr
  
  
                   b21%M_lique = 0.d0
                   r21%M_lique = 0.d0
- 
+                  
                   do ini = 1, nlev_lique
                      do fin = 1, nlev_lique
-                         if((energy%ene_lique(ini)-energy%ene_lique(fin)).gt.0.d0) then  
+                         if((e%ene_lique(ini)-e%ene_lique(fin)).gt.0.d0) then  
                                                                              ! gt in the case of stancil
                                                                              ! [according to the ordering in the  
                                                                              ! energy file downwards, 
                                                                              ! after the inversion "-" 
                                                                              ! => E1 - E2  > 0 ( =>  E2 - E1 < 0)]
-                                 b21%M_lique(ini, fin) = c**2/(2.d0*hp*(energy%freq_lique(ini, fin))**3)* &
-                                                   a21%M_lique(ini,fin)
+                b21%M_lique(ini, fin) = (c**2/(2.d0*hp*(e%freq_lique(ini, fin))**3)) * a21%M_lique(ini,fin)
                                  r21%M_lique(ini, fin) = a21%M_lique(ini, fin) +    &
                                                    b21%M_lique(ini, fin) *    &
-                                              planck(energy%freq_lique(ini, fin), Tr)
+                                              planck(e%freq_lique(ini, fin), Tr)
+            print*, ini, fin, b21%M_lique(ini,fin), r21%M_lique(ini,fin)
+                                              
                     !write(6,'(a26, 2(i3,2x), (e16.10,2x), a8, 3(e16.10,2x))') 'from radiative downwards: ', &
                     !                                         ini, fin,                                      &
                     !                                         b21%M(ini, fin),                               &
