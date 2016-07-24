@@ -64,17 +64,20 @@ module collisions
                 !   write(6,'(6(i3,2x))') rr%vic(i),rr%jic(i),rr%vfc(i),rr%jfc(i),      &
                 !           rr%couple1c(i),rr%couple2c(i)
                 !enddo
+                ! detailed balance implementation
                  do i=1,ntrans
                     vi=rr%vic(i)
                     ji=rr%jic(i)
                     vf=rr%vfc(i)
                     jf=rr%jfc(i)
-                    dE = abs(e%en(vi,ji)-e%en(vf,jf))
+                    dE = abs(e%en_lique(vi,ji)-e%en_lique(vf,jf))
                      do it=1,ntemp
                         rr%matrix_lique(rr%couple1c(i),rr%couple2c(i),it) = &
                                        rr%reading(vi,ji,vf,jf,it)
-                        rr%matrix_lique(rr%couple2c(i),rr%couple1c(i),it) = &
-                          dexp(-dE/(kb*rr%temp(it))) * rr%reading(vi,ji,vf,jf,it)
+                        rr%matrix_lique(rr%couple2c(i),rr%couple1c(i),it) =       &
+                          dexp(-dE/(kb*rr%temp(it))) * rr%reading(vi,ji,vf,jf,it) &
+                          * ((2.*jf+1.))/(2.*ji+1.)
+                          
                      enddo
                  enddo
 
