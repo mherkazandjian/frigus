@@ -149,6 +149,7 @@ def reduce_einstein_coefficients(A, energy_levels):
     # pylab.imshow(A_reduced, interpolation='none')
     # pylab.colorbar()
     # pylab.show()
+
     return A_reduced
 
 def reduce_vj_repr(en, a_eins, cr, T,  ini, fin, vj_unique,
