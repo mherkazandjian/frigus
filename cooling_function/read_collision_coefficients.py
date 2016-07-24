@@ -12,6 +12,8 @@ from scipy import interpolate
 import pylab
 from IPython.core.debugger import Tracer
 
+from utils import linear_2d_index
+
 def unique_level_pairs(vj):
     """from a list of levels find the list of unique levels and return them.
     :param iterable vj: the list of v levels where each item vj[x] is a level.

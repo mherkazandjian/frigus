@@ -15,8 +15,9 @@ Limitations
     inserted in the model.
 """
 
-import read_ei
-import read_cr
+import pylab
+import read_einstien_coefficient
+import read_collision_coefficients
 import read_levels
 import population
 from population import reduce_vj_repr, coolingFunction, fit_glover
@@ -40,17 +41,16 @@ energy_levels = read_levels.read_levels_lique(
 #
 # read the einstein coefficients for the H2 transitions
 #
-A, A_info_nnz = read_ei.read_einstein()
+A, A_info_nnz = read_einstien_coefficient.read_einstein()
 
 #
 # reduce the Einstein coefficients to a 2D matrix (construct the A matrix)
 #
-A_reduced_slow = population.reduce_einstein_coefficients_slow(A_info_nnz,
-                                                              energy_levels)
+# A_reduced_slow = population.reduce_einstein_coefficients_slow(A_info_nnz,
+#                                                               energy_levels)
+A_reduced = population.reduce_einstein_coefficients(A, energy_levels)
 
-A_reduced = population.reduce_einstein_coefficients(A,
-                                                    A_info_nnz,
-                                                    energy_levels)
+
 pdb.set_trace()
 
 # read the Einstein coefficients
@@ -59,14 +59,14 @@ nc = 1.e9
 
 
 # read the collisional rates for H2 with H
-cr_upper_2_lower, T, ini, fin, vj_unique = read_cr.read_collision_coefficients(
+cr_upper_2_lower, T, ini, fin, vj_unique = read_collision_coefficients.read_collision_coefficients(
                                                       "Read/Rates_H_H2.dat")
 
-cr = read_cr.compute_lower_to_upper_collision_coefficients(cr_upper_2_lower,
-                                                           ini,
-                                                           fin,
-                                                           T,
-                                                           energy_levels)
+cr = read_collision_coefficients.compute_lower_to_upper_collision_coefficients(cr_upper_2_lower,
+                                                                               ini,
+                                                                               fin,
+                                                                               T,
+                                                                               energy_levels)
 
 
 
