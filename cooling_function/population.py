@@ -53,22 +53,36 @@ def reduce_einstein_coefficients_slow(A_info_nnz, energy_levels):
 
     check_self_transitions_in_Einstien_nnz_data(A_info_nnz)
 
+    v_nnz, j_nnz, vp_nnz, jp_nnz, A_nnz = A_info_nnz
+    v_max = max(vp_nnz.max(), vp_nnz.max())
+
     levels = energy_levels
+
+    # compute labels of available levels based on levels of the Einstein data
+    # transitions
+    labels = linear_2d_index(levels['v'], levels['j'], n_i=v_max+1)
+
+    # get the unique label for the (v,j) pairs
+    labels_ini = linear_2d_index(v_nnz, j_nnz, n_i=v_max+1)
+    labels_fin = linear_2d_index(vp_nnz, jp_nnz, n_i=v_max+1)
 
     A_reduced = zeros((levels.size, levels.size), 'f8')
 
-    v_nnz, j_nnz, vp_nnz, jp_nnz, A_nnz = A_info_nnz
-    for i, A in enumerate(A_nnz):
+    for i, A_i in enumerate(A_nnz):
 
-        print('{:4}/{:4}'.format(i, len(A_nnz)))
+        # print('{:4}/{:4}'.format(i+1, len(A_nnz)))
 
-        v, j, vp, jp = v_nnz[i], j_nnz[i], vp_nnz[i], jp_nnz[i]
+        # get the indices based on v,j, jp, jp comaprisons
+        #     v, j, vp, jp = v_nnz[i], j_nnz[i], vp_nnz[i], jp_nnz[i]
+        #     ind_ini = where((levels['v'] == v)*(levels['j'] == j))[0]
+        #     ind_fin = where((levels['v'] == vp)*(levels['j'] == jp))[0]
 
-        ind_ini = where((levels['v'] == v)*(levels['j'] == j))[0]
-        ind_fin = where((levels['v'] == vp)*(levels['j'] == jp))[0]
+        # get the indices based on label comparisons
+        ind_ini = where(labels == labels_ini[i])[0]
+        ind_fin = where(labels == labels_fin[i])[0]
 
         if ind_ini.size != 0 or ind_fin.size != 0:
-            A_reduced[ind_ini, ind_fin] = A
+            A_reduced[ind_ini, ind_fin] = A_i
         else:
             continue
 
@@ -77,10 +91,11 @@ def reduce_einstein_coefficients_slow(A_info_nnz, energy_levels):
     pylab.imshow(A_reduced, interpolation='none')
     pylab.colorbar()
     pylab.show()
+    pdb.set_trace()
     return A_reduced
 
 
-def reduce_einstein_coefficients(A, energy_levels):
+def reduce_einstein_coefficients(A, A_info_nnz, energy_levels):
     """Given the array A that is indexed using four indices A[v, j, v', j']
     returns an array A_reduced that is indexed with two indices A_reduced[i, f]
     where i and f are the initial and final levels respectively.
@@ -88,16 +103,22 @@ def reduce_einstein_coefficients(A, energy_levels):
     :return: A_reduced
     """
 
+    v_nnz, j_nnz, vp_nnz, jp_nnz, A_nnz = A_info_nnz
+    # for i, A_i in enumerate(A_nnz):
+    #     v, j, vp, jp = v_nnz[i], j_nnz[i], vp_nnz[i], jp_nnz[i]
+    #     print(A[v, j, vp, jp], A_i)
+    #     assert A[v, j, vp, jp] == A_i
+
+
     # labels of the levels for which energy data is available
     labels = energy_levels['label']
 
     # find the elements of A that are non zero
-    v, j, vp, jp = where(A > 0.0)
+    # (v_nnz, j_nnz, vp_nnz, jp_nnz), A_nnz = where(A > 0.0), A[A > 0.0]
 
     # get the unique label for the (v,j) pairs
-    labels_ini = linear_2d_index(v, j, n_i=energy_levels['v'].max() + 1)
-    labels_fin = linear_2d_index(vp, jp, n_i=energy_levels['v'].max() + 1)
-    A_nnz = A[A > 0.0]
+    labels_ini = linear_2d_index(v_nnz, j_nnz, n_i=energy_levels['v'].max()+1)
+    labels_fin = linear_2d_index(vp_nnz, jp_nnz, n_i=energy_levels['v'].max()+1)
 
     # keep transitions whose initial levels labels and the final label of the
     # transition are found in energy_levels

@@ -43,13 +43,15 @@ energy_levels = read_levels.read_levels_lique(
 A, A_info_nnz = read_ei.read_einstein()
 
 #
-# reduce the Einstien coefficents to a 2D matrix (construct the A matrix)
+# reduce the Einstein coefficients to a 2D matrix (construct the A matrix)
 #
 A_reduced_slow = population.reduce_einstein_coefficients_slow(A_info_nnz,
                                                               energy_levels)
-pdb.set_trace()
 
-A_reduced = population.reduce_einstein_coefficients(A, energy_levels)
+A_reduced = population.reduce_einstein_coefficients(A,
+                                                    A_info_nnz,
+                                                    energy_levels)
+pdb.set_trace()
 
 # read the Einstein coefficients
 nc = 1.e9

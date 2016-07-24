@@ -4,7 +4,7 @@ read the Einstein coefficients
 """
 
 import numpy
-from numpy import zeros, testing
+from numpy import zeros, testing, array
 from IPython.core.debugger import Tracer
 
 
@@ -128,4 +128,5 @@ def read_einstein():
     testing.assert_approx_equal(A.sum(), 9.3724e-4, significant=4)
     testing.assert_approx_equal(A[7, 2, 4, 2], 4.133e-7, significant=4)
 
-    return A, (vp_nnz, jp_nnz, vpp_nnz, jpp_nnz, A_nnz)
+    return A, (array(vp_nnz, 'i4'), array(jp_nnz, 'i4'),
+               array(vpp_nnz, 'i4'), array(jpp_nnz, 'i4'), array(A_nnz, 'f8'))
