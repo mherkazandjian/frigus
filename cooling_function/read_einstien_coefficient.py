@@ -4,8 +4,9 @@ read the Einstein coefficients
 """
 
 import numpy
-from numpy import zeros, testing
+from numpy import zeros, testing, array
 from IPython.core.debugger import Tracer
+
 
 def read_einstein():
     """read the data provided by Simbotin from multiple files and returns the A
@@ -33,6 +34,10 @@ def read_einstein():
         print(A[3, 9, 0, 18])
     """
 
+    # lists that store the read data. These are the nonzero entries of A
+    # that is also returned
+    vp_nnz, jp_nnz, vpp_nnz, jpp_nnz, A_nnz = [], [], [], [], []
+
     def read_j2j_x(fname, A, delta_j=None, skip_rows=None):
         """read the Einstein coefficients from the file "fname" and modify the
         corresponding entries of 'A'.
@@ -40,9 +45,9 @@ def read_einstein():
         .. warning:: this function modifies the values of A
 
         in the snippet below:
-        - the first row is the final vibrational level v''
+        - the first row is initial vibrational level v'
         - the first column is the initial rotational level j'
-        - the second column is the initial vibrational level v'
+        - the second column is the final vibrational level v''
         - the final rational level can be obtained from j' (the first column)
           by adding 'delta_j'
 
@@ -56,9 +61,6 @@ def read_einstein():
          a transition.
         :param int skip_rows: The number of rows to skip in parsing the data
          file. (i.e the number of lines of the header).
-        :return: A 4D matrix containing the Einstein coefficients. To obtain
-         an Einstein coefficient of the transition (v',j') -> (v'', j'')
-         A[v', j', v'', j'']
         """
 
         # opening the original ascii file and discard empty lines
@@ -85,6 +87,15 @@ def read_einstein():
                     A_tmp = numpy.float64(A_i.replace('D', 'E'))
                     vp, jpp = vp_all[i], jp + delta_j
                     A[vp, jp, vpp, jpp] = A_tmp
+
+                    if vp == vpp and jp == jpp:
+                        raise ValueError('v -> v, j -> j transition. This is'
+                                         'not possible')
+                    vp_nnz.append(vp)
+                    jp_nnz.append(jp)
+                    vpp_nnz.append(vpp)
+                    jpp_nnz.append(jpp)
+                    A_nnz.append(A_tmp)
 
                 # We determine that the end of a block has reached by checking
                 # that the first 10 chars of next line are empty
@@ -117,4 +128,5 @@ def read_einstein():
     testing.assert_approx_equal(A.sum(), 9.3724e-4, significant=4)
     testing.assert_approx_equal(A[7, 2, 4, 2], 4.133e-7, significant=4)
 
-    return A
+    return A, (array(vp_nnz, 'i4'), array(jp_nnz, 'i4'),
+               array(vpp_nnz, 'i4'), array(jpp_nnz, 'i4'), array(A_nnz, 'f8'))

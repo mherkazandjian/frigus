@@ -14,44 +14,60 @@ Limitations
   - The smallest data set of (A, B, K) determines the number of states to be
     inserted in the model.
 """
-import os
-import read_ei
-import read_cr
+
+import pylab
+import read_einstien_coefficient
+import read_collision_coefficients
 import read_levels
 import population
 from population import reduce_vj_repr, coolingFunction, fit_glover
 import matplotlib.pyplot as plt
 
+import numpy
 from numpy import zeros
 import pdb
 from numpy import log10, unique
 
-# density of the colliding species H (unit = m^3/s)
-nc = 1.e9
-
-# read the energy levels (v, j, energy (unit = eV) )
-levels = read_levels.read_levels_lique('Read/H2Xvjlevels_francois_mod.cs')
-
+#
+# read the energy levels (v, j, energy)
+#
+energy_levels = read_levels.read_levels_lique(
+                       'Read/H2Xvjlevels_francois_mod.cs')
+# en_H2 = read_levels.read_levels("Read/H2Xvjlevels.cs")
 # print('{:3}{:3}{:10}'.format('v', 'j', 'E(eV)'))
 # for level in levels:
 #     print('{:<3}{:<3}{:<10}'.format(level['v'], level['j'], level['E']))
 
-# read the einstein coefficients (unit = 1/s) for the H2 transitions
-# A[v', j', v'', j'']
-A = read_ei.read_einstein()
-# with open(os.path.expanduser('~/tmp/sandbox/A.out'), 'w') as fobj:
-#     for vp in xrange(A.shape[0]):
-#         for jp in xrange(A.shape[1]):
-#             for vpp in xrange(A.shape[2]):
-#                 for jpp in xrange(A.shape[3]):
-#                     if A[vp, jp, vpp, jpp] > 1e-15:
-#                         fobj.write('{:<3} {:<3} {:<3} {:<3} {:.7e}\n'.format(
-#                         vp, jp, vpp, jpp, A[vp, jp, vpp, jpp]
-#                         ))
+#
+# read the einstein coefficients for the H2 transitions
+#
+A, A_info_nnz = read_einstien_coefficient.read_einstein()
+
+#
+# reduce the Einstein coefficients to a 2D matrix (construct the A matrix)
+#
+# A_reduced_slow = population.reduce_einstein_coefficients_slow(A_info_nnz,
+#                                                               energy_levels)
+A_reduced = population.reduce_einstein_coefficients(A, energy_levels)
+
+
+pdb.set_trace()
+
+# read the Einstein coefficients
+nc = 1.e9
+'''density of the colliding species, in units of 1.e3 cm-3 as in Lipovka'''
+
 
 # read the collisional rates for H2 with H
-cr, T, ini, fin, vj_unique = read_cr.read_coeff("Read/Rates_H_H2.dat")
-pdb.set_trace()
+cr_upper_2_lower, T, ini, fin, vj_unique = read_collision_coefficients.read_collision_coefficients(
+                                                      "Read/Rates_H_H2.dat")
+
+cr = read_collision_coefficients.compute_lower_to_upper_collision_coefficients(cr_upper_2_lower,
+                                                                               ini,
+                                                                               fin,
+                                                                               T,
+                                                                               energy_levels)
+
 
 
 # creating the array for the radiation temperatures;

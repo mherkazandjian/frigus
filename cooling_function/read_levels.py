@@ -7,6 +7,8 @@ import numpy
 from numpy import loadtxt, genfromtxt
 import pylab
 
+from utils import linear_2d_index
+
 
 def read_levels(fname):
     """parse the  data of
@@ -100,10 +102,14 @@ def read_levels_lique(fname):
 
     data = numpy.zeros(inds.shape, dtype=[('v', 'i4'),
                                           ('j', 'i4'),
+                                          ('g', 'f8'),
+                                          ('label', 'i4'),
                                           ('E', 'f8')])
 
     data['v'] = v
     data['j'] = j
+    data['g'] = 2*j + 1
+    data['label'] = linear_2d_index(v, j)
     data['E'] = energies
 
     return data

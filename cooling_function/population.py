@@ -1,21 +1,163 @@
-from numpy import zeros, fabs, arange, array_equal, exp, ones, log10
-from numpy import linalg, eye, dot
+from __future__ import print_function
+import pylab
+
+import numpy
+from numpy import (zeros, fabs, arange, array_equal, exp, ones, log10,
+                   linalg, eye, dot, where, intersect1d, setdiff1d, in1d)
+import pdb
+
 from IPython.core.debugger import Tracer
 
-import read_ei
-import read_cr
+import read_einstien_coefficient
+import read_collision_coefficients
 import read_levels
 from scipy.constants import c,h,Boltzmann
 from Leiden_ISM.ismUtils import planckOccupation as ng
 
+from utils import linear_2d_index, find_matching_indices
+
 kb = Boltzmann
+
+
+def check_self_transitions_in_Einstien_nnz_data(A_info_nnz):
+    """raises an error if there are self transitions in the non-zero data of
+    the Einstien coefficients.
+
+    :param A_info_nnz: a tuple of elements v_nnz, j_nnz, vp_nnz, jp_nnz, A_nnz
+    :return: True if everything ok, else error is raised
+    """
+    v_nnz, j_nnz, vp_nnz, jp_nnz, A_nnz = A_info_nnz
+
+    for i, A in enumerate(A_nnz):
+        v, j, vp, jp = v_nnz[i], j_nnz[i], vp_nnz[i], jp_nnz[i]
+        if v == vp and j == jp:
+            raise ValueError('v -> v, j -> j transition. This is'
+                             'not possible')
+
+    return True
+
+
+def reduce_einstein_coefficients_slow(A_info_nnz, energy_levels):
+    """Use the nonzero entries of the Einstein coefficients to construct the
+    A matrix for the levels found in the energy_levels parameter.
+
+    :param A_info_nnz: a tuple of elements v_nnz, j_nnz, vp_nnz, jp_nnz, A_nnz
+    :param energy_levels: numpy array array of N rows, the v and j levels and
+     their corresponding energy. The elements of the array are stored in
+     increasing order in the energy. This array can be obtained e.g. from
+     read_levels.read_levels_lique()
+    :return: A 2D matrix of shape (energy_levels.size, energy_levels.size) that
+     is a lower triangular matrix containing the Einstien coefficients.
+    """
+
+    check_self_transitions_in_Einstien_nnz_data(A_info_nnz)
+
+    v_nnz, j_nnz, vp_nnz, jp_nnz, A_nnz = A_info_nnz
+    v_max = max(v_nnz.max(), vp_nnz.max())
+
+    levels = energy_levels
+
+    # compute labels of available levels based on levels of the Einstein data
+    # transitions
+    labels = linear_2d_index(levels['v'], levels['j'], n_i=v_max+1)
+
+    # get the unique label for the (v,j) pairs
+    labels_ini = linear_2d_index(v_nnz, j_nnz, n_i=v_max+1)
+    labels_fin = linear_2d_index(vp_nnz, jp_nnz, n_i=v_max+1)
+
+    A_reduced = zeros((levels.size, levels.size), 'f8')
+
+    for i, A_i in enumerate(A_nnz):
+
+        # print('{:4}/{:4}'.format(i+1, len(A_nnz)))
+
+        # get the indices based on v,j, jp, jp comaprisons
+        #     v, j, vp, jp = v_nnz[i], j_nnz[i], vp_nnz[i], jp_nnz[i]
+        #     ind_ini = where((levels['v'] == v)*(levels['j'] == j))[0]
+        #     ind_fin = where((levels['v'] == vp)*(levels['j'] == jp))[0]
+
+        # get the indices based on label comparisons
+        ind_ini = where(labels == labels_ini[i])[0]
+        ind_fin = where(labels == labels_fin[i])[0]
+
+        if ind_ini.size != 0 or ind_fin.size != 0:
+            A_reduced[ind_ini, ind_fin] = A_i
+        else:
+            continue
+
+
+    # DEBUG
+    # A_reduced[A_reduced > 0.0] = numpy.log10(A_reduced[A_reduced > 0.0])
+    # pylab.imshow(A_reduced, interpolation='none')
+    # pylab.colorbar()
+    # pylab.show()
+
+    return A_reduced
+
+
+def reduce_einstein_coefficients(A, energy_levels):
+    """Given the array A that is indexed using four indices A[v, j, v', j']
+    returns an array A_reduced that is indexed with two indices A_reduced[i, f]
+    where i and f are the initial and final levels respectively.
+
+    :param A: A 4D matrix holding the A coefficients. A[v, j, v', j'] where
+     (v,j) are the initial levels and (v',j') are the final levels.
+    :param energy_levels: numpy array array of N rows, the v and j levels and
+     their corresponding energy. The elements of the array are stored in
+     increasing order in the energy. This array can be obtained e.g. from
+     read_levels.read_levels_lique()
+    :return: A_reduced that is a square matrix of shape
+     (energy_levels.size, energy_levels.size) with the nonzero values of A
+     mapped to the indices of the levels in the array energy_levels.
+    """
+
+    levels = energy_levels
+
+    # find the non zeros elements of A that and their indices
+    (v_nnz, j_nnz, vp_nnz, jp_nnz), A_nnz = where(A > 0.0), A[A > 0.0]
+
+    # find the maximum v level from the transitions levels
+    v_max = max(v_nnz.max(), vp_nnz.max())
+
+    # compute labels of available levels based on levels of the Einstein data
+    # transitions
+    labels = linear_2d_index(levels['v'], levels['j'], n_i=v_max+1)
+
+    # get the unique label for the (v,j) pairs
+    labels_ini = linear_2d_index(v_nnz, j_nnz, n_i=v_max+1)
+    labels_fin = linear_2d_index(vp_nnz, jp_nnz, n_i=v_max+1)
+
+    # keep transitions whose initial levels labels and the final label of the
+    # transition are found in energy_levels
+    mask = in1d(labels_ini, labels)*in1d(labels_fin, labels)
+    labels_ini, labels_fin = labels_ini[mask], labels_fin[mask]
+    A_nnz = A_nnz[mask]
+
+    # get the indices of the labels of the levels in the transitions (that are
+    # now all a subset of the energy_levels)
+    inds_ini = find_matching_indices(labels, labels_ini)
+    inds_fin = find_matching_indices(labels, labels_fin)
+
+    # define the reduced A matrix and fill it up using inds_ini and inds_fin
+    n_levels = energy_levels.size
+    A_reduced = zeros((n_levels, n_levels), 'f8')
+
+    A_reduced[inds_ini, inds_fin] = A_nnz
+
+    # DEBUG
+    # A_reduced[A_reduced > 0.0] = numpy.log10(A_reduced[A_reduced > 0.0])
+    # pylab.imshow(A_reduced, interpolation='none')
+    # pylab.colorbar()
+    # pylab.show()
+
+    return A_reduced
 
 def reduce_vj_repr(en, a_eins, cr, T,  ini, fin, vj_unique,
                    debug=False):
     """.. todo:: add doc"""
 
     # number of v and j levels respectively
-    nv, nj =  en.shape
+    nv, nj = en.shape
 
     # linear indices for all the energy levels
     lind = arange(en.size)
