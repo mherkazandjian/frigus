@@ -152,6 +152,43 @@ def reduce_einstein_coefficients(A, energy_levels):
 
     return A_reduced
 
+
+def compute_delta_energy_matrix(levels):
+    """Given the energy levels, returns the delta energy matrix
+     \Delta E = E - E^T that is documented in the notebook.
+    :return: square matrix of shape n x n where n is the number of energy
+     levels.
+    """
+    n = levels.size
+    energies_as_column = levels['E'].reshape(1, n)
+
+    # the energy matrix with identical columns
+    E_matrix = numpy.repeat(energies_as_column, n, axis=0).T
+
+    delta_E = E_matrix - E_matrix.T
+
+    return delta_E
+
+
+def compute_degeneracy_matrix(levels):
+    """Given the energy levels, returns the degeneracy matrix R that is
+     strictly upper triangular that is documented in the notebook.
+    :return: square matrix of shape n x n.
+    """
+    n = levels.size
+    degeneracies_as_column = levels['g'].reshape(1, n)
+
+    G = numpy.repeat(degeneracies_as_column, n, axis=0).T
+
+    # a strict upper triangular matrix
+    one_U_nn = numpy.tril(numpy.ones((n, n), 'f8'), -1).T
+
+    # the R matrix (the ratios of the degeneracies)
+    R = (G * (1.0 / G.T)).T * one_U_nn
+
+    return R
+
+
 def reduce_vj_repr(en, a_eins, cr, T,  ini, fin, vj_unique,
                    debug=False):
     """.. todo:: add doc"""
