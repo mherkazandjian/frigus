@@ -178,18 +178,11 @@ def reduce_collisional_coefficients_slow(cr_info_nnz, energy_levels):
     """
     # check_self_transitions_in_Einstien_nnz_data(A_info_nnz)
 
-    ini_nnz, fin_nnz, unique_nnz, cr_nnz = cr_info_nnz
-    # continue from here
-    #
-    #
-    #
-    #
-    #
-    #
+    levels = energy_levels
+
+    (v_nnz, j_nnz), (vp_nnz, jp_nnz), unique_nnz, cr_nnz = cr_info_nnz
 
     v_max = max(v_nnz.max(), vp_nnz.max())
-
-    levels = energy_levels
 
     # compute labels of available levels based on levels of the Einstein data
     # transitions
@@ -199,13 +192,13 @@ def reduce_collisional_coefficients_slow(cr_info_nnz, energy_levels):
     labels_ini = linear_2d_index(v_nnz, j_nnz, n_i=v_max+1)
     labels_fin = linear_2d_index(vp_nnz, jp_nnz, n_i=v_max+1)
 
-    A_reduced = zeros((levels.size, levels.size), 'f8')
+    K_ex_reduced = zeros((levels.size, levels.size, cr_nnz.shape[0]), 'f8')
 
-    for i, A_i in enumerate(A_nnz):
+    for i, cr_i in enumerate(cr_nnz.T):
 
         # print('{:4}/{:4}'.format(i+1, len(A_nnz)))
 
-        # get the indices based on v,j, jp, jp comaprisons
+        # get the indices based on v,j, jp, jp comparisons
         #     v, j, vp, jp = v_nnz[i], j_nnz[i], vp_nnz[i], jp_nnz[i]
         #     ind_ini = where((levels['v'] == v)*(levels['j'] == j))[0]
         #     ind_fin = where((levels['v'] == vp)*(levels['j'] == jp))[0]
@@ -215,18 +208,19 @@ def reduce_collisional_coefficients_slow(cr_info_nnz, energy_levels):
         ind_fin = where(labels == labels_fin[i])[0]
 
         if ind_ini.size != 0 or ind_fin.size != 0:
-            A_reduced[ind_ini, ind_fin] = A_i
+            K_ex_reduced[ind_ini, ind_fin, :] = cr_i
         else:
             continue
 
 
     # DEBUG
-    # A_reduced[A_reduced > 0.0] = numpy.log10(A_reduced[A_reduced > 0.0])
-    # pylab.imshow(A_reduced, interpolation='none')
+    # K_ex_reduced[K_ex_reduced > 0.0] = numpy.log10(
+    #     K_ex_reduced[K_ex_reduced > 0.0])
+    # pylab.imshow(K_ex_reduced[..., 0], interpolation='none')
     # pylab.colorbar()
     # pylab.show()
 
-    return A_reduced
+    return K_ex_reduced
 
 
 
