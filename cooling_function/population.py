@@ -3,7 +3,7 @@ import pylab
 
 import numpy
 from numpy import (zeros, fabs, arange, array_equal, exp, ones, log10,
-                   linalg, eye, dot, where, intersect1d, setdiff1d, in1d)
+                   linalg, eye, dot, where, intersect1d, setdiff1d, in1d, pi)
 import pdb
 
 from IPython.core.debugger import Tracer
@@ -11,12 +11,14 @@ from IPython.core.debugger import Tracer
 import read_einstien_coefficient
 import read_collision_coefficients
 import read_levels
-from scipy.constants import c,h,Boltzmann
+from scipy.constants import c as c_light
+from scipy.constants import h as h_planck
+from scipy.constants import Boltzmann as kb
+from scipy.constants import hbar as hbar_planck
+
 from Leiden_ISM.ismUtils import planckOccupation as ng
 
 from utils import linear_2d_index, find_matching_indices
-
-kb = Boltzmann
 
 
 def check_self_transitions_in_Einstien_nnz_data(A_info_nnz):
@@ -187,6 +189,30 @@ def compute_degeneracy_matrix(levels):
     R = (G * (1.0 / G.T)).T * one_U_nn
 
     return R
+
+
+def compute_B_matrix(levels, A_matrix):
+    """given the energy levels, returns the stimulated emission and absorption
+    coefficients matrix.
+
+    :param A_matrix: The spontaneous emission coefficients matrix (A in the
+     ipython notebook)
+    :param levels: The energy levels
+    :return: The B matrix defined in the notebook
+    """
+    delta_e = compute_delta_energy_matrix(levels)
+
+    nu_matrix = delta_e / h_planck
+
+    B_e_matrix = (8.0*pi*hbar_planck/c_light**3)*(nu_matrix**3)*A_matrix
+
+    R_matrix = compute_degeneracy_matrix(levels)
+
+    B_a_matrix = B_e_matrix.T * R_matrix
+
+    B_matrix = B_e_matrix + B_a_matrix
+
+    return B_matrix
 
 
 def reduce_vj_repr(en, a_eins, cr, T,  ini, fin, vj_unique,

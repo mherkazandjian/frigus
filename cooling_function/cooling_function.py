@@ -48,11 +48,13 @@ A, A_info_nnz = read_einstien_coefficient.read_einstein()
 #
 # A_reduced_slow = population.reduce_einstein_coefficients_slow(A_info_nnz,
 #                                                               energy_levels)
-A_reduced = population.reduce_einstein_coefficients(A, energy_levels)
+A_reduced_matrix = population.reduce_einstein_coefficients(A, energy_levels)
 
-delta_e = population.compute_delta_energy_matrix(energy_levels)
+delta_e_matrix = population.compute_delta_energy_matrix(energy_levels)
 
 degeneracies_matrix = population.compute_degeneracy_matrix(energy_levels)
+
+B_matrix = population.compute_B_matrix(energy_levels, A_reduced_matrix)
 
 pdb.set_trace()
 
