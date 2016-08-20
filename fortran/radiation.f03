@@ -99,7 +99,7 @@ module radiation
                                  r21%M_lique(ini, fin) = a21%M_lique(ini, fin) +    &
                                                    b21%M_lique(ini, fin) *    &
                                               planck(e%freq_lique(ini, fin), Tr)
-            print*, ini, fin, b21%M_lique(ini,fin), r21%M_lique(ini,fin)
+            print*, ini, fin, b21%M_lique(ini,fin), a21%M_lique(ini, fin), r21%M_lique(ini,fin)
                                               
                     !write(6,'(a26, 2(i3,2x), (e16.10,2x), a8, 3(e16.10,2x))') 'from radiative downwards: ', &
                     !                                         ini, fin,                                      &
