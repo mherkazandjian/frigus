@@ -13,6 +13,7 @@ import read_collision_coefficients
 import read_levels
 from scipy.constants import c as c_light
 from scipy.constants import h as h_planck
+from scipy.constants import electron_volt as ev
 from scipy.constants import Boltzmann as kb
 from scipy.constants import hbar as hbar_planck
 
@@ -20,6 +21,7 @@ from Leiden_ISM.ismUtils import planckOccupation as ng
 
 from utils import linear_2d_index, find_matching_indices
 
+kb_ev = kb / ev
 
 def check_self_transitions_in_Einstien_nnz_data(A_info_nnz):
     """raises an error if there are self transitions in the non-zero data of
@@ -148,7 +150,7 @@ def compute_degeneracy_matrix(levels):
     return R
 
 
-def compute_B_matrix(levels, A_matrix):
+def compute_B_matrix_from_A_matrix(levels, A_matrix):
     """given the energy levels, returns the stimulated emission and absorption
     coefficients matrix.
 
@@ -171,6 +173,7 @@ def compute_B_matrix(levels, A_matrix):
 
     return B_matrix
 
+
 def reduce_collisional_coefficients_slow(cr_info_nnz, energy_levels):
     """
 
@@ -184,6 +187,8 @@ def reduce_collisional_coefficients_slow(cr_info_nnz, energy_levels):
 
     v_max = max(v_nnz.max(), vp_nnz.max())
 
+    n_T = cr_nnz.shape[0]
+
     # compute labels of available levels based on levels of the Einstein data
     # transitions
     labels = linear_2d_index(levels['v'], levels['j'], n_i=v_max+1)
@@ -192,7 +197,7 @@ def reduce_collisional_coefficients_slow(cr_info_nnz, energy_levels):
     labels_ini = linear_2d_index(v_nnz, j_nnz, n_i=v_max+1)
     labels_fin = linear_2d_index(vp_nnz, jp_nnz, n_i=v_max+1)
 
-    K_ex_reduced = zeros((levels.size, levels.size, cr_nnz.shape[0]), 'f8')
+    K_ex_reduced = zeros((n_T, levels.size, levels.size), 'f8')
 
     for i, cr_i in enumerate(cr_nnz.T):
 
@@ -208,7 +213,7 @@ def reduce_collisional_coefficients_slow(cr_info_nnz, energy_levels):
         ind_fin = where(labels == labels_fin[i])[0]
 
         if ind_ini.size != 0 or ind_fin.size != 0:
-            K_ex_reduced[ind_ini, ind_fin, :] = cr_i
+            K_ex_reduced[:, ind_ini, ind_fin] = cr_i.reshape(cr_i.size, 1)
         else:
             continue
 
@@ -216,12 +221,11 @@ def reduce_collisional_coefficients_slow(cr_info_nnz, energy_levels):
     # DEBUG
     # K_ex_reduced[K_ex_reduced > 0.0] = numpy.log10(
     #     K_ex_reduced[K_ex_reduced > 0.0])
-    # pylab.imshow(K_ex_reduced[..., 0], interpolation='none')
+    # pylab.imshow(K_ex_reduced[:, :, 0], interpolation='none')
     # pylab.colorbar()
     # pylab.show()
 
     return K_ex_reduced
-
 
 
 def reduce_collisional_coefficients(cr, energy_levels):
@@ -229,7 +233,25 @@ def reduce_collisional_coefficients(cr, energy_levels):
 
     :return:
     """
-    pass
+    raise NotImplementedError("not implemented yet")
+
+
+def compute_K_matrix_from_K_dex_matrix(levels, K_dex, T):
+    """
+
+    :return:
+    """
+    delta_e = compute_delta_energy_matrix(levels)
+
+    R_matrix = compute_degeneracy_matrix(levels)
+
+    # R*K^T_{dex} to be multiplied by the exp(-dE/kb*T) in the loop
+    K_ex = numpy.zeros(K_dex.shape, 'f8')
+    for i, T_i in enumerate(T):
+        K_ex[i, :, :] = \
+            R_matrix * K_dex[i, :, :].T * exp(-delta_e/(kb_ev * T_i))
+
+    return K_dex + K_ex
 
 
 def reduce_vj_repr(en, a_eins, cr, T,  ini, fin, vj_unique,

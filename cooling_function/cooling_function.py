@@ -29,6 +29,10 @@ import pdb
 from numpy import log10, unique
 
 #
+# .. todo:: use proper units and standardize them or use astropy units..etc..
+# .. todo:: to make sure that there are no errors done in unit conversion
+#
+
 # read the energy levels (v, j, energy)
 #
 energy_levels = read_levels.read_levels_lique(
@@ -54,7 +58,8 @@ A_reduced_matrix = population.reduce_einstein_coefficients(A, energy_levels)
 delta_e_matrix = population.compute_delta_energy_matrix(energy_levels)
 
 # compute the stimulated emission and absorption coefficients matrix
-B_matrix = population.compute_B_matrix(energy_levels, A_reduced_matrix)
+B_matrix = population.compute_B_matrix_from_A_matrix(energy_levels,
+                                                     A_reduced_matrix)
 
 # read the collisional rates for H2 with H
 collision_rate, T, collision_rates_nnz = read_collision_coefficients(
@@ -64,6 +69,10 @@ collision_rate, T, collision_rates_nnz = read_collision_coefficients(
 K_dex_matrix = population.reduce_collisional_coefficients_slow(
                                                  collision_rates_nnz,
                                                  energy_levels)
+
+K_matrix = population.compute_K_matrix_from_K_dex_matrix(energy_levels,
+                                                         K_dex_matrix,
+                                                         T)
 pdb.set_trace()
 
 # read the Einstein coefficients

@@ -98,11 +98,11 @@ def read_collision_coefficients(fname):
     # declare the array where the data will be stored
     nv, nj, nvp, njp = v.max()+1, j.max()+1, vp.max()+1, jp.max()+1
     nv_max, nj_max = int(max(nv, nvp)), int(max(nj, njp))
-    data = zeros((nv_max, nj_max, nv_max, nj_max, cr.shape[0]), 'f8')
+    data = zeros((T.size, nv_max, nj_max, nv_max, nj_max), 'f8')
 
     # copy the read data into the container array
     for i, cri in enumerate(cr.T):
-        data[v[i], j[i], vp[i], jp[i], :] = cri
+        data[:, v[i], j[i], vp[i], jp[i]] = cri
         ini[:, i] = v[i], j[i]
         fin[:, i] = vp[i], jp[i]
 
