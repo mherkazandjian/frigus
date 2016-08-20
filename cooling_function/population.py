@@ -52,49 +52,6 @@ def reduce_einstein_coefficients_slow(A_info_nnz, energy_levels):
      is a lower triangular matrix containing the Einstien coefficients.
     """
 
-    check_self_transitions_in_Einstien_nnz_data(A_info_nnz)
-
-    v_nnz, j_nnz, vp_nnz, jp_nnz, A_nnz = A_info_nnz
-    v_max = max(v_nnz.max(), vp_nnz.max())
-
-    levels = energy_levels
-
-    # compute labels of available levels based on levels of the Einstein data
-    # transitions
-    labels = linear_2d_index(levels['v'], levels['j'], n_i=v_max+1)
-
-    # get the unique label for the (v,j) pairs
-    labels_ini = linear_2d_index(v_nnz, j_nnz, n_i=v_max+1)
-    labels_fin = linear_2d_index(vp_nnz, jp_nnz, n_i=v_max+1)
-
-    A_reduced = zeros((levels.size, levels.size), 'f8')
-
-    for i, A_i in enumerate(A_nnz):
-
-        # print('{:4}/{:4}'.format(i+1, len(A_nnz)))
-
-        # get the indices based on v,j, jp, jp comaprisons
-        #     v, j, vp, jp = v_nnz[i], j_nnz[i], vp_nnz[i], jp_nnz[i]
-        #     ind_ini = where((levels['v'] == v)*(levels['j'] == j))[0]
-        #     ind_fin = where((levels['v'] == vp)*(levels['j'] == jp))[0]
-
-        # get the indices based on label comparisons
-        ind_ini = where(labels == labels_ini[i])[0]
-        ind_fin = where(labels == labels_fin[i])[0]
-
-        if ind_ini.size != 0 or ind_fin.size != 0:
-            A_reduced[ind_ini, ind_fin] = A_i
-        else:
-            continue
-
-
-    # DEBUG
-    # A_reduced[A_reduced > 0.0] = numpy.log10(A_reduced[A_reduced > 0.0])
-    # pylab.imshow(A_reduced, interpolation='none')
-    # pylab.colorbar()
-    # pylab.show()
-
-    return A_reduced
 
 
 def reduce_einstein_coefficients(A, energy_levels):
@@ -213,6 +170,72 @@ def compute_B_matrix(levels, A_matrix):
     B_matrix = B_e_matrix + B_a_matrix
 
     return B_matrix
+
+def reduce_collisional_coefficients_slow(cr_info_nnz, energy_levels):
+    """
+
+    :return:
+    """
+    # check_self_transitions_in_Einstien_nnz_data(A_info_nnz)
+
+    ini_nnz, fin_nnz, unique_nnz, cr_nnz = cr_info_nnz
+    # continue from here
+    #
+    #
+    #
+    #
+    #
+    #
+
+    v_max = max(v_nnz.max(), vp_nnz.max())
+
+    levels = energy_levels
+
+    # compute labels of available levels based on levels of the Einstein data
+    # transitions
+    labels = linear_2d_index(levels['v'], levels['j'], n_i=v_max+1)
+
+    # get the unique label for the (v,j) pairs
+    labels_ini = linear_2d_index(v_nnz, j_nnz, n_i=v_max+1)
+    labels_fin = linear_2d_index(vp_nnz, jp_nnz, n_i=v_max+1)
+
+    A_reduced = zeros((levels.size, levels.size), 'f8')
+
+    for i, A_i in enumerate(A_nnz):
+
+        # print('{:4}/{:4}'.format(i+1, len(A_nnz)))
+
+        # get the indices based on v,j, jp, jp comaprisons
+        #     v, j, vp, jp = v_nnz[i], j_nnz[i], vp_nnz[i], jp_nnz[i]
+        #     ind_ini = where((levels['v'] == v)*(levels['j'] == j))[0]
+        #     ind_fin = where((levels['v'] == vp)*(levels['j'] == jp))[0]
+
+        # get the indices based on label comparisons
+        ind_ini = where(labels == labels_ini[i])[0]
+        ind_fin = where(labels == labels_fin[i])[0]
+
+        if ind_ini.size != 0 or ind_fin.size != 0:
+            A_reduced[ind_ini, ind_fin] = A_i
+        else:
+            continue
+
+
+    # DEBUG
+    # A_reduced[A_reduced > 0.0] = numpy.log10(A_reduced[A_reduced > 0.0])
+    # pylab.imshow(A_reduced, interpolation='none')
+    # pylab.colorbar()
+    # pylab.show()
+
+    return A_reduced
+
+
+
+def reduce_collisional_coefficients(cr, energy_levels):
+    """
+
+    :return:
+    """
+    pass
 
 
 def reduce_vj_repr(en, a_eins, cr, T,  ini, fin, vj_unique,

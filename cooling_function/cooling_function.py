@@ -17,7 +17,7 @@ Limitations
 
 import pylab
 import read_einstien_coefficient
-import read_collision_coefficients
+from read_collision_coefficients import read_collision_coefficients
 import read_levels
 import population
 from population import reduce_vj_repr, coolingFunction, fit_glover
@@ -50,12 +50,20 @@ A, A_info_nnz = read_einstien_coefficient.read_einstein()
 #                                                               energy_levels)
 A_reduced_matrix = population.reduce_einstein_coefficients(A, energy_levels)
 
+# compute the detla E matrix
 delta_e_matrix = population.compute_delta_energy_matrix(energy_levels)
 
-degeneracies_matrix = population.compute_degeneracy_matrix(energy_levels)
-
+# compute the stimulated emission and absorption coefficients matrix
 B_matrix = population.compute_B_matrix(energy_levels, A_reduced_matrix)
 
+# read the collisional rates for H2 with H
+collision_rate, T, collision_rates_nnz = read_collision_coefficients(
+                                                      "Read/Rates_H_H2.dat")
+
+# getting the collisional de-excitation matrix (K_dex)
+K_dex_matrix = population.reduce_collisional_coefficients_slow(
+                                                 collision_rates_nnz,
+                                                 energy_levels)
 pdb.set_trace()
 
 # read the Einstein coefficients
@@ -63,9 +71,6 @@ nc = 1.e9
 '''density of the colliding species, in units of 1.e3 cm-3 as in Lipovka'''
 
 
-# read the collisional rates for H2 with H
-cr_upper_2_lower, T, ini, fin, vj_unique = read_collision_coefficients.read_collision_coefficients(
-                                                      "Read/Rates_H_H2.dat")
 
 cr = read_collision_coefficients.compute_lower_to_upper_collision_coefficients(cr_upper_2_lower,
                                                                                ini,

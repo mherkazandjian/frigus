@@ -65,18 +65,24 @@ def read_collision_coefficients(fname):
       rate coefficients in the 5D array. This array has the same size as the
       last dimension of K (i.e K[0,0,0,0,:].size = T.size
 
-      The third element is a 2D array of shape (2, n_transitions) (ini). The
-      columns of this array (v, j = ini) are the initial v and
-      j of the transitions for a certain T section. i.e. the number of non-zero
-      elements in K for a certain temperature is equal to the number of
-      elements in the v or j columns.
-      v.size = j.size = where(K[..., 0] > 0)[0].size
+      The third element is a tuple of 4 elements:
 
-      The fourth element is the same of the 3rd element but for the final
-      transitions (v', j' = fin)
+         - The first element is a 2D array of shape (2, n_transitions) (ini).
+           The columns of this array (v, j = ini) are the initial v and j of
+           the transitions for a certain T section. i.e. the number of non-zero
+           elements in K for a certain temperature is equal to the number of
+           elements in the v or j columns.
+           v.size = j.size = where(K[..., 0] > 0)[0].size
 
-      The last element is a 2D array of shape (2, n_unique_transitions) which
-      are the unique levels involved in all the transitions.
+         - The second element is the same of the first element but for the
+           final transitions (v', j' = fin)
+
+         - The third element is a 2D array of shape (2, n_unique_transitions)
+           that are the unique levels involved in all the transitions.
+
+         - The last element is an array of shape (T.size, n_transitions)
+           which are the collisional coefficient rates with non-zero values
+           for each value of temperature in the T array.
     """
 
     # the temperature in the data file is not provided explicitly. It
@@ -104,7 +110,7 @@ def read_collision_coefficients(fname):
     unique_levels = unique_level_pairs(hstack((unique_level_pairs(ini),
                                                unique_level_pairs(fin))))
 
-    return data*1e-6, T, ini, fin, unique_levels
+    return data*1e-6, T, (ini, fin, unique_levels, cr)
 
 
 def compute_lower_to_upper_collision_coefficients(cr,
