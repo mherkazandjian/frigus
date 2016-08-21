@@ -33,6 +33,12 @@ from numpy import log10, unique
 # .. todo:: to make sure that there are no errors done in unit conversion
 #
 
+# density of the colliding species, in units of 1.e3 cm-3 as in Lipovka
+nc = 1.e9
+
+# the kinetic temperature of the gas
+T_kin = 6000.0
+
 # read the energy levels (v, j, energy)
 #
 energy_levels = read_levels.read_levels_lique(
@@ -47,6 +53,17 @@ energy_levels = read_levels.read_levels_lique(
 #
 A, A_info_nnz = read_einstien_coefficient.read_einstein()
 
+# read the collisional rates for H2 with H
+collision_rates, T, collision_rates_info_nnz = read_collision_coefficients(
+                                                      "Read/Rates_H_H2.dat")
+
+# find the maximum v and j from the Einstein and collisional rates data sets
+# and adjust the labels of the energy levels according to that
+v_max_data, j_max_data = population.find_v_max_j_max_from_data(
+                                          A_info_nnz,
+                                          collision_rates_info_nnz)
+energy_levels.set_labels(v_max=v_max_data+1)
+
 #
 # reduce the Einstein coefficients to a 2D matrix (construct the A matrix)
 #
@@ -58,26 +75,23 @@ A_reduced_matrix = population.reduce_einstein_coefficients(A, energy_levels)
 delta_e_matrix = population.compute_delta_energy_matrix(energy_levels)
 
 # compute the stimulated emission and absorption coefficients matrix
-B_matrix = population.compute_B_matrix_from_A_matrix(energy_levels,
-                                                     A_reduced_matrix)
+B_J_nu_matrix = population.compute_B_J_nu_matrix_from_A_matrix(energy_levels,
+                                                               A_reduced_matrix,
+                                                               T_kin)
 
-# read the collisional rates for H2 with H
-collision_rate, T, collision_rates_nnz = read_collision_coefficients(
-                                                      "Read/Rates_H_H2.dat")
 
 # getting the collisional de-excitation matrix (K_dex)
 K_dex_matrix = population.reduce_collisional_coefficients_slow(
-                                                 collision_rates_nnz,
+                                                 collision_rates_info_nnz,
                                                  energy_levels)
 
 K_matrix = population.compute_K_matrix_from_K_dex_matrix(energy_levels,
                                                          K_dex_matrix,
                                                          T)
+
 pdb.set_trace()
 
 # read the Einstein coefficients
-nc = 1.e9
-'''density of the colliding species, in units of 1.e3 cm-3 as in Lipovka'''
 
 
 
