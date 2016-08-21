@@ -54,13 +54,33 @@ def getSlabThicknessFromAv(slabsAv, nGas, Z):
     dAvSlabs = slabsAv[1::] - slabsAv[0:-1]
     dxSlabs  = AvToLength( dAvSlabs, nGas, Z)
     return dxSlabs
-    
+
+
 def planckOccupation(h, nu, kb, T):
     """computes the planck function for input parameters.
-       :keywords: beta, nu,  
+    :param h: .. todo:: document
+    :param nu: .. todo:: document
+    :param kb: .. todo:: document
+    :param T: .. todo:: document
+    :return: .. todo:: document
     """
     x = h * nu / (kb * T)
     return 1.0 / (np.exp(x) - 1.0)
+
+
+def planck_function(h, nu, kb, T, c):
+    """
+    https://en.wikipedia.org/wiki/Planck%27s_law
+    :param h: Planck's constant
+    :param nu: The frequency
+    :param kb: Boltzmann's constant
+    :param T: The temperature
+    :param c: The speed of light
+    :return: The plank function (the spectral radiance)
+     [Power / sr Length^2 wavelength]
+    """
+    return (2.0*h*nu**3/c**2)*planckOccupation(h, nu, kb, T)
+
 
 def ortho_para_abundance_at_eq(tkin, xH2):
     """compute the ortho to para abundance (relative to xH2) at thermodynamic equilibirum given a kinetic temperature.
