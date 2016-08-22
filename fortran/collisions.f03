@@ -32,6 +32,9 @@ module collisions
                  rr%reading = 0.d0
                  rr%matrix = 0.d0
                  rr%temp = [ (i, i=100,5000,100) ]
+                 !do i = 1, ntemp
+                 !   print*, 'temperature', i, rr%temp(i)
+                 !enddo
 
                  open (20, file='Read/Rates_H_H2.dat', status = 'unknown')
 
@@ -64,6 +67,7 @@ module collisions
                 !   write(6,'(6(i3,2x))') rr%vic(i),rr%jic(i),rr%vfc(i),rr%jfc(i),      &
                 !           rr%couple1c(i),rr%couple2c(i)
                 !enddo
+
                 ! detailed balance implementation
                  do i=1,ntrans
                     vi=rr%vic(i)
@@ -71,7 +75,7 @@ module collisions
                     vf=rr%vfc(i)
                     jf=rr%jfc(i)
                     dE = abs(e%en_lique(vi,ji)-e%en_lique(vf,jf))
-                     do it=1,ntemp
+                     do it = 1, ntemp
                         rr%matrix_lique(rr%couple1c(i),rr%couple2c(i),it) = &
                                        rr%reading(vi,ji,vf,jf,it)
                         rr21%matrix_lique(rr%couple1c(i),rr%couple2c(i),it) = &
