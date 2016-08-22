@@ -73,9 +73,10 @@ module radiation
                   ! this subroutine returns the Einstein coefficients
                   ! for downward stimulated transitions
                   ! input: a21
-                  ! output: b21 = c**2/(2*hp*nu) a21
-                  use types_and_parameters, only: hp, c, nlev, nlev_lique,  &
-                                                  energy_lev,               &
+                  ! output: b21 = 8*hp*pi*nu**3/c**3 a21
+                  use types_and_parameters, only: hp, c, pi,         &
+                                                  nlev, nlev_lique,  &
+                                                  energy_lev,        &
                                                   ini, fin
  
                   type(radiative_coeffs) :: a21, b21, r21
@@ -95,11 +96,12 @@ module radiation
                                                                              ! energy file downwards, 
                                                                              ! after the inversion "-" 
                                                                              ! => E1 - E2  > 0 ( =>  E2 - E1 < 0)]
-                b21%M_lique(ini, fin) = (c**2/(2.d0*hp*(e%freq_lique(ini, fin))**3)) * a21%M_lique(ini,fin)
-                                 r21%M_lique(ini, fin) = a21%M_lique(ini, fin) +    &
+                b21%M_lique(ini, fin) = (4.d0*hp*e%freq_lique(ini, fin)**3/c**3) * a21%M_lique(ini,fin)
+                                 r21%M_lique(ini, fin) = &!a21%M_lique(ini, fin) +    &
                                                    b21%M_lique(ini, fin) *    &
                                               planck(e%freq_lique(ini, fin), Tr)
-            print*, ini, fin, b21%M_lique(ini,fin), a21%M_lique(ini, fin), r21%M_lique(ini,fin)
+            !!print*, ini, fin, b21%M_lique(ini,fin), a21%M_lique(ini, fin), r21%M_lique(ini,fin)
+            !write(6,'(2(i2, 2x),2(e14.7, 2x))') ini, fin, e%freq_lique(ini, fin), planck(e%freq_lique(ini, fin), Tr)
                                               
                     !write(6,'(a26, 2(i3,2x), (e16.10,2x), a8, 3(e16.10,2x))') 'from radiative downwards: ', &
                     !                                         ini, fin,                                      &
@@ -115,52 +117,52 @@ module radiation
        end subroutine radiative_downwards 
 
        
-!       subroutine radiative_upwards(energy, Tr, a21, b12, r12)
-!                  use types_and_parameters, only: hp, nlev,   &
-!                                                  energy_lev, &
-!                                                  ini, fin
-!                  real*8  :: Tr
-!                  real*8  :: g1, g2
-!                  type(radiative_coeffs) :: a21, b21, b12, r21, r12
-!                  type(energy_lev) :: energy
-!                  
-! 
-!                  b12%M = 0.d0
-!                  r12%M = 0.d0
-!                  
-!                  call radiative_downwards(energy, Tr, a21, b21, r21)
-!                  !print*, 'a21%M', a21%M
-!                  !print*, 'b21%M', b21%M
-!                  
-!                  do ini = 1, nlev
-!                      do fin = 1, nlev
-!                         ! naming the indexes in the matrices as if this condition 
-!                         ! were the alternative ("elseif") of the previous subroutine
-!                         if((energy%ene(ini)-energy%ene(fin)).lt.0.d0) then  ! according to the ordering in the  
-!                                                                             ! energy file upwards, 
-!                                                                             ! after the inversion "-" 
-!                                                                             ! => E1 - E2  < 0  (=>  E2 - E1 > 0)
-!                                 if(energy%jl(fin).ne.0) then
-!                                    g2 = 2.*energy%jl(ini) + 1.
-!                                    g1 = 2.*energy%jl(fin) + 1.
-! 
-!                                    b12%M(fin, ini) = (g2/g1)*     &
-!                                                         b21%M(ini, fin)
-!                                    r12%M(fin, ini) = b12%M(fin, ini)*                     &
-!                                                      planck(energy%freq(ini, fin), Tr)
-!                                 endif
-!                                 !write(6,'(a24, 2(i3,2x), (e10.4, 2x), a8, 2(e10.4,2x))')                 &
-!                                 !                                       'from radiative upwards: ', &
-!                                 !                                        ini, fin, b12%M(ini, fin), &
-!                                 !                                        'planck: ',                &
-!                                 !                                planck(energy%freq(ini, fin), Tr), &
-!                                 !                                        r12%M(ini, fin)
-!                              endif
-!                      enddo
-!                  enddo
-!                  !print*, 'b12%M', b12%M
-!                  
-!       end subroutine radiative_upwards
+       subroutine radiative_upwards(e, Tr, a21, b21, b12, r12)
+                  use types_and_parameters, only: hp, c, nlev, nlev_lique,  &
+                                                  energy_lev,               &
+                                                  ini, fin
+                                                  
+                  real*8  :: Tr
+                  real*8  :: g1, g2
+                  type(radiative_coeffs) :: a21, b21, b12, r21, r12
+                  type(energy_lev) :: e
+                  
+ 
+                  b12%M_lique = 0.d0
+                  r12%M_lique = 0.d0
+                  
+                  !call radiative_downwards(e, Tr, a21, b21, r21)
+                  !print*, 'a21%M', a21%M
+                  !print*, 'b21%M', b21%M
+                  
+                  do ini = 1, nlev_lique
+                      do fin = 1, nlev_lique
+                write(6,'(a29, 2(i3,2x), 2(e10.4, 2x))')                 &
+                     'from radiative upwards before: ',                                         &
+                      ini, fin, b21%M_lique(ini, fin),b21%M_lique(fin, ini)
+                         ! naming the indexes in the matrices as if this condition 
+                         ! were the alternative ("elseif") of the previous subroutine
+                         if((e%ene_lique(ini)-e%ene_lique(fin)).gt.0.d0) then ! according to the ordering in the  
+                                                                              ! energy file upwards, 
+                                                                              ! after the inversion "-" 
+                                                                              ! => E1 - E2  < 0  (=>  E2 - E1 > 0)
+                                 !if(e%jl_lique(fin).ne.0) then
+                                    g2 = 2.*e%jl_lique(fin) + 1.
+                                    g1 = 2.*e%jl_lique(ini) + 1.
+ 
+                                    b12%M_lique(fin, ini) = (g2/g1)*     &
+                                                         b21%M_lique(ini, fin)
+                                    r12%M_lique(fin, ini) = b12%M_lique(fin, ini)*                     &
+                                                      planck(e%freq_lique(ini, fin), Tr)
+                                 !endif
+                        endif
+                !write(6,'(a24, 2(i3,2x), (e10.4, 2x), a8, 2(e10.4,2x))')                 &
+                !     'from radiative upwards: ',                                         &
+                !      ini, fin, b12%M_lique(ini, fin), 'planck: ', planck(e%freq_lique(ini, fin), Tr), r12%M_lique(ini, fin)
+                      enddo
+                  enddo
+                  return
+       end subroutine radiative_upwards
 
 
 

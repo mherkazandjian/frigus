@@ -9,3 +9,4 @@ cooling_glover.f90
 *.o
 fort.*
 *.cs
+fortran/Read/frequencies_lique

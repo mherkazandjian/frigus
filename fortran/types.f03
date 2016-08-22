@@ -5,6 +5,7 @@ module types_and_parameters
     real*8, parameter                           :: hp = 6.62607004d-34  !J s Planck constant
     real*8, parameter                           :: c  = 2.99792458d8    !speed of light m/s
     real*8, parameter                           :: q  = 1.60217662d-19  !charge of electron in C
+    real*8, parameter                           :: pi = 3.14159265359
 
     !GENERAL PURPOSE INDEXES DEFITION 
     integer                                     :: i, l, m, n, i0, i1, i2, i3
@@ -14,7 +15,7 @@ module types_and_parameters
 
     ! GAS DENSITY AND RADIATION TEMPERATURE
     integer, parameter                          :: ndensity = 1   ! dimension of the arra of density
-    real*8, parameter                           :: Trad = 30.d0   ! radiation temperature in kelvin
+    real*8, parameter                           :: Trad = 3000.d0   ! radiation temperature in kelvin
     real*8, parameter, dimension(1:ndensity)    :: nb = 1.d14     ! baryon density [m-3]
     
     ! ENERGY LEVELS

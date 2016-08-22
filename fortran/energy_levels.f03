@@ -25,7 +25,7 @@ module energy_levels
                                                                                           ! file
                    open (23, file='Read/lev_labels', status = 'unknown')
                    open (24, file='Read/lev_labels_lique', status = 'unknown')
-
+                   open (26, file='Read/frequencies_lique', status = 'unknown')
                    
                     allocate(e%en(0:vmax,0:jmax))
                     allocate(e%ene(1:nlev))
@@ -80,15 +80,7 @@ module energy_levels
                     e%en_lique = e%en_lique*q
                     e%ene_lique = e%ene_lique*q
 
-                    ! evaluation of the frequencies
-                    e%freq_lique = 0.d0
-                    do ini = 1, nlev_lique
-                        do fin = 1, nlev_lique
-                            e%freq_lique(ini, fin) = dabs(e%ene_lique(ini)-e%ene_lique(fin))/hp
-                        enddo
-                    enddo
-
-                     e%ene = -e%ene   ! to revert the actual way the energies are given
+                    e%ene = -e%ene   ! to revert the actual way the energies are given
                                      ! Emax @ (v=0,j=0) --> Emin @ (v=0,j=0)
 
                                      
@@ -97,14 +89,33 @@ module energy_levels
                     ! linear system of equations to be solved)
                      call piksrt(nlev, nlev_lique, e)                                     
 
+                    ! evaluation of the frequencies
+                    e%freq_lique = 0.d0
+                    do ini = 1, nlev_lique
+                        do fin = 1, nlev_lique
+                            e%freq_lique(ini, fin) = dabs(e%ene_lique(ini)-e%ene_lique(fin))/hp
+                        enddo
+                    enddo                     
+                     
+                     
                      do i=1,nlev                     
                         write(23,'(3(i3,2x))') i, e%vl(i), e%jl(i)
                      enddo
 
                      write(24,'(a5, 2x, 2(a1,4x))') 'label', 'v' , 'j'
                      do i=1,nlev_lique
-                        write(24,'(3(i3,2x))') i, e%vl_lique(i), e%jl_lique(i)
+                        write(24,'(3(i3,2x),e14.7)') i, e%vl_lique(i), e%jl_lique(i), e%ene_lique(i)/q
                      enddo
+                     
+                     write(26,'(a5, 2x, 4(a2,3x))') 'label', 'v' , 'j', 'vp' , 'jp'
+                     do i=1,nlev_lique
+                        do j=1,nlev_lique                     
+                            write(26,'(6(i3,2x),e14.7)') i, j,                            &
+                                                            e%vl_lique(i), e%jl_lique(i), &
+                                                            e%vl_lique(j), e%jl_lique(j), & 
+                                                            e%freq_lique(i,j)
+                        enddo
+                     enddo                     
 
                     return
         end subroutine reading_data_energies
