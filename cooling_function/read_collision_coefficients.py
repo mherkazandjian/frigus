@@ -110,7 +110,7 @@ def read_collision_coefficients(fname):
     unique_levels = unique_level_pairs(hstack((unique_level_pairs(ini),
                                                unique_level_pairs(fin))))
 
-    return data*1e-6, T, (ini, fin, unique_levels, cr)
+    return data*1e-6, T, (ini, fin, unique_levels, cr*1e-6)
 
 
 def compute_lower_to_upper_collision_coefficients(cr,
