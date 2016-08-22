@@ -14,9 +14,9 @@ module types_and_parameters
     real*8                                      :: xm, ym
 
     ! GAS DENSITY AND RADIATION TEMPERATURE
-    integer, parameter                          :: ndensity = 1   ! dimension of the arra of density
+    integer, parameter                          :: ndensity = 1     ! dimension of the arra of density
     real*8, parameter                           :: Trad = 3000.d0   ! radiation temperature in kelvin
-    real*8, parameter, dimension(1:ndensity)    :: nb = 1.d14     ! baryon density [m-3]
+    real*8, parameter, dimension(1:ndensity)    :: nb = 1.d14        ! baryon density [m-3]
     
     ! ENERGY LEVELS
     integer, parameter :: nlev = 301
@@ -76,7 +76,7 @@ module types_and_parameters
 
     type :: reaction_matrix
         real*8 :: A(1:nlev, 1:nlev)
-        real*8 :: A_lique(1:nlev_lique, 1:nlev_lique)        
+        real*8 :: A_lique(1:nlev_lique, 1:nlev_lique, 1:ntemp)        
     end type reaction_matrix
     
     

@@ -43,8 +43,29 @@ module level_population
 !         ! transitions; according to the convention adopted:
 !         !     downward transitions -> upper triangular matrix
 !         !     upward transitions   -> lower triangular matrix
-! 
-!         rad%M = r21%M + r12%M
+         print*, 'nb = ', nb(1)
+         do i = 1, ntrans
+               do it = 1, ntemp
+                 rr%matrix_lique(rr%couple1c(i),rr%couple2c(i), it) = &
+                 rr%matrix_lique(rr%couple1c(i),rr%couple2c(i), it) * nb(1)
+                 rr21%matrix_lique(rr%couple1c(i),rr%couple2c(i), it) = &
+                 rr21%matrix_lique(rr%couple1c(i),rr%couple2c(i), it) * nb(1)
+                 rr12%matrix_lique(rr%couple1c(i),rr%couple2c(i), it) = &
+                 rr12%matrix_lique(rr%couple1c(i),rr%couple2c(i), it) * nb(1)
+               enddo
+         enddo
+
+         
+         
+         do i = 1, ntrans
+               do it = 1, ntemp
+                  write(6,'(2(i2,2x), 2(e14.7,2x) )') rr%couple1c(i),rr%couple2c(i),   &
+                                                      rr%temp(it),                     &
+                                    rr%matrix_lique(rr%couple1c(i),rr%couple2c(i), it)
+               enddo
+            enddo
+
+!         rad%M_lique = r21%M_lique + r12%M_lique
 ! 
 !         it = 1
 !         
@@ -132,23 +153,23 @@ module level_population
 
     ! TEST COLLISIONAL COEFFICIENTS
     ! test 1: checks for comparison with the Python code
-    ! diagonal_rr21 = 0.d0
-    ! diagonal_rr12 = 0.d0    
-    ! do i = 1, ntrans
-    !    do it = 1, ntemp
-    !        if(rr%couple1c(i).ge.rr%couple2c(i))  then
-    !            diagonal_rr21 = diagonal_rr21 + rr21%matrix_lique(rr%couple1c(i),rr%couple2c(i),it)
-    !        else
-    !            diagonal_rr12 = diagonal_rr12 + rr12%matrix_lique(rr%couple2c(i),rr%couple1c(i),it)
-    !        endif
-    !    enddo
-    !enddo
-    !print*, 'rr21', sum(rr21%matrix_lique), diagonal_rr21, 'max', maxval(rr21%matrix_lique)
-    !print*, 'rr12', sum(rr12%matrix_lique), diagonal_rr12, 'max', maxval(rr12%matrix_lique)
+     diagonal_rr21 = 0.d0
+     diagonal_rr12 = 0.d0    
+     do i = 1, ntrans
+        do it = 1, ntemp
+            if(rr%couple1c(i).ge.rr%couple2c(i))  then
+                diagonal_rr21 = diagonal_rr21 + rr21%matrix_lique(rr%couple1c(i),rr%couple2c(i),it)
+            else
+                diagonal_rr12 = diagonal_rr12 + rr12%matrix_lique(rr%couple2c(i),rr%couple1c(i),it)
+            endif
+        enddo
+    enddo
+    print*, 'rr21', sum(rr21%matrix_lique), diagonal_rr21, 'max', maxval(rr21%matrix_lique)
+    print*, 'rr12', sum(rr12%matrix_lique), diagonal_rr12, 'max', maxval(rr12%matrix_lique)
     
-    !print*, 'sum_collisional: ', sum(rr%matrix_lique)
-    !print*, 'max_collisional: ', maxval(rr%matrix_lique)
-    !print*, 'min_collisional: ', minval(rr%matrix_lique)    
+    print*, 'sum_collisional: ', sum(rr%matrix_lique)
+    print*, 'max_collisional: ', maxval(rr%matrix_lique)
+    print*, 'min_collisional: ', minval(rr%matrix_lique)    
     
     ! test 2: checks with the read values from the input file + detailed balance
     ! do i = 1, ntrans
