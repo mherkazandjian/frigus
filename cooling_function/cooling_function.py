@@ -37,7 +37,7 @@ from numpy import log10, unique
 nc = 1.e9
 
 # the kinetic temperature of the gas
-T_kin = 6000.0
+T_kin = 3000.0
 
 # read the energy levels (v, j, energy)
 #
