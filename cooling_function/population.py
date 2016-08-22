@@ -4,6 +4,8 @@ import pylab
 import numpy
 from numpy import (zeros, fabs, arange, array_equal, exp, ones, log10,
                    linalg, eye, dot, where, intersect1d, setdiff1d, in1d, pi)
+import scipy
+
 import pdb
 
 from IPython.core.debugger import Tracer
@@ -252,7 +254,7 @@ def reduce_collisional_coefficients_slow(cr_info_nnz, energy_levels):
     labels_ini = linear_2d_index(v_nnz, j_nnz, n_i=levels.v_max_allowed)
     labels_fin = linear_2d_index(vp_nnz, jp_nnz, n_i=levels.v_max_allowed)
 
-    K_ex_reduced = zeros((n_T, levels.data.size, levels.data.size), 'f8')
+    K_ex_reduced = zeros((levels.data.size, levels.data.size, n_T), 'f8')
 
     for i, cr_i in enumerate(cr_nnz.T):
 
@@ -268,7 +270,7 @@ def reduce_collisional_coefficients_slow(cr_info_nnz, energy_levels):
         ind_fin = where(labels == labels_fin[i])[0]
 
         if ind_ini.size != 0 or ind_fin.size != 0:
-            K_ex_reduced[:, ind_ini, ind_fin] = cr_i.reshape(cr_i.size, 1)
+            K_ex_reduced[ind_ini, ind_fin, :] = cr_i
         else:
             continue
 
@@ -300,11 +302,13 @@ def compute_K_matrix_from_K_dex_matrix(energy_levels, K_dex, T_range, T):
 
     R_matrix = compute_degeneracy_matrix(energy_levels)
 
-    # find the temperature interval within which T is
-    T_ind = where(T == T_range)
+    # get the linear interpolator of the upper to lower collision rates as a
+    # function of temperature (the last axis). This function returns an array
+    # that is the same shape of K_dex[..., 0]
+    K_dex_interpolator = scipy.interpolate.interp1d(T_range, K_dex)
 
-    # R*K^T_{dex}(T) to be multiplied by the exp(-dE/kb*T) in the loop
-    K_dex_T = K_dex[T_ind][0]
+    # R*K_{dex}^T(T) to be multiplied by the exp(-dE/kb*T) in the loop
+    K_dex_T = K_dex_interpolator(T)
     K_ex_T = R_matrix * K_dex_T.T * exp(-delta_e_matrix/(kb_ev * T))
 
     K_matrix = K_dex_T + K_ex_T
@@ -312,29 +316,27 @@ def compute_K_matrix_from_K_dex_matrix(energy_levels, K_dex, T_range, T):
     return K_matrix
 
 
-def solveEquilibrium(full):
+def solveEquilibrium(M_matrix):
     """solve for the equilibrium population densities.
-    
+
     i.e solving A.x = b
-    where full = A
+    where M_matrix = A
     """
 
-    n = full.shape[0]
+    sz = M_matrix.shape[0]
     
     # solving directly
     # replacing the first row with the conservation equation
-    dndt = zeros((n, 1), 'f8')
-    full[0, :], dndt[0] = 1.0, 1.0
+    dndt = zeros((sz, 1), 'f8')
+    M_matrix[0, :], dndt[0] = 1.0, 1.0
 
     # solving the system A.x = b
     # before solving, we will divide each row by the diagonal
-    A, b = full, dndt
-    # for i in arange(n):
-    #     A[i, :] = A[i, :] / A[i, i]
+    A, b = M_matrix, dndt
+    for i in arange(sz):
+        A[i, :] = A[i, :] / A[i, i]
 
     x = linalg.solve(A, b)
-
-    #print x.T
 
     # the fractional population density
     f = x
@@ -347,6 +349,48 @@ def solveEquilibrium(full):
 #     the redshift parameter z)
 #     '''
 #     return Tr
+
+
+def cooling_rate_at_steady_state(A_matrix,
+                                 energy_levels,
+                                 K_dex_matrix,
+                                 T_rng,
+                                 T_kin,
+                                 collider_density):
+    """
+
+    :return:
+    """
+
+    # compute the stimulated emission and absorption coefficients matrix
+    B_J_nu_matrix = compute_B_J_nu_matrix_from_A_matrix(energy_levels,
+                                                        A_matrix,
+                                                        T_kin)
+
+    # get the K matrix for a certain temperature in the tabulated range
+    K_matrix = compute_K_matrix_from_K_dex_matrix(energy_levels,
+                                                  K_dex_matrix,
+                                                  T_rng,
+                                                  T_kin)
+    assert (numpy.fabs(1.0 - K_matrix.sum() / 1.8873371663e-08) < 1e-10,
+            "asdadasd")
+
+    # compute the M matrix that can be used to compute the equilibrium state of
+    # the levels (see notebook)
+    O_matrix = (A_matrix + B_J_nu_matrix + K_matrix * collider_density).T
+
+    D_matrix = numpy.zeros(O_matrix.shape, 'f8')
+    D_matrix[numpy.diag_indices(D_matrix.shape[0])] = -O_matrix.sum(axis=0)
+
+    M_matrix = O_matrix + D_matrix
+
+    # solve the equilibrium population densities
+    n_vj_equilibrium = solveEquilibrium(M_matrix)
+
+    # compute the cooling rate
+    c_rate = cooling_rate(n_vj_equilibrium, energy_levels, A_matrix)
+
+    return c_rate
 
 
 def cooling_rate(population_densities, energy_levels, A_matrix):
@@ -364,8 +408,12 @@ def cooling_rate(population_densities, energy_levels, A_matrix):
     return retval
 
 
-f=0.
 def fit_glover(T):
+    """
+
+    :param T:
+    :return:
+    """
     if 100 < T and T <= 1000:
       return   10**(-24.311209
                +3.5692468*log10(T/1000.)
