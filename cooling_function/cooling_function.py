@@ -69,14 +69,14 @@ energy_levels.set_labels(v_max=v_max_data+1)
 #
 # A_reduced_slow = population.reduce_einstein_coefficients_slow(A_info_nnz,
 #                                                               energy_levels)
-A_reduced_matrix = population.reduce_einstein_coefficients(A, energy_levels)
+A_matrix = population.reduce_einstein_coefficients(A, energy_levels)
 
 # compute the detla E matrix
 delta_e_matrix = population.compute_delta_energy_matrix(energy_levels)
 
 # compute the stimulated emission and absorption coefficients matrix
 B_J_nu_matrix = population.compute_B_J_nu_matrix_from_A_matrix(energy_levels,
-                                                               A_reduced_matrix,
+                                                               A_matrix,
                                                                T_kin)
 
 
@@ -91,6 +91,15 @@ K_matrix = population.compute_K_matrix_from_K_dex_matrix(energy_levels,
                                                          K_dex_matrix,
                                                          T,
                                                          T_kin)
+
+# compute the M matrix that can be used to compute the equilibrium state of the
+# levels (see notebook)
+O_matrix = (A_matrix + B_J_nu_matrix + K_matrix*nc).T
+
+D_matrix = numpy.zeros(O_matrix.shape, 'f8')
+D_matrix[numpy.diag_indices(D_matrix.shape[0])] = O_matrix.sum(axis=0)
+
+M_matrix = O_matrix + D_matrix
 
 pdb.set_trace()
 
