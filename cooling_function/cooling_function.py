@@ -87,7 +87,8 @@ K_dex_matrix = population.reduce_collisional_coefficients_slow(
 
 K_matrix = population.compute_K_matrix_from_K_dex_matrix(energy_levels,
                                                          K_dex_matrix,
-                                                         T)
+                                                         T,
+                                                         T_kin)
 
 pdb.set_trace()
 

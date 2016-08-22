@@ -291,22 +291,27 @@ def reduce_collisional_coefficients(cr, energy_levels):
     raise NotImplementedError("not implemented yet")
 
 
-def compute_K_matrix_from_K_dex_matrix(energy_levels, K_dex, T):
+def compute_K_matrix_from_K_dex_matrix(energy_levels, K_dex, T_range, T):
     """
 
     :return:
     """
-    delta_e_matrix = compute_delta_energy_matrix(energy_levels)
+    delta_e_matrix = fabs(compute_delta_energy_matrix(energy_levels))
 
     R_matrix = compute_degeneracy_matrix(energy_levels)
 
+    # find the temperature interval within which T is
+    # T_ind_1, T_ind_2 = where(T_range >= T)[0], where(T_range < T)[0]
+
     # R*K^T_{dex} to be multiplied by the exp(-dE/kb*T) in the loop
     K_ex = numpy.zeros(K_dex.shape, 'f8')
-    for i, T_i in enumerate(T):
+    for i, T_i in enumerate(T_range):
         K_ex[i, :, :] = \
             R_matrix * K_dex[i, :, :].T * exp(-delta_e_matrix/(kb_ev * T_i))
 
-    return K_dex + K_ex
+    K_matrix = K_dex + K_ex
+
+    return K_matrix
 
 
 def reduce_vj_repr(en, a_eins, cr, T,  ini, fin, vj_unique,

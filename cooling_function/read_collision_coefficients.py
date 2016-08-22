@@ -57,9 +57,9 @@ def read_collision_coefficients(fname):
     0  2  0  0     0.6561E-13  0.7861E-13  0.9070E-13  0.1266E-12.....
 
     :param string fname: The path to the ascii data.
-    :return: a tuple of 5 elements.
+    :return: a tuple of 3 elements.
       The first element is a 5D array that holds all the rate coefficients.
-      K[v, j, v', j', T_index]
+      K[v, j, v', j', T_index] ( in m3/s)
 
       The second element is a 1D temperature array (T) corresponding to the
       rate coefficients in the 5D array. This array has the same size as the
