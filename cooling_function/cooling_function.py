@@ -80,11 +80,13 @@ B_J_nu_matrix = population.compute_B_J_nu_matrix_from_A_matrix(energy_levels,
                                                                T_kin)
 
 
-# getting the collisional de-excitation matrix (K_dex)
+# getting the collisional de-excitation matrix (K_dex) (for all tabulated
+# values
 K_dex_matrix = population.reduce_collisional_coefficients_slow(
                                                  collision_rates_info_nnz,
                                                  energy_levels)
 
+# get the K matrix for a certain temperature in the tabulated range
 K_matrix = population.compute_K_matrix_from_K_dex_matrix(energy_levels,
                                                          K_dex_matrix,
                                                          T,
