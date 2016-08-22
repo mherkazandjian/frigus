@@ -117,14 +117,14 @@ module radiation
        end subroutine radiative_downwards 
 
        
-       subroutine radiative_upwards(e, Tr, a21, b21, b12, r12)
+       subroutine radiative_upwards(e, Tr, a21, b21, b12, jnu, r12)
                   use types_and_parameters, only: hp, c, nlev, nlev_lique,  &
                                                   energy_lev,               &
                                                   ini, fin
                                                   
                   real*8  :: Tr
                   real*8  :: g1, g2
-                  type(radiative_coeffs) :: a21, b21, b12, r21, r12
+                  type(radiative_coeffs) :: a21, b21, b12, r21, r12, jnu
                   type(energy_lev) :: e
                   
  
@@ -137,28 +137,31 @@ module radiation
                   
                   do ini = 1, nlev_lique
                       do fin = 1, nlev_lique
-                write(6,'(a29, 2(i3,2x), 2(e10.4, 2x))')                 &
-                     'from radiative upwards before: ',                                         &
-                      ini, fin, b21%M_lique(ini, fin),b21%M_lique(fin, ini)
+                            if(ini.ne.fin) then
+                                jnu%M_lique(ini, fin) = planck(e%freq_lique(ini, fin), Tr)
+                            else
+                                jnu%M_lique(ini, fin) = 0.d0
+                            endif
+                !write(6,'(a29, 2(i3,2x), 2(e10.4, 2x))')                 &
+                !     'from radiative upwards before: ',                                         &
+                !      ini, fin, b21%M_lique(ini, fin),b21%M_lique(fin, ini)
                          ! naming the indexes in the matrices as if this condition 
                          ! were the alternative ("elseif") of the previous subroutine
-                         if((e%ene_lique(ini)-e%ene_lique(fin)).gt.0.d0) then ! according to the ordering in the  
+                            if((e%ene_lique(ini)-e%ene_lique(fin)).gt.0.d0) then ! according to the ordering in the  
                                                                               ! energy file upwards, 
                                                                               ! after the inversion "-" 
                                                                               ! => E1 - E2  < 0  (=>  E2 - E1 > 0)
-                                 !if(e%jl_lique(fin).ne.0) then
-                                    g2 = 2.*e%jl_lique(fin) + 1.
-                                    g1 = 2.*e%jl_lique(ini) + 1.
+                                    g2 = 2.*e%jl_lique(ini) + 1.
+                                    g1 = 2.*e%jl_lique(fin) + 1.
  
                                     b12%M_lique(fin, ini) = (g2/g1)*     &
                                                          b21%M_lique(ini, fin)
                                     r12%M_lique(fin, ini) = b12%M_lique(fin, ini)*                     &
-                                                      planck(e%freq_lique(ini, fin), Tr)
-                                 !endif
+                                                            jnu%M_lique(ini, fin)
                         endif
-                !write(6,'(a24, 2(i3,2x), (e10.4, 2x), a8, 2(e10.4,2x))')                 &
-                !     'from radiative upwards: ',                                         &
-                !      ini, fin, b12%M_lique(ini, fin), 'planck: ', planck(e%freq_lique(ini, fin), Tr), r12%M_lique(ini, fin)
+                write(6,'(a24, 2(i3,2x), a8, (e10.4, 2x))')                 &
+                     'from radiative upwards: ',                            &
+                      ini, fin, 'planck: ', jnu%M_lique(ini, fin)
                       enddo
                   enddo
                   return
@@ -173,6 +176,7 @@ module radiation
          real*8 :: xx, yy, ni, T
          xx = hp * ni / (kb * T)
          yy = (2.d0*hp*ni**3)/c**2
+         if(ni.eq.0.d0) planck = 0.d0
          if(xx.lt.0.6739d3) then 
             planck = yy* 1.0d0 / (dexp(xx) - 1.0d0)
          else

@@ -6,13 +6,13 @@ program cooling
      use level_population, only: lev_pop, tests
     
     type(energy_lev) :: energy
-    type(radiative_coeffs) :: a21, b21, r21, b12, r12
+    type(radiative_coeffs) :: a21, b21, r21, b12, r12, jnu
     type(collisional_coeffs) :: rr    
     type(population) :: x
     
-     call lev_pop(energy, a21, b21, r21, b12, r12, rr, x)
+     call lev_pop(energy, a21, b21, r21, b12, jnu, r12, rr, x)
       
-     call tests(energy, rr, a21, b21, r21, b12, r12)
+     call tests(energy, rr, a21, b21, r21, b12, jnu, r12)
 
      
      

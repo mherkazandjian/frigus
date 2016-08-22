@@ -21,10 +21,10 @@ module level_population
 
     contains
     
-    subroutine lev_pop(energy, a21, b21, r21, b12, r12, rr, x)
+    subroutine lev_pop(energy, a21, b21, r21, b12, jnu, r12, rr, x)
     
         type(energy_lev) :: energy
-        type(radiative_coeffs) :: a21, b21, b12, r21, r12, rad
+        type(radiative_coeffs) :: a21, b21, b12, jnu, r21, r12, rad
         type(collisional_coeffs) :: rr
         !type(reaction_matrix)  :: coll_rad_matrix
         type(population) :: x, y
@@ -41,7 +41,7 @@ module level_population
         
         print*, 'T_Radiation', Trad
     
-        call radiative_upwards(energy, Trad, a21, b21, b12, r12)
+        call radiative_upwards(energy, Trad, a21, b21, b12, jnu, r12)
 
 !         ! building the total radiative matrix, including both stimulated and spontaneous
 !         ! transitions; according to the convention adopted:
@@ -70,11 +70,11 @@ module level_population
     end subroutine lev_pop
     
     
-    subroutine tests(energy, rr, a21, b21, r21, b12, r12)
+    subroutine tests(energy, rr, a21, b21, r21, b12, jnu, r12)
         real*8 :: diagonal_a21, diagonal_b21, diagonal_r21
         real*8 :: diagonal_b12, diagonal_r12
         type(energy_lev) :: energy
-        type(radiative_coeffs) :: a21, b21, r21, b12, r12!, rad
+        type(radiative_coeffs) :: a21, b21, r21, b12, r12, jnu!, rad
         type(collisional_coeffs) :: rr
         !type(reaction_matrix)  :: coll_rad_matrix
         !type(population) :: x, y    
@@ -147,6 +147,7 @@ module level_population
     diagonal_r21 = 0.d0
     diagonal_b12 = 0.d0
     diagonal_r12 = 0.d0
+    diagonal_jnu = 0.d0    
     ! TEST RADIATIVE TRANSITIONS COEFFICIENTS
       do ini = 1, nlev_lique
          do fin = 1, nlev_lique
@@ -163,22 +164,26 @@ module level_population
     !                                        r12%M(fin, ini),                   &
     !                                        rad%M(ini, fin)
             if(ini.ge.fin)  then
-            diagonal_a21 = diagonal_a21 + a21%M_lique(ini, fin)   
-            diagonal_b21 = diagonal_b21 + b21%M_lique(ini, fin)   
-            diagonal_r21 = diagonal_r21 + r21%M_lique(ini, fin)
+                diagonal_a21 = diagonal_a21 + a21%M_lique(ini, fin)   
+                diagonal_b21 = diagonal_b21 + b21%M_lique(ini, fin)   
+                diagonal_r21 = diagonal_r21 + r21%M_lique(ini, fin)
             else
-            diagonal_b12 = diagonal_b12 + b12%M_lique(ini, fin)
-            diagonal_r12 = diagonal_r12 + r12%M_lique(ini, fin)
+                diagonal_b12 = diagonal_b12 + b12%M_lique(ini, fin)
+                diagonal_r12 = diagonal_r12 + r12%M_lique(ini, fin)
             endif
+            
+            diagonal_jnu = diagonal_jnu + jnu%M_lique(ini, fin)
          enddo
       enddo
       print*, 'a21', sum(a21%M_lique), diagonal_a21
       write(6, '(a13,e14.7)') 'max frequency', maxval(energy%freq_lique)
       print*, 'b21', sum(b21%M_lique), diagonal_b21, 'max', maxval(b21%M_lique)
-      print*, 'b12', sum(b12%M_lique), diagonal_b12, 'max', maxval(b12%M_lique)      
-      print*, 'r21', sum(r21%M_lique), diagonal_r21, 'max', maxval(r21%M_lique)      
-      print*, 'r12', sum(r12%M_lique), diagonal_r12, 'max', maxval(r12%M_lique)      
+      print*, 'jnu', sum(jnu%M_lique), diagonal_jnu, 'max', maxval(jnu%M_lique)
+      print*, 'r21', sum(r21%M_lique), diagonal_r21, 'max', maxval(r21%M_lique)
 
+      print*, 'b12', sum(b12%M_lique), diagonal_b12, 'max', maxval(b12%M_lique)
+      print*, 'r12', sum(r12%M_lique), diagonal_r12, 'max', maxval(r12%M_lique)
+      print*, 'r21+r12', sum(r21%M_lique+r12%M_lique), 'max', maxval(r21%M_lique+r12%M_lique)
     ! TEST MATRIX LINEAR SYSTEM
     !   do ini = 1, nlev
     !        write(6,'(a11, i3, e14.7)') 'population:', ini, y%pop(ini)
