@@ -21,11 +21,11 @@ module level_population
 
     contains
     
-    subroutine lev_pop(energy, a21, b21, r21, b12, jnu, r12, rr, x)
+    subroutine lev_pop(energy, a21, b21, r21, b12, jnu, r12, rr, rr21, rr12, x)
     
         type(energy_lev) :: energy
         type(radiative_coeffs) :: a21, b21, b12, jnu, r21, r12, rad
-        type(collisional_coeffs) :: rr
+        type(collisional_coeffs) :: rr, rr21, rr12
         !type(reaction_matrix)  :: coll_rad_matrix
         type(population) :: x, y
 
@@ -33,7 +33,7 @@ module level_population
 
         call reading_data_radiative(energy, a21)
     
-        call reading_data_collisions(energy, rr)
+        call reading_data_collisions(energy, rr, rr21, rr12)
         
         print*, 'T_Radiation', Trad
         
@@ -70,12 +70,13 @@ module level_population
     end subroutine lev_pop
     
     
-    subroutine tests(energy, rr, a21, b21, r21, b12, jnu, r12)
+    subroutine tests(energy, rr, rr21, rr12, a21, b21, r21, b12, jnu, r12)
         real*8 :: diagonal_a21, diagonal_b21, diagonal_r21
         real*8 :: diagonal_b12, diagonal_r12
+        real*8 :: diagonal_rr21, diagonal_rr12        
         type(energy_lev) :: energy
         type(radiative_coeffs) :: a21, b21, r21, b12, r12, jnu!, rad
-        type(collisional_coeffs) :: rr
+        type(collisional_coeffs) :: rr, rr21, rr12
         !type(reaction_matrix)  :: coll_rad_matrix
         !type(population) :: x, y    
     ! TEST READING ENERGY LEVELS
@@ -126,8 +127,15 @@ module level_population
     ! TEST COLLISIONAL COEFFICIENTS
     ! check of the coefficients compared to the read data by François + 
     ! detailed balance
-    !    do i=1, ntrans
-    !       do it=1, ntemp
+    diagonal_rr21 = 0.d0
+    diagonal_rr12 = 0.d0    
+     do i=1, ntrans
+        do it=1, ntemp
+            if(rr%couple1c(i).ge.rr%couple2c(i))  then
+                diagonal_rr21 = diagonal_rr21 + rr21%matrix_lique(rr%couple1c(i),rr%couple2c(i),it)
+            else
+                diagonal_rr12 = diagonal_rr12 + rr12%matrix_lique(rr%couple2c(i),rr%couple1c(i),it)
+            endif        
     !          write(6, '(6(i3,2x), 4(e14.5))') rr%couple1c(i),rr%couple2c(i),   &
     !                                    rr%vic(i),rr%jic(i),rr%vfc(i),rr%jfc(i),&
     !                                    rr%temp(it),                            &
@@ -136,19 +144,23 @@ module level_population
     !                          (rr%matrix_lique(rr%couple1c(i),rr%couple2c(i),it)-     &
     !                      rr%matrix_lique(rr%couple2c(i),rr%couple1c(i),it))*1.d6/    &
     !                      (rr%matrix_lique(rr%couple1c(i),rr%couple2c(i),it)*1.d6)
-    !        enddo
-    !    enddo
+        enddo
+    enddo
+    print*, 'rr21', sum(rr21%matrix_lique), diagonal_rr21, 'max', maxval(rr21%matrix_lique)
+    print*, 'rr12', sum(rr12%matrix_lique), diagonal_rr12, 'max', maxval(rr12%matrix_lique)
+    
     print*, 'sum_collisional: ', sum(rr%matrix_lique)
     print*, 'max_collisional: ', maxval(rr%matrix_lique)
     print*, 'min_collisional: ', minval(rr%matrix_lique)    
     
+    
+    ! TEST RADIATIVE TRANSITIONS COEFFICIENTS
     diagonal_a21 = 0.d0
     diagonal_b21 = 0.d0
     diagonal_r21 = 0.d0
     diagonal_b12 = 0.d0
     diagonal_r12 = 0.d0
     diagonal_jnu = 0.d0    
-    ! TEST RADIATIVE TRANSITIONS COEFFICIENTS
       do ini = 1, nlev_lique
          do fin = 1, nlev_lique
     !        !if(a21%M(ini, fin).ne.0.d0)                                        &

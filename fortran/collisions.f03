@@ -14,7 +14,7 @@ module collisions
     
     contains
 
-      subroutine reading_data_collisions(e, rr)
+      subroutine reading_data_collisions(e, rr, rr21, rr12)
                  use energy_levels, only: reading_data_energies
                  use types_and_parameters, only: it, nlev, nlev_lique,  &
                                                  vimax, jimax,          &
@@ -23,7 +23,7 @@ module collisions
                                                  vi, ji, vf, jf,        &
                                                  kb
  
-                 type(collisional_coeffs) :: rr                   ! reaction rate
+                 type(collisional_coeffs) :: rr, rr21, rr12       ! reaction rate
                  type(energy_lev) :: e
 
                  real*8 :: dE
@@ -74,10 +74,14 @@ module collisions
                      do it=1,ntemp
                         rr%matrix_lique(rr%couple1c(i),rr%couple2c(i),it) = &
                                        rr%reading(vi,ji,vf,jf,it)
+                        rr21%matrix_lique(rr%couple1c(i),rr%couple2c(i),it) = &
+                          rr%matrix_lique(rr%couple1c(i),rr%couple2c(i),it)
+                          
                         rr%matrix_lique(rr%couple2c(i),rr%couple1c(i),it) =       &
                           dexp(-dE/(kb*rr%temp(it))) * rr%reading(vi,ji,vf,jf,it) &
-                          * ((2.*jf+1.))/(2.*ji+1.)
-                          
+                          * ((2.*ji+1.))/(2.*jf+1.)
+                        rr12%matrix_lique(rr%couple2c(i),rr%couple1c(i),it) = &
+                          rr%matrix_lique(rr%couple2c(i),rr%couple1c(i),it)
                      enddo
                  enddo
 
