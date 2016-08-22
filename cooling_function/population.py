@@ -17,15 +17,36 @@ from scipy.constants import electron_volt as ev
 from scipy.constants import Boltzmann as kb
 from scipy.constants import hbar as hbar_planck
 
-from Leiden_ISM.ismUtils import planckOccupation as ng
+from Leiden_ISM.ismUtils import planck_function as J_nu
 
 from utils import linear_2d_index, find_matching_indices
 
 kb_ev = kb / ev
 
+
+def find_v_max_j_max_from_data(A_einstein_nnz, cr_coefficients_nnz):
+    """"""
+
+    # find the non zeros elements and their corresponding indices of the
+    # Einstein coefficients
+    v_nnz, j_nnz, vp_nnz, jp_nnz, A_nnz = A_einstein_nnz
+    v_max_A = max(v_nnz.max(), vp_nnz.max())
+    j_max_A = max(j_nnz.max(), jp_nnz.max())
+    print('DEBUG: (v_max_A, j_max_A) = ', v_max_A, j_max_A)
+
+    # find the non zeros elements and their corresponding indices of the
+    # collisional coefficients
+    (v_nnz, j_nnz), (vp_nnz, jp_nnz), unique_nnz, cr_nnz = cr_coefficients_nnz
+    v_max_cr = max(v_nnz.max(), vp_nnz.max())
+    j_max_cr = max(j_nnz.max(), jp_nnz.max())
+    print('DEBUG: (v_max_cr, j_max_cr) = ', v_max_cr, j_max_cr)
+
+    return max(v_max_A, v_max_cr), max(j_max_A, j_max_cr)
+
+
 def check_self_transitions_in_Einstien_nnz_data(A_info_nnz):
     """raises an error if there are self transitions in the non-zero data of
-    the Einstien coefficients.
+    the Einstein coefficients.
 
     :param A_info_nnz: a tuple of elements v_nnz, j_nnz, vp_nnz, jp_nnz, A_nnz
     :return: True if everything ok, else error is raised
@@ -54,6 +75,44 @@ def reduce_einstein_coefficients_slow(A_info_nnz, energy_levels):
      is a lower triangular matrix containing the Einstien coefficients.
     """
 
+    check_self_transitions_in_Einstien_nnz_data(A_info_nnz)
+
+    v_nnz, j_nnz, vp_nnz, jp_nnz, A_nnz = A_info_nnz
+
+    levels = energy_levels
+
+    # get the unique label for the (v,j) pairs
+    labels_ini = linear_2d_index(v_nnz, j_nnz, n_i=levels.v_max_allowed)
+    labels_fin = linear_2d_index(vp_nnz, jp_nnz, n_i=levels.v_max_allowed)
+
+    A_reduced = zeros((levels.size, levels.size), 'f8')
+
+    for i, A_i in enumerate(A_nnz):
+
+        # print('{:4}/{:4}'.format(i+1, len(A_nnz)))
+
+        # get the indices based on v,j, jp, jp comaprisons
+        #     v, j, vp, jp = v_nnz[i], j_nnz[i], vp_nnz[i], jp_nnz[i]
+        #     ind_ini = where((levels['v'] == v)*(levels['j'] == j))[0]
+        #     ind_fin = where((levels['v'] == vp)*(levels['j'] == jp))[0]
+
+        # get the indices based on label comparisons
+        ind_ini = where(levels.data['label'] == labels_ini[i])[0]
+        ind_fin = where(levels.data['label'] == labels_fin[i])[0]
+
+        if ind_ini.size != 0 or ind_fin.size != 0:
+            A_reduced[ind_ini, ind_fin] = A_i
+        else:
+            continue
+
+
+    # DEBUG
+    # A_reduced[A_reduced > 0.0] = numpy.log10(A_reduced[A_reduced > 0.0])
+    # pylab.imshow(A_reduced, interpolation='none')
+    # pylab.colorbar()
+    # pylab.show()
+
+    return A_reduced
 
 
 def reduce_einstein_coefficients(A, energy_levels):
@@ -73,20 +132,15 @@ def reduce_einstein_coefficients(A, energy_levels):
     """
 
     levels = energy_levels
+    n_levels = energy_levels.data.size
+    labels = energy_levels.data['label']
 
-    # find the non zeros elements of A that and their indices
+    # find the non zeros elements and their corresponding indices in A
     (v_nnz, j_nnz, vp_nnz, jp_nnz), A_nnz = where(A > 0.0), A[A > 0.0]
 
-    # find the maximum v level from the transitions levels
-    v_max = max(v_nnz.max(), vp_nnz.max())
-
-    # compute labels of available levels based on levels of the Einstein data
-    # transitions
-    labels = linear_2d_index(levels['v'], levels['j'], n_i=v_max+1)
-
     # get the unique label for the (v,j) pairs
-    labels_ini = linear_2d_index(v_nnz, j_nnz, n_i=v_max+1)
-    labels_fin = linear_2d_index(vp_nnz, jp_nnz, n_i=v_max+1)
+    labels_ini = linear_2d_index(v_nnz, j_nnz, n_i=levels.v_max_allowed)
+    labels_fin = linear_2d_index(vp_nnz, jp_nnz, n_i=levels.v_max_allowed)
 
     # keep transitions whose initial levels labels and the final label of the
     # transition are found in energy_levels
@@ -100,7 +154,6 @@ def reduce_einstein_coefficients(A, energy_levels):
     inds_fin = find_matching_indices(labels, labels_fin)
 
     # define the reduced A matrix and fill it up using inds_ini and inds_fin
-    n_levels = energy_levels.size
     A_reduced = zeros((n_levels, n_levels), 'f8')
 
     A_reduced[inds_ini, inds_fin] = A_nnz
@@ -120,8 +173,8 @@ def compute_delta_energy_matrix(levels):
     :return: square matrix of shape n x n where n is the number of energy
      levels.
     """
-    n = levels.size
-    energies_as_column = levels['E'].reshape(1, n)
+    n = levels.data.size
+    energies_as_column = levels.data['E'].reshape(1, n)
 
     # the energy matrix with identical columns
     E_matrix = numpy.repeat(energies_as_column, n, axis=0).T
@@ -136,8 +189,8 @@ def compute_degeneracy_matrix(levels):
      strictly upper triangular that is documented in the notebook.
     :return: square matrix of shape n x n.
     """
-    n = levels.size
-    degeneracies_as_column = levels['g'].reshape(1, n)
+    n = levels.data.size
+    degeneracies_as_column = levels.data['g'].reshape(1, n)
 
     G = numpy.repeat(degeneracies_as_column, n, axis=0).T
 
@@ -150,28 +203,34 @@ def compute_degeneracy_matrix(levels):
     return R
 
 
-def compute_B_matrix_from_A_matrix(levels, A_matrix):
+def compute_B_J_nu_matrix_from_A_matrix(energy_levels, A_matrix, T):
     """given the energy levels, returns the stimulated emission and absorption
     coefficients matrix.
+    https://en.wikipedia.org/wiki/Einstein_coefficients
 
     :param A_matrix: The spontaneous emission coefficients matrix (A in the
      ipython notebook)
-    :param levels: The energy levels
+    :param energy_levels: The energy levels
     :return: The B matrix defined in the notebook
     """
-    delta_e = compute_delta_energy_matrix(levels)
+    delta_e = compute_delta_energy_matrix(energy_levels)
 
-    nu_matrix = delta_e / h_planck
+    nu_matrix = fabs(delta_e*ev) / h_planck
 
     B_e_matrix = (8.0*pi*hbar_planck/c_light**3)*(nu_matrix**3)*A_matrix
 
-    R_matrix = compute_degeneracy_matrix(levels)
+    R_matrix = compute_degeneracy_matrix(energy_levels)
+
+    J_nu_matrix = J_nu(h_planck, nu_matrix, kb, T, c_light)
+    numpy.fill_diagonal(J_nu_matrix, 0.0)
 
     B_a_matrix = B_e_matrix.T * R_matrix
 
     B_matrix = B_e_matrix + B_a_matrix
 
-    return B_matrix
+    B_J_nu_matrix = B_matrix * J_nu_matrix
+
+    return B_J_nu_matrix
 
 
 def reduce_collisional_coefficients_slow(cr_info_nnz, energy_levels):
@@ -182,22 +241,18 @@ def reduce_collisional_coefficients_slow(cr_info_nnz, energy_levels):
     # check_self_transitions_in_Einstien_nnz_data(A_info_nnz)
 
     levels = energy_levels
+    n_levels = energy_levels.data.size
+    labels = energy_levels.data['label']
 
     (v_nnz, j_nnz), (vp_nnz, jp_nnz), unique_nnz, cr_nnz = cr_info_nnz
 
-    v_max = max(v_nnz.max(), vp_nnz.max())
-
     n_T = cr_nnz.shape[0]
 
-    # compute labels of available levels based on levels of the Einstein data
-    # transitions
-    labels = linear_2d_index(levels['v'], levels['j'], n_i=v_max+1)
-
     # get the unique label for the (v,j) pairs
-    labels_ini = linear_2d_index(v_nnz, j_nnz, n_i=v_max+1)
-    labels_fin = linear_2d_index(vp_nnz, jp_nnz, n_i=v_max+1)
+    labels_ini = linear_2d_index(v_nnz, j_nnz, n_i=levels.v_max_allowed)
+    labels_fin = linear_2d_index(vp_nnz, jp_nnz, n_i=levels.v_max_allowed)
 
-    K_ex_reduced = zeros((n_T, levels.size, levels.size), 'f8')
+    K_ex_reduced = zeros((n_T, levels.data.size, levels.data.size), 'f8')
 
     for i, cr_i in enumerate(cr_nnz.T):
 
@@ -236,20 +291,20 @@ def reduce_collisional_coefficients(cr, energy_levels):
     raise NotImplementedError("not implemented yet")
 
 
-def compute_K_matrix_from_K_dex_matrix(levels, K_dex, T):
+def compute_K_matrix_from_K_dex_matrix(energy_levels, K_dex, T):
     """
 
     :return:
     """
-    delta_e = compute_delta_energy_matrix(levels)
+    delta_e_matrix = compute_delta_energy_matrix(energy_levels)
 
-    R_matrix = compute_degeneracy_matrix(levels)
+    R_matrix = compute_degeneracy_matrix(energy_levels)
 
     # R*K^T_{dex} to be multiplied by the exp(-dE/kb*T) in the loop
     K_ex = numpy.zeros(K_dex.shape, 'f8')
     for i, T_i in enumerate(T):
         K_ex[i, :, :] = \
-            R_matrix * K_dex[i, :, :].T * exp(-delta_e/(kb_ev * T_i))
+            R_matrix * K_dex[i, :, :].T * exp(-delta_e_matrix/(kb_ev * T_i))
 
     return K_dex + K_ex
 

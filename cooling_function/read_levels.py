@@ -10,6 +10,46 @@ import pylab
 from utils import linear_2d_index
 
 
+class EnergyLevelsMolecule(object):
+    """
+    Container class that holds energy levels data. This supports two quantum
+    numbers of the molecule, vibrations and rotations.
+    """
+    def __init__(self, n_levels):
+        """
+        constructor
+        """
+
+        self.data = numpy.zeros(n_levels, dtype=[('v', 'i4'),
+                                                 ('j', 'i4'),
+                                                 ('g', 'f8'),
+                                                 ('label', 'i4'),
+                                                 ('E', 'f8')])
+        """the numpy array that holds the levels data"""
+
+        self.v_max_allowed = None
+        """The maximum value of v that is allowed. This could be higher or
+        lower than the values in self.data['v']"""
+
+        self.j_max_allowed = None
+        """The maximum value of j that is allowed. This could be higher or
+        lower than the values in self.data['j']"""
+
+    def set_labels(self, v_max=None):
+        """
+        set the field self.data['label']. This method modifies
+        self.data['label'] and self.v_max_allowed
+
+        :param v_max: The maximum value of v to be used in computing and
+         setting the labels.
+        """
+        if v_max is not None:
+            self.v_max_allowed = v_max
+        self.data['label'] = linear_2d_index(self.data['v'],
+                                             self.data['j'],
+                                             n_i=v_max)
+
+
 def read_levels(fname):
     """parse the  data of
 
@@ -100,16 +140,12 @@ def read_levels_lique(fname):
 
     v, j, energies = data_read[inds, 2], data_read[inds, 3], data_read[inds, 5]
 
-    data = numpy.zeros(inds.shape, dtype=[('v', 'i4'),
-                                          ('j', 'i4'),
-                                          ('g', 'f8'),
-                                          ('label', 'i4'),
-                                          ('E', 'f8')])
+    energy_levels = EnergyLevelsMolecule(inds.size)
 
-    data['v'] = v
-    data['j'] = j
-    data['g'] = 2*j + 1
-    data['label'] = linear_2d_index(v, j)
-    data['E'] = energies
+    energy_levels.data['v'] = v
+    energy_levels.data['j'] = j
+    energy_levels.data['g'] = 2*j + 1
+    energy_levels.data['E'] = energies
+    energy_levels.data['label'] = linear_2d_index(v, j)
 
-    return data
+    return energy_levels
