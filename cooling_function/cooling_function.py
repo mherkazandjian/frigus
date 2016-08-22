@@ -20,7 +20,7 @@ import read_einstien_coefficient
 from read_collision_coefficients import read_collision_coefficients
 import read_levels
 import population
-from population import reduce_vj_repr, coolingFunction, fit_glover
+from population import cooling_rate, fit_glover
 import matplotlib.pyplot as plt
 
 import numpy
@@ -33,8 +33,8 @@ from numpy import log10, unique
 # .. todo:: to make sure that there are no errors done in unit conversion
 #
 
-# density of the colliding species, in units of 1.e3 cm-3 as in Lipovka
-nc = 1.e9
+# density of the colliding species, in m^3
+nc = 1.e14
 
 # the kinetic temperature of the gas
 T_kin = 3000.0
@@ -97,22 +97,17 @@ K_matrix = population.compute_K_matrix_from_K_dex_matrix(energy_levels,
 O_matrix = (A_matrix + B_J_nu_matrix + K_matrix*nc).T
 
 D_matrix = numpy.zeros(O_matrix.shape, 'f8')
-D_matrix[numpy.diag_indices(D_matrix.shape[0])] = O_matrix.sum(axis=0)
+D_matrix[numpy.diag_indices(D_matrix.shape[0])] = -O_matrix.sum(axis=0)
 
 M_matrix = O_matrix + D_matrix
 
+# solve the equilibrium population densities
+n_vj_equilibrium = population.solveEquilibrium(M_matrix)
+
+# compute the cooling rate
+c_rate = cooling_rate(n_vj_equilibrium, energy_levels, A_matrix)
+
 pdb.set_trace()
-
-# read the Einstein coefficients
-
-
-
-cr = read_collision_coefficients.compute_lower_to_upper_collision_coefficients(cr_upper_2_lower,
-                                                                               ini,
-                                                                               fin,
-                                                                               T,
-                                                                               energy_levels)
-
 
 
 # creating the array for the radiation temperatures;
@@ -121,49 +116,22 @@ tcmb = zeros(T.size)
 tcmb = 2*T
 #tcmb[:] = 2.*T[:]
 
-
-# reduce the level representation from 2D indexing to 1D indexing
-lin_data = reduce_vj_repr(en_H2, A, cr, T, ini, fin, vj_unique)
-en_l, a_eins_l, cr_l, ini_l, fin_l, vj_unique_l, g = lin_data
-
-cf = zeros(T.size)
-fit = zeros(T.size)
-for itemp in range(T.size):
-    matrix = population.computeRateMatrix(en_l,
-                                      a_eins_l,
-                                      cr_l,
-                                      ini_l,
-                                      fin_l,
-                                      vj_unique_l,
-                                      g,
-                                      T,
-                                      tcmb,
-                                      nc,
-                                      itemp,
-                                      itemp)
-
-    nvj = population.solveEquilibrium(matrix)
-    cooling_function = population.coolingFunction(nvj,
-                                              en_l,
-                                              a_eins_l,
-                                              ini_l,
-                                              fin_l,
-                                              vj_unique_l)
-    cf[itemp] = cooling_function
-    fit[itemp] = fit_glover(T[itemp])
-
-    print cooling_function*1e13 # to have the output in erg cm-3 s-1
+# cf = zeros(T.size)
+# fit = zeros(T.size)
+# for itemp in range(T.size):
+#     cf[itemp] = cooling_function
+#     fit[itemp] = fit_glover(T[itemp])
+#
+#     print cooling_function*1e13 # to have the output in erg cm-3 s-1
 
 
-plt.plot(T, cf*1e13, 'x', T, fit, 'o')
-plt.xscale('log')
-plt.yscale('log')
+# plt.plot(T, cf*1e13, 'x', T, fit, 'o')
+# plt.xscale('log')
+# plt.yscale('log')
 #plt.axes(xrange())
 #yaxes: 1e-29:1e-22
 #plt.legend('reaction rate [cm^{-3}s^{-1}]')
 plt.show()
-
-
 
 ## plotting the population densities
 
@@ -180,7 +148,7 @@ def plot_vj_populations(v, j, nvj):
     ax.set_zlabel('n(v,j)')
     pylab.show()
 
-plot_vj_populations(vj_unique[0], vj_unique[1], log10(nvj.flatten()))
+# plot_vj_populations(vj_unique[0], vj_unique[1], log10(nvj.flatten()))
 
 
 print 'done reading!'
