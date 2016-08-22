@@ -301,15 +301,13 @@ def compute_K_matrix_from_K_dex_matrix(energy_levels, K_dex, T_range, T):
     R_matrix = compute_degeneracy_matrix(energy_levels)
 
     # find the temperature interval within which T is
-    # T_ind_1, T_ind_2 = where(T_range >= T)[0], where(T_range < T)[0]
+    T_ind = where(T == T_range)
 
-    # R*K^T_{dex} to be multiplied by the exp(-dE/kb*T) in the loop
-    K_ex = numpy.zeros(K_dex.shape, 'f8')
-    for i, T_i in enumerate(T_range):
-        K_ex[i, :, :] = \
-            R_matrix * K_dex[i, :, :].T * exp(-delta_e_matrix/(kb_ev * T_i))
+    # R*K^T_{dex}(T) to be multiplied by the exp(-dE/kb*T) in the loop
+    K_dex_T = K_dex[T_ind][0]
+    K_ex_T = R_matrix * K_dex_T.T * exp(-delta_e_matrix/(kb_ev * T))
 
-    K_matrix = K_dex + K_ex
+    K_matrix = K_dex_T + K_ex_T
 
     return K_matrix
 
