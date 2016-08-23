@@ -55,7 +55,7 @@ module types_and_parameters
         real*8  :: reading(-1:1,0:14,0:14,0:jmax)
         real*8, allocatable, dimension(:,:,:,:)  :: arranging
         real*8  :: M(1:nlev,1:nlev)
-        real*8  :: M_lique(0:nlev_lique,0:nlev_lique)        
+        real*8  :: M_lique(1:nlev_lique,1:nlev_lique)        
         integer :: ntransrad
         integer, allocatable, dimension(:) :: couple1r, couple2r 
         integer, allocatable, dimension(:) :: vir, jir, vfr, jfr
@@ -75,8 +75,8 @@ module types_and_parameters
     
 
     type :: reaction_matrix
-        real*8 :: A(1:nlev, 1:nlev)
-        real*8 :: A_lique(1:nlev_lique, 1:nlev_lique, 1:ntemp)        
+        real*8 :: A(1:nlev, 1:nlev)    
+        real*8 :: M(1:nlev_lique, 1:nlev_lique, 1:ntemp)        
     end type reaction_matrix
     
     

@@ -2,7 +2,7 @@ module matrix_construction
 
     ! this module evaluates the terms that go in the matrix that contains all the collisional 
     ! and radiative contribution for the formation/destruction of each level 
-    use types_and_parameters, only: nlev,                                 &
+    use types_and_parameters, only: nlev_lique,                           &
                                     radiative_coeffs, collisional_coeffs, &
                                     reaction_matrix, population,          &
                                     Trad, nb,                             &
@@ -12,17 +12,18 @@ module matrix_construction
 
     subroutine matrix_builder(rad, rr, it, coll_rad_matrix)
 
-               type(radiative_coeffs) :: rad
+               type(radiative_coeffs)   :: rad
                type(collisional_coeffs) :: rr
                type(reaction_matrix)    :: coll_rad_matrix
                integer :: it
                
 !                do it = 1, ntemp
-!                   coll_rad_matrix%A_lique = 0.d0
-!                   do row = 1, nlev
-!                      do col = 1, nlev
-!                         if(row.eq.col) then 
-!                            coll_rad_matrix%A_lique(row,col) = coll_rad_matrix%A_lique(row, col)   &
+!                coll_rad_matrix%M = 0.d0
+!                do row = 1, nlev_lique
+!                   do col = 1, nlev_lique
+!                      if(row.ne.col) then 
+!                         coll_rad_matrix%M(row,col) = coll_rad_matrix%M(row, col)   &
+!                                                      +
 !                                                               -rad%M_lique(row, fin)                &
 !                                                               -rr%matrix(row, fin, it) * nb(1)
 !                                   else

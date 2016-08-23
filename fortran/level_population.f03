@@ -26,7 +26,7 @@ module level_population
         type(energy_lev) :: energy
         type(radiative_coeffs) :: a21, b21, b12, jnu, r21, r12, rad
         type(collisional_coeffs) :: rr, rr21, rr12
-        !type(reaction_matrix)  :: coll_rad_matrix
+        type(reaction_matrix)  :: coll_rad_matrix
         type(population) :: x, y
 
         call reading_data_energies(energy)
@@ -43,29 +43,11 @@ module level_population
 !         ! transitions; according to the convention adopted:
 !         !     downward transitions -> upper triangular matrix
 !         !     upward transitions   -> lower triangular matrix
-         print*, 'nb = ', nb(1)
-         !do i = 1, ntrans
-         !      do it = 1, ntemp
-         !        rr%matrix_lique(rr%couple1c(i),rr%couple2c(i), it) = &
-         !        rr%matrix_lique(rr%couple1c(i),rr%couple2c(i), it) * nb(1)
-         !        rr21%matrix_lique(rr%couple1c(i),rr%couple2c(i), it) = &
-         !        rr21%matrix_lique(rr%couple1c(i),rr%couple2c(i), it) * nb(1)
-         !        rr12%matrix_lique(rr%couple1c(i),rr%couple2c(i), it) = &
-         !        rr12%matrix_lique(rr%couple1c(i),rr%couple2c(i), it) * nb(1)
-         !      enddo
-         !enddo
 
+         !call multiplication_by_nc(rr, rr21, rr12, nb(1))
          
-         
-         do i = 1, ntrans
-               do it = 1, ntemp
-                  write(6,'(2(i2,2x), 2(e14.7,2x) )') rr%couple1c(i),rr%couple2c(i),   &
-                                                      rr%temp(it),                     &
-                                    rr%matrix_lique(rr%couple1c(i),rr%couple2c(i), it)
-               enddo
-            enddo
-
-!         rad%M_lique = r21%M_lique + r12%M_lique
+          
+!        rad%M_lique = r21%M_lique + r12%M_lique
 ! 
 !         it = 1
 !         
@@ -85,6 +67,25 @@ module level_population
      
         return
     end subroutine lev_pop
+
+    subroutine multiplication_by_nc(rr, rr21, rr12, nc) 
+        real*8 nc
+        type(collisional_coeffs) :: rr, rr21, rr12
+        print*, 'nc = ', nc
+        do i = 1, ntrans
+           do it = 1, ntemp
+              rr%matrix_lique(rr%couple1c(i),rr%couple2c(i), it) = &
+              rr%matrix_lique(rr%couple1c(i),rr%couple2c(i), it) * nc
+              rr21%matrix_lique(rr%couple1c(i),rr%couple2c(i), it) = &
+              rr21%matrix_lique(rr%couple1c(i),rr%couple2c(i), it) * nc
+              rr12%matrix_lique(rr%couple1c(i),rr%couple2c(i), it) = &
+              rr12%matrix_lique(rr%couple1c(i),rr%couple2c(i), it) * nc
+           enddo
+         enddo
+         
+         return
+    end subroutine multiplication_by_nc
+
     
     
     subroutine tests(energy, rr, rr21, rr12, a21, b21, r21, b12, jnu, r12)
@@ -185,6 +186,16 @@ module level_population
     !    enddo
     !enddo    
 
+    ! test 3: check for collisional coefficients and corresponding temperature
+    !     do i = 1, ntrans
+    !           do it = 1, ntemp
+    !              write(6,'(2(i2,2x), 2(e14.7,2x) )') rr%couple1c(i),rr%couple2c(i),   &
+    !                                                  rr%temp(it),                     &
+    !                                rr%matrix_lique(rr%couple1c(i),rr%couple2c(i), it)
+    !           enddo
+    !     enddo    
+    
+    
 !----------------------------------------------------------------------------------------------------
 
     ! TEST RADIATIVE TRANSITIONS COEFFICIENTS
