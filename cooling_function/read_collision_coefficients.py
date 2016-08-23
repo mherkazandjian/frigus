@@ -6,15 +6,9 @@ Read the collisional rates (collision coefficients)
 import numpy
 from numpy import (loadtxt, arange, int32, zeros, unique, void,
                    ascontiguousarray, dtype, hstack, fabs, exp)
-from scipy.constants import Boltzmann, elementary_charge
-from scipy import interpolate
 
 from astropy import units as u
 
-import pylab
-from IPython.core.debugger import Tracer
-
-from utils import linear_2d_index
 
 def unique_level_pairs(vj):
     """from a list of levels find the list of unique levels and return them.
@@ -112,7 +106,6 @@ def read_collision_coefficients(fname):
     unique_levels = unique_level_pairs(hstack((unique_level_pairs(ini),
                                                unique_level_pairs(fin))))
 
-
     # set the units of the data to be returned
     data_with_units = data * (u.cm**3 / u.second)
     cr_with_units = cr * (u.cm**3 / u.second)
@@ -122,55 +115,3 @@ def read_collision_coefficients(fname):
     cr_with_units = cr_with_units.to(u.m**3 / u.second)
 
     return data_with_units, T_values, (ini, fin, unique_levels, cr_with_units)
-
-
-def compute_lower_to_upper_collision_coefficients(cr,
-                                                  ini,
-                                                  fin,
-                                                  T,
-                                                  energy_levels):
-    """
-    compute the collision coefficients of the lower to upper transitions using
-    the detailed balance.
-
-    :param cr: is the collision rates 5D matrix returned by
-      read_collision_coefficients.
-    :param ini: the initial levels returned by read_collision_coefficients.
-    :param fin: the final levels returned by read_collision_coefficients.
-    :param T: The temperatures corresponding to the last index of the cr array.
-     returned by read_collision_coefficients.
-    :param energy_levels: The energy levels
-
-    :return: a copy of the cr matrix with the updated lower to upper
-    transitions coefficients.
-    """
-
-    retval = cr.copy()
-
-    # convert Boltzmann to eV
-    kB = Boltzmann/elementary_charge
-
-    for T_index, T_i in enumerate(T):
-        for transition_index in range(ini.shape[1]):
-            vi, ji = ini[:, transition_index]
-            vf, jf = fin[:, transition_index]
-
-            # the initial and final and the difference of the energies
-            # respectively
-            energy_i = energy_levels[(energy_levels['v'] == vi)*\
-                                     (energy_levels['j'] == ji)]['E'][0]
-            energy_f = energy_levels[(energy_levels['v'] == vf)*\
-                                     (energy_levels['j'] == jf)]['E'][0]
-
-            dE = fabs(energy_f - energy_i)
-
-            # the degeneracies of the initial and final levels respectively
-            g_i, g_f = float(2*ji + 1), float(2*jf + 1)
-
-            # compute the rate from lower to upper and update its value
-            cr_upper_2_lower = cr[vi, ji, vf, jf, T_index]
-            cr_lower_2_upper = (g_f / g_i)*cr_upper_2_lower*exp(-dE/(kB*T_i))
-
-            retval[vf, jf, vi, ji, T_index] = cr_lower_2_upper
-
-    return retval

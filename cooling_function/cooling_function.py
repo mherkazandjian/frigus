@@ -27,7 +27,7 @@ import matplotlib.pyplot as plt
 # .. todo:: organize these imports
 import read_einstien_coefficient
 from read_collision_coefficients import read_collision_coefficients
-import read_levels
+import read_energy_levels
 import population
 from population import cooling_rate, fit_glover
 
@@ -39,14 +39,14 @@ import pdb
 #
 
 # density of the colliding species, in m^3
-nc = 1.e10 * u.meter**-3
+nc_H = 1e14 * u.meter**-3
 
 # the kinetic temperature of the gas
-T_kin = 100.0 * u.Kelvin
+T_kin = 3000.0 * u.Kelvin
 
 # read the energy levels (v, j, energy)
 #
-energy_levels = read_levels.read_levels_lique(
+energy_levels = read_energy_levels.read_levels_lique(
                        'Read/H2Xvjlevels_francois_mod.cs')
 # en_H2 = read_levels.read_levels("Read/H2Xvjlevels.cs")
 # print('{:3}{:3}{:10}'.format('v', 'j', 'E(eV)'))
@@ -90,21 +90,21 @@ def cooling_rate_at_steady_state_T_kin_nc(T_kin, nc):
                                                    T_kin,
                                                    nc)
 
-cooling_rate = cooling_rate_at_steady_state_T_kin_nc(T_kin, nc)
+cooling_rate = cooling_rate_at_steady_state_T_kin_nc(T_kin, nc_H)
 
 print('this')
 lambda_vs_T_kin = []
 for T_kin in T_rng:
     print(T_kin)
-    lambda_vs_T_kin += [cooling_rate_at_steady_state_T_kin_nc(T_kin, nc)]
+    lambda_vs_T_kin += [cooling_rate_at_steady_state_T_kin_nc(T_kin, nc_H)]
 
 lambda_vs_T_kin = u.Quantity(lambda_vs_T_kin)
 lambda_vs_T_kin_glover = u.Quantity([fit_glover(T_kin) for T_kin in
                                      T_rng.value])
 
 pylab.loglog(T_rng.value, lambda_vs_T_kin.si.value, '-o', label='cooling H2')
-pylab.loglog(T_rng.value, lambda_vs_T_kin_glover.si.value,
-           'r--', label='cooling H2 glover')
+# pylab.loglog(T_rng.value, lambda_vs_T_kin_glover.si.value,
+#            'r--', label='cooling H2 glover')
 pylab.legend()
 pylab.show()
 
