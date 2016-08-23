@@ -44,7 +44,7 @@ module level_population
 !         !     downward transitions -> upper triangular matrix
 !         !     upward transitions   -> lower triangular matrix
 
-         !call multiplication_by_nc(rr, rr21, rr12, nb(1))
+         call multiplication_by_nc(rr, rr21, rr12, nb(1))
          
           
 !        rad%M_lique = r21%M_lique + r12%M_lique
@@ -72,18 +72,10 @@ module level_population
         real*8 nc
         type(collisional_coeffs) :: rr, rr21, rr12
         print*, 'nc = ', nc
-        do i = 1, ntrans
-           do it = 1, ntemp
-              rr%matrix_lique(rr%couple1c(i),rr%couple2c(i), it) = &
-              rr%matrix_lique(rr%couple1c(i),rr%couple2c(i), it) * nc
-              rr21%matrix_lique(rr%couple1c(i),rr%couple2c(i), it) = &
-              rr21%matrix_lique(rr%couple1c(i),rr%couple2c(i), it) * nc
-              rr12%matrix_lique(rr%couple1c(i),rr%couple2c(i), it) = &
-              rr12%matrix_lique(rr%couple1c(i),rr%couple2c(i), it) * nc
-           enddo
-         enddo
-         
-         return
+        rr%matrix_lique = rr%matrix_lique * nc        
+        rr21%matrix_lique = rr21%matrix_lique * nc        
+        rr12%matrix_lique = rr12%matrix_lique * nc                
+        return
     end subroutine multiplication_by_nc
 
     
@@ -168,7 +160,8 @@ module level_population
     print*, 'rr21', sum(rr21%matrix_lique), diagonal_rr21, 'max', maxval(rr21%matrix_lique)
     print*, 'rr12', sum(rr12%matrix_lique), diagonal_rr12, 'max', maxval(rr12%matrix_lique)
     
-    print*, 'sum_collisional: ', sum(rr%matrix_lique)
+    print*, 'sum_collisional: ', sum(rr%matrix_lique),                        &
+            'sum(rr21+rr12):',sum(rr21%matrix_lique + rr12%matrix_lique)
     print*, 'max_collisional: ', maxval(rr%matrix_lique)
     print*, 'min_collisional: ', minval(rr%matrix_lique)    
     
