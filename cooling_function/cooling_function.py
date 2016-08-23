@@ -39,7 +39,7 @@ import pdb
 #
 
 # density of the colliding species, in m^3
-nc = 1.e14 * u.meter**3
+nc = 1.e10 * u.meter**-3
 
 # the kinetic temperature of the gas
 T_kin = 5000.0 * u.Kelvin
@@ -96,10 +96,10 @@ print('this')
 lambda_vs_T_kin = []
 for T_kin in T_rng:
     print(T_kin)
-    lambda_vs_T_kin.append(cooling_rate_at_steady_state_T_kin_nc(T_kin, nc))
+    lambda_vs_T_kin.append(cooling_rate_at_steady_state_T_kin_nc(T_kin, nc).value)
 
-pylab.loglog(T_rng, lambda_vs_T_kin, '-o', label='cooling H2')
-pylab.loglog(T_rng, [fit_glover(T_kin) for T_kin in T_rng],
+pylab.loglog(T_rng.value, lambda_vs_T_kin, '-o', label='cooling H2')
+pylab.loglog(T_rng.value, [fit_glover(T_kin) for T_kin in T_rng.value],
            'r--', label='cooling H2 glover')
 pylab.show()
 
