@@ -65,7 +65,7 @@ def planckOccupation(h, nu, kb, T):
     :return: .. todo:: document
     """
     x = h * nu / (kb * T)
-    return 1.0 / (np.exp(x) - 1.0)
+    return 1.0 / (np.exp(x) + 1.0)
 
 
 def planck_function(h, nu, kb, T, c):

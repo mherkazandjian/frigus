@@ -7,6 +7,9 @@ import numpy
 from numpy import loadtxt, genfromtxt
 import pylab
 
+from astropy.table import QTable
+from astropy import units as u
+
 from utils import linear_2d_index
 
 
@@ -15,16 +18,16 @@ class EnergyLevelsMolecule(object):
     Container class that holds energy levels data. This supports two quantum
     numbers of the molecule, vibrations and rotations.
     """
-    def __init__(self, n_levels):
+    def __init__(self, n_levels, energy_unit=None):
         """
         constructor
         """
 
-        self.data = numpy.zeros(n_levels, dtype=[('v', 'i4'),
-                                                 ('j', 'i4'),
-                                                 ('g', 'f8'),
-                                                 ('label', 'i4'),
-                                                 ('E', 'f8')])
+        self.data = QTable(dict(v=numpy.zeros(n_levels, 'i4'),
+                                j=numpy.zeros(n_levels, 'i4'),
+                                g=numpy.zeros(n_levels, 'i4'),
+                                label=numpy.zeros(n_levels, 'i4'),
+                                E=numpy.zeros(n_levels, 'f8')*energy_unit))
         """the numpy array that holds the levels data"""
 
         self.v_max_allowed = None
@@ -140,12 +143,12 @@ def read_levels_lique(fname):
 
     v, j, energies = data_read[inds, 2], data_read[inds, 3], data_read[inds, 5]
 
-    energy_levels = EnergyLevelsMolecule(inds.size)
+    energy_levels = EnergyLevelsMolecule(inds.size, energy_unit=u.eV)
 
     energy_levels.data['v'] = v
     energy_levels.data['j'] = j
     energy_levels.data['g'] = 2*j + 1
-    energy_levels.data['E'] = energies
+    energy_levels.data['E'] = energies*u.eV
     energy_levels.data['label'] = linear_2d_index(v, j)
 
     return energy_levels
