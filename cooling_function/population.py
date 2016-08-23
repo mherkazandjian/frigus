@@ -134,7 +134,7 @@ def reduce_einstein_coefficients(A, energy_levels):
     """
 
     levels = energy_levels
-    n_levels = energy_levels.data.size
+    n_levels = len(energy_levels.data)
     labels = energy_levels.data['label']
 
     # find the non zeros elements and their corresponding indices in A
@@ -156,7 +156,7 @@ def reduce_einstein_coefficients(A, energy_levels):
     inds_fin = find_matching_indices(labels, labels_fin)
 
     # define the reduced A matrix and fill it up using inds_ini and inds_fin
-    A_reduced = zeros((n_levels, n_levels), 'f8')
+    A_reduced = zeros((n_levels, n_levels), 'f8') * A_nnz.unit
 
     A_reduced[inds_ini, inds_fin] = A_nnz
 
