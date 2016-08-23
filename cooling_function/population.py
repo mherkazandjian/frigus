@@ -6,24 +6,19 @@ from numpy import (zeros, fabs, arange, array_equal, exp, ones, log10,
                    linalg, eye, dot, where, intersect1d, setdiff1d, in1d, pi)
 import scipy
 
-import pdb
+from astropy import units as u
+from astropy.constants import c as c_light
+from astropy.constants import h as h_planck
+from astropy.constants import k_B as kb
+from astropy.analytic_functions import blackbody_nu as B_nu
 
-from IPython.core.debugger import Tracer
+import pdb
 
 import read_einstien_coefficient
 import read_collision_coefficients
 import read_levels
-from scipy.constants import c as c_light
-from scipy.constants import h as h_planck
-from scipy.constants import electron_volt as ev
-from scipy.constants import Boltzmann as kb
-from scipy.constants import hbar as hbar_planck
-
-from Leiden_ISM.ismUtils import planck_function as J_nu
 
 from utils import linear_2d_index, find_matching_indices
-
-kb_ev = kb / ev
 
 
 def find_v_max_j_max_from_data(A_einstein_nnz, cr_coefficients_nnz):
@@ -134,7 +129,7 @@ def reduce_einstein_coefficients(A, energy_levels):
     """
 
     levels = energy_levels
-    n_levels = energy_levels.data.size
+    n_levels = len(energy_levels.data)
     labels = energy_levels.data['label']
 
     # find the non zeros elements and their corresponding indices in A
@@ -156,7 +151,7 @@ def reduce_einstein_coefficients(A, energy_levels):
     inds_fin = find_matching_indices(labels, labels_fin)
 
     # define the reduced A matrix and fill it up using inds_ini and inds_fin
-    A_reduced = zeros((n_levels, n_levels), 'f8')
+    A_reduced = zeros((n_levels, n_levels), 'f8') * A_nnz.unit
 
     A_reduced[inds_ini, inds_fin] = A_nnz
 
@@ -175,7 +170,7 @@ def compute_delta_energy_matrix(levels):
     :return: square matrix of shape n x n where n is the number of energy
      levels.
     """
-    n = levels.data.size
+    n = len(levels.data)
     energies_as_column = levels.data['E'].reshape(1, n)
 
     # the energy matrix with identical columns
@@ -191,7 +186,7 @@ def compute_degeneracy_matrix(levels):
      strictly upper triangular that is documented in the notebook.
     :return: square matrix of shape n x n.
     """
-    n = levels.data.size
+    n = len(levels.data)
     degeneracies_as_column = levels.data['g'].reshape(1, n)
 
     G = numpy.repeat(degeneracies_as_column, n, axis=0).T
@@ -217,13 +212,17 @@ def compute_B_J_nu_matrix_from_A_matrix(energy_levels, A_matrix, T):
     """
     delta_e = compute_delta_energy_matrix(energy_levels)
 
-    nu_matrix = fabs(delta_e*ev) / h_planck
+    nu_matrix = (fabs(delta_e) / h_planck).to(u.Hz)
 
-    B_e_matrix = (8.0*pi*hbar_planck/c_light**3)*(nu_matrix**3)*A_matrix
+    B_e_matrix = A_matrix / (8.0*pi*h_planck*nu_matrix**3/c_light**3)
+    numpy.fill_diagonal(B_e_matrix, 0.0)
 
     R_matrix = compute_degeneracy_matrix(energy_levels)
 
-    J_nu_matrix = J_nu(h_planck, nu_matrix, kb, T, c_light)
+    # B_nu is the planck function, when multiplied by 4pi/c we obtain the
+    # spectral energy density usually called u_i and that has dimensions
+    # of Energy / Length^3 / Hz
+    J_nu_matrix = (4.0*pi*u.sr/c_light)*B_nu(nu_matrix, T)
     numpy.fill_diagonal(J_nu_matrix, 0.0)
 
     B_a_matrix = B_e_matrix.T * R_matrix
@@ -243,7 +242,7 @@ def reduce_collisional_coefficients_slow(cr_info_nnz, energy_levels):
     # check_self_transitions_in_Einstien_nnz_data(A_info_nnz)
 
     levels = energy_levels
-    n_levels = energy_levels.data.size
+    n_levels = len(energy_levels.data)
     labels = energy_levels.data['label']
 
     (v_nnz, j_nnz), (vp_nnz, jp_nnz), unique_nnz, cr_nnz = cr_info_nnz
@@ -254,7 +253,7 @@ def reduce_collisional_coefficients_slow(cr_info_nnz, energy_levels):
     labels_ini = linear_2d_index(v_nnz, j_nnz, n_i=levels.v_max_allowed)
     labels_fin = linear_2d_index(vp_nnz, jp_nnz, n_i=levels.v_max_allowed)
 
-    K_ex_reduced = zeros((levels.data.size, levels.data.size, n_T), 'f8')
+    K_ex_reduced = zeros((n_levels, n_levels, n_T), 'f8') * cr_nnz.unit
 
     for i, cr_i in enumerate(cr_nnz.T):
 
@@ -308,8 +307,8 @@ def compute_K_matrix_from_K_dex_matrix(energy_levels, K_dex, T_range, T):
     K_dex_interpolator = scipy.interpolate.interp1d(T_range, K_dex)
 
     # R*K_{dex}^T(T) to be multiplied by the exp(-dE/kb*T) in the loop
-    K_dex_T = K_dex_interpolator(T)
-    K_ex_T = R_matrix * K_dex_T.T * exp(-delta_e_matrix/(kb_ev * T))
+    K_dex_T = K_dex_interpolator(T) * K_dex.unit
+    K_ex_T = R_matrix * K_dex_T.T * exp(-delta_e_matrix/(kb * T))
 
     K_matrix = K_dex_T + K_ex_T
 
@@ -324,23 +323,22 @@ def solveEquilibrium(M_matrix):
     """
 
     sz = M_matrix.shape[0]
-    
-    # solving directly
-    # replacing the first row with the conservation equation
-    dndt = zeros((sz, 1), 'f8')
-    M_matrix[0, :], dndt[0] = 1.0, 1.0
+
+    # solving directly. replacing the first row with the conservation equation
+    # i.e the sum of the independent variable is 1, i.e the sum of the
+    # population levels is
+    dxdt = zeros((sz, 1), 'f8')
+    M_matrix[0, :], dxdt[0] = 1.0, 1.0
 
     # solving the system A.x = b
     # before solving, we will divide each row by the diagonal
-    A, b = M_matrix, dndt
+    A, b = M_matrix, dxdt
     for i in arange(sz):
         A[i, :] = A[i, :] / A[i, i]
 
     x = linalg.solve(A, b)
 
-    # the fractional population density
-    f = x
-    return f
+    return x
 
 
 #def Tg2Tr(Tg):
@@ -372,23 +370,23 @@ def cooling_rate_at_steady_state(A_matrix,
                                                   K_dex_matrix,
                                                   T_rng,
                                                   T_kin)
-    assert (numpy.fabs(1.0 - K_matrix.sum() / 1.8873371663e-08) < 1e-10,
-            "asdadasd")
+    # assert (numpy.fabs(1.0 - K_matrix.sum() / 1.8873371663e-08) < 1e-10,
+    #         "asdadasd")
 
     # compute the M matrix that can be used to compute the equilibrium state of
     # the levels (see notebook)
     O_matrix = (A_matrix + B_J_nu_matrix + K_matrix * collider_density).T
 
-    D_matrix = numpy.zeros(O_matrix.shape, 'f8')
+    D_matrix = numpy.zeros(O_matrix.shape, 'f8') * O_matrix.unit
     D_matrix[numpy.diag_indices(D_matrix.shape[0])] = -O_matrix.sum(axis=0)
 
     M_matrix = O_matrix + D_matrix
 
     # solve the equilibrium population densities
-    n_vj_equilibrium = solveEquilibrium(M_matrix)
+    x_vj_equilibrium = solveEquilibrium(M_matrix.si.value)
 
-    # compute the cooling rate
-    c_rate = cooling_rate(n_vj_equilibrium, energy_levels, A_matrix)
+    # compute the cooling rate (per particle)
+    c_rate = cooling_rate(x_vj_equilibrium, energy_levels, A_matrix)
 
     return c_rate
 
@@ -401,30 +399,37 @@ def cooling_rate(population_densities, energy_levels, A_matrix):
     :param A_matrix:
     :return:
     """
-    delta_e_matrix = fabs(compute_delta_energy_matrix(energy_levels))
+    delta_e_matrix = fabs(compute_delta_energy_matrix(energy_levels)).si.value
+    A_matrix = A_matrix.si.value
 
     retval = dot(dot(A_matrix, delta_e_matrix), population_densities).sum()
 
-    return retval
+    return retval * u.Joule * u.second**-1 * u.meter**-3
 
 
 def fit_glover(T):
     """
+    fit of the cooling rate of H2 as a function of temperature (in K) in units
+    of erg/s/cm^3
 
     :param T:
     :return:
     """
-    if 100 < T and T <= 1000:
-      return   10**(-24.311209
+    if 100.0 <= T and T <= 1000:
+      retval = 10**(-24.311209
                +3.5692468*log10(T/1000.)
                -11.332860*(log10(T/1000.))**2
                -27.850082*(log10(T/1000.))**3
                -21.328264*(log10(T/1000.))**4
                -4.2519023*(log10(T/1000.))**5)
     elif 1000 < T and T <=6000:
-      return 10**(-24.311209
+      retval = 10**(-24.311209
                +4.6450521*log10(T/1000.)
                -3.7209846*log10((T/1000.))**2
                +5.9369081*log10((T/1000.))**3
                -5.5108047*log10((T/1000.))**4
                +1.5538288*log10((T/1000.))**5)
+    else:
+        raise ValueError("""out of bound""")
+
+    return retval * u.erg * u.s**-1 * u.cm**-3
