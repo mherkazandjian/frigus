@@ -5,6 +5,7 @@ import numpy
 from numpy import (zeros, fabs, arange, array_equal, exp, ones, log10,
                    linalg, eye, dot, where, intersect1d, setdiff1d, in1d, pi)
 import scipy
+from scipy import interpolate
 
 from astropy import units as u
 from astropy.constants import c as c_light
@@ -399,8 +400,7 @@ def cooling_rate_at_steady_state(A_matrix,
     # the levels (see notebook)
     O_matrix = (A_matrix + B_J_nu_matrix + K_matrix * collider_density).T
 
-    D_matrix = numpy.zeros(O_matrix.shape, 'f8') * O_matrix.unit
-    D_matrix[numpy.diag_indices(D_matrix.shape[0])] = -O_matrix.sum(axis=0)
+    D_matrix = -numpy.eye(O_matrix.shape[0])*O_matrix.sum(axis=0)
 
     M_matrix = O_matrix + D_matrix
 
