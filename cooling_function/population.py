@@ -243,7 +243,7 @@ def reduce_collisional_coefficients_slow(cr_info_nnz, energy_levels):
     # check_self_transitions_in_Einstien_nnz_data(A_info_nnz)
 
     levels = energy_levels
-    n_levels = energy_levels.data.size
+    n_levels = len(energy_levels.data)
     labels = energy_levels.data['label']
 
     (v_nnz, j_nnz), (vp_nnz, jp_nnz), unique_nnz, cr_nnz = cr_info_nnz
@@ -254,7 +254,7 @@ def reduce_collisional_coefficients_slow(cr_info_nnz, energy_levels):
     labels_ini = linear_2d_index(v_nnz, j_nnz, n_i=levels.v_max_allowed)
     labels_fin = linear_2d_index(vp_nnz, jp_nnz, n_i=levels.v_max_allowed)
 
-    K_ex_reduced = zeros((levels.data.size, levels.data.size, n_T), 'f8')
+    K_ex_reduced = zeros((n_levels, n_levels, n_T), 'f8') * cr_nnz.unit
 
     for i, cr_i in enumerate(cr_nnz.T):
 
