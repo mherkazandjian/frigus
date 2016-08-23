@@ -79,7 +79,7 @@ module radiation
                                                   energy_lev,        &
                                                   ini, fin
  
-                  type(radiative_coeffs) :: a21, b21, r21
+                  type(radiative_coeffs) :: a21, b21, r21, jnu
                   type(energy_lev) :: e
  
                   real*8 :: Tr
@@ -90,12 +90,18 @@ module radiation
                   
                   do ini = 1, nlev_lique
                      do fin = 1, nlev_lique
+                         if(ini.ne.fin) then
+                            jnu%M_lique(ini, fin) = (4.d0*pi/c)*planck(e%freq_lique(ini, fin), Tr)
+                         else
+                            jnu%M_lique(ini, fin) = 0.d0
+                         endif                     
                          if((e%ene_lique(ini)-e%ene_lique(fin)).gt.0.d0) then  
-                            b21%M_lique(ini, fin) = (4.d0*hp*e%freq_lique(ini, fin)**3/c**3) *      &
-                                                    a21%M_lique(ini,fin)
-                                 r21%M_lique(ini, fin) = a21%M_lique(ini, fin) +          &
+                            b21%M_lique(ini, fin) =                                         &
+                                        (c**3/(8.d0*pi*hp*e%freq_lique(ini, fin)**3))*      &
+                                        a21%M_lique(ini,fin)
+                            r21%M_lique(ini, fin) = &!a21%M_lique(ini, fin) +          &
                                                          b21%M_lique(ini, fin) *          &
-                                                         planck(e%freq_lique(ini, fin), Tr)
+                                                         jnu%M_lique(ini, fin)
                             !! print*, ini, fin, b21%M_lique(ini,fin),                    &
                             !! a21%M_lique(ini, fin), r21%M_lique(ini,fin)                &
                             ! write(6,'(2(i2, 2x),2(e14.7, 2x))')                         &
@@ -116,8 +122,8 @@ module radiation
 
        
        subroutine radiative_upwards(e, Tr, a21, b21, b12, jnu, r12)
-                  use types_and_parameters, only: hp, c, nlev, nlev_lique,  &
-                                                  energy_lev,               &
+                  use types_and_parameters, only: hp, c, pi, nlev, nlev_lique,  &
+                                                  energy_lev,                   &
                                                   ini, fin
                                                   
                   real*8  :: Tr
@@ -134,7 +140,7 @@ module radiation
                   do ini = 1, nlev_lique
                       do fin = 1, nlev_lique
                             if(ini.ne.fin) then
-                                jnu%M_lique(ini, fin) = planck(e%freq_lique(ini, fin), Tr)
+                                jnu%M_lique(ini, fin) = (4.d0*pi/c)*planck(e%freq_lique(ini, fin), Tr)
                             else
                                 jnu%M_lique(ini, fin) = 0.d0
                             endif

@@ -44,16 +44,16 @@ module level_population
 !         !     downward transitions -> upper triangular matrix
 !         !     upward transitions   -> lower triangular matrix
          print*, 'nb = ', nb(1)
-         do i = 1, ntrans
-               do it = 1, ntemp
-                 rr%matrix_lique(rr%couple1c(i),rr%couple2c(i), it) = &
-                 rr%matrix_lique(rr%couple1c(i),rr%couple2c(i), it) * nb(1)
-                 rr21%matrix_lique(rr%couple1c(i),rr%couple2c(i), it) = &
-                 rr21%matrix_lique(rr%couple1c(i),rr%couple2c(i), it) * nb(1)
-                 rr12%matrix_lique(rr%couple1c(i),rr%couple2c(i), it) = &
-                 rr12%matrix_lique(rr%couple1c(i),rr%couple2c(i), it) * nb(1)
-               enddo
-         enddo
+         !do i = 1, ntrans
+         !      do it = 1, ntemp
+         !        rr%matrix_lique(rr%couple1c(i),rr%couple2c(i), it) = &
+         !        rr%matrix_lique(rr%couple1c(i),rr%couple2c(i), it) * nb(1)
+         !        rr21%matrix_lique(rr%couple1c(i),rr%couple2c(i), it) = &
+         !        rr21%matrix_lique(rr%couple1c(i),rr%couple2c(i), it) * nb(1)
+         !        rr12%matrix_lique(rr%couple1c(i),rr%couple2c(i), it) = &
+         !        rr12%matrix_lique(rr%couple1c(i),rr%couple2c(i), it) * nb(1)
+         !      enddo
+         !enddo
 
          
          
@@ -205,7 +205,7 @@ module level_population
     !            diagonal_b12 = diagonal_b12 + b12%M_lique(ini, fin)
     !            diagonal_r12 = diagonal_r12 + r12%M_lique(ini, fin)
     !        endif
-            
+           
     !        diagonal_jnu = diagonal_jnu + jnu%M_lique(ini, fin)
     !     enddo
     !  enddo
@@ -217,7 +217,7 @@ module level_population
     !  print*, 'b12', sum(b12%M_lique), diagonal_b12, 'max', maxval(b12%M_lique)
     !  print*, 'r12', sum(r12%M_lique), diagonal_r12, 'max', maxval(r12%M_lique)
     !  print*, 'r21+r12', sum(r21%M_lique+r12%M_lique), 'max', maxval(r21%M_lique+r12%M_lique)
-      
+     
     ! test 2: to check the read data and filled matrices
     !  do ini = 1, nlev_lique
     !     do fin = 1, nlev_lique
