@@ -77,6 +77,8 @@ module types_and_parameters
     type :: reaction_matrix
         real*8 :: A(1:nlev, 1:nlev)    
         real*8 :: M(1:nlev_lique, 1:nlev_lique, 1:ntemp)        
+        real*8 :: O(1:nlev_lique, 1:nlev_lique, 1:ntemp)        
+        real*8 :: D(1:nlev_lique, 1:nlev_lique, 1:ntemp)                
     end type reaction_matrix
     
     

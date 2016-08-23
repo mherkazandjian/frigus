@@ -21,7 +21,7 @@ module level_population
 
     contains
     
-    subroutine lev_pop(energy, a21, b21, r21, b12, jnu, r12, rr, rr21, rr12, x)
+    subroutine lev_pop(energy, a21, b21, r21, b12, jnu, r12, rr, rr21, rr12, id_t, coll_rad_matrix, x)
     
         type(energy_lev) :: energy
         type(radiative_coeffs) :: a21, b21, b12, jnu, r21, r12, rad
@@ -44,14 +44,15 @@ module level_population
 !         !     downward transitions -> upper triangular matrix
 !         !     upward transitions   -> lower triangular matrix
 
+         rad%M_lique = r21%M_lique + r12%M_lique
+
          call multiplication_by_nc(rr, rr21, rr12, nb(1))
          
-          
-!        rad%M_lique = r21%M_lique + r12%M_lique
-! 
-!         it = 1
-!         
-!         call matrix_builder(rad, rr, it, coll_rad_matrix)
+
+ 
+         id_t = 30
+         
+         call matrix_builder(rad, rr, id_t, coll_rad_matrix)
 ! 
 !         call initialize_level_population(y)
 ! 
@@ -71,23 +72,25 @@ module level_population
     subroutine multiplication_by_nc(rr, rr21, rr12, nc) 
         real*8 nc
         type(collisional_coeffs) :: rr, rr21, rr12
+        type(collisional_coeffs) :: rr_new, rr21_new, rr12_new
         print*, 'nc = ', nc
-        rr%matrix_lique = rr%matrix_lique * nc        
-        rr21%matrix_lique = rr21%matrix_lique * nc        
-        rr12%matrix_lique = rr12%matrix_lique * nc                
+        rr%matrix_lique = rr%matrix_lique * nc
+        rr21%matrix_lique = rr21%matrix_lique * nc
+        rr12%matrix_lique = rr12%matrix_lique * nc
         return
     end subroutine multiplication_by_nc
 
     
     
-    subroutine tests(energy, rr, rr21, rr12, a21, b21, r21, b12, jnu, r12)
+    subroutine tests(energy, rr, rr21, rr12, a21, b21, r21, b12, jnu, r12, coll_rad_matrix, it)
         real*8 :: diagonal_a21, diagonal_b21, diagonal_r21
         real*8 :: diagonal_b12, diagonal_r12
-        real*8 :: diagonal_rr21, diagonal_rr12        
+        real*8 :: diagonal_rr21, diagonal_rr12      
+        real*8 :: diagonal_M, diagonal_O, diagonal_D
         type(energy_lev) :: energy
         type(radiative_coeffs) :: a21, b21, r21, b12, r12, jnu, rad
         type(collisional_coeffs) :: rr, rr21, rr12
-        !type(reaction_matrix)  :: coll_rad_matrix
+        type(reaction_matrix)  :: coll_rad_matrix
         !type(population) :: x, y    
 
 !----------------------------------------------------------------------------------------------------      
@@ -149,17 +152,16 @@ module level_population
      diagonal_rr21 = 0.d0
      diagonal_rr12 = 0.d0    
      do i = 1, ntrans
-        do it = 1, ntemp
+        do itt = 1, ntemp
             if(rr%couple1c(i).ge.rr%couple2c(i))  then
-                diagonal_rr21 = diagonal_rr21 + rr21%matrix_lique(rr%couple1c(i),rr%couple2c(i),it)
+                diagonal_rr21 = diagonal_rr21 + rr21%matrix_lique(rr%couple1c(i),rr%couple2c(i),itt)
             else
-                diagonal_rr12 = diagonal_rr12 + rr12%matrix_lique(rr%couple2c(i),rr%couple1c(i),it)
+                diagonal_rr12 = diagonal_rr12 + rr12%matrix_lique(rr%couple2c(i),rr%couple1c(i),itt)
             endif
         enddo
     enddo
     print*, 'rr21', sum(rr21%matrix_lique), diagonal_rr21, 'max', maxval(rr21%matrix_lique)
     print*, 'rr12', sum(rr12%matrix_lique), diagonal_rr12, 'max', maxval(rr12%matrix_lique)
-    
     print*, 'sum_collisional: ', sum(rr%matrix_lique),                        &
             'sum(rr21+rr12):',sum(rr21%matrix_lique + rr12%matrix_lique)
     print*, 'max_collisional: ', maxval(rr%matrix_lique)
@@ -193,34 +195,34 @@ module level_population
 
     ! TEST RADIATIVE TRANSITIONS COEFFICIENTS
     ! test 1: checks for comparison with the Python code
-    !diagonal_a21 = 0.d0
-    !diagonal_b21 = 0.d0
-    !diagonal_r21 = 0.d0
-    !diagonal_b12 = 0.d0
-    !diagonal_r12 = 0.d0
-    !diagonal_jnu = 0.d0    
-    !  do ini = 1, nlev_lique
-    !     do fin = 1, nlev_lique
-    !        if(ini.ge.fin)  then
-    !            diagonal_a21 = diagonal_a21 + a21%M_lique(ini, fin)   
-    !            diagonal_b21 = diagonal_b21 + b21%M_lique(ini, fin)   
-    !            diagonal_r21 = diagonal_r21 + r21%M_lique(ini, fin)
-    !        else
-    !            diagonal_b12 = diagonal_b12 + b12%M_lique(ini, fin)
-    !            diagonal_r12 = diagonal_r12 + r12%M_lique(ini, fin)
-    !        endif
+    diagonal_a21 = 0.d0
+    diagonal_b21 = 0.d0
+    diagonal_r21 = 0.d0
+    diagonal_b12 = 0.d0
+    diagonal_r12 = 0.d0
+    diagonal_jnu = 0.d0    
+      do ini = 1, nlev_lique
+         do fin = 1, nlev_lique
+            if(ini.ge.fin)  then
+                diagonal_a21 = diagonal_a21 + a21%M_lique(ini, fin)   
+                diagonal_b21 = diagonal_b21 + b21%M_lique(ini, fin)   
+                diagonal_r21 = diagonal_r21 + r21%M_lique(ini, fin)
+            else
+                diagonal_b12 = diagonal_b12 + b12%M_lique(ini, fin)
+                diagonal_r12 = diagonal_r12 + r12%M_lique(ini, fin)
+            endif
            
-    !        diagonal_jnu = diagonal_jnu + jnu%M_lique(ini, fin)
-    !     enddo
-    !  enddo
-    !  print*, 'a21', sum(a21%M_lique), diagonal_a21
-    !  write(6, '(a13,e14.7)') 'max frequency', maxval(energy%freq_lique)
-    !  print*, 'b21', sum(b21%M_lique), diagonal_b21, 'max', maxval(b21%M_lique)
-    !  print*, 'jnu', sum(jnu%M_lique), diagonal_jnu, 'max', maxval(jnu%M_lique)
-    !  print*, 'r21', sum(r21%M_lique), diagonal_r21, 'max', maxval(r21%M_lique)
-    !  print*, 'b12', sum(b12%M_lique), diagonal_b12, 'max', maxval(b12%M_lique)
-    !  print*, 'r12', sum(r12%M_lique), diagonal_r12, 'max', maxval(r12%M_lique)
-    !  print*, 'r21+r12', sum(r21%M_lique+r12%M_lique), 'max', maxval(r21%M_lique+r12%M_lique)
+            diagonal_jnu = diagonal_jnu + jnu%M_lique(ini, fin)
+         enddo
+      enddo
+      print*, 'a21', sum(a21%M_lique), diagonal_a21
+      write(6, '(a13,e14.7)') 'max frequency', maxval(energy%freq_lique)
+      print*, 'b21', sum(b21%M_lique), diagonal_b21, 'max', maxval(b21%M_lique)
+      print*, 'jnu', sum(jnu%M_lique), diagonal_jnu, 'max', maxval(jnu%M_lique)
+      print*, 'r21', sum(r21%M_lique), diagonal_r21, 'max', maxval(r21%M_lique)
+      print*, 'b12', sum(b12%M_lique), diagonal_b12, 'max', maxval(b12%M_lique)
+      print*, 'r12', sum(r12%M_lique), diagonal_r12, 'max', maxval(r12%M_lique)
+      print*, 'r21+r12', sum(r21%M_lique+r12%M_lique), 'max', maxval(r21%M_lique+r12%M_lique)
      
     ! test 2: to check the read data and filled matrices
     !  do ini = 1, nlev_lique
@@ -238,9 +240,31 @@ module level_population
     !                                        r12%M(fin, ini),                   &
     !                                        rad%M(ini, fin)
 
-!----------------------------------------------------------------------------------------------------
+!---------------------------------------------------------------------------------------------------
 
     ! TEST MATRIX LINEAR SYSTEM
+    ! test 1: checks for the off-diagonal terms of M
+    diagonal_M = 0.d0
+    diagonal_O = 0.d0
+    diagonal_D = 0.d0
+      do ini = 1, nlev_lique
+         do fin = 1, nlev_lique
+                diagonal_O = diagonal_O + coll_rad_matrix%O(ini, fin, it)
+                diagonal_D = diagonal_D + coll_rad_matrix%D(ini, fin, it)                
+                diagonal_M = diagonal_M + coll_rad_matrix%M(ini, fin, it)                
+         enddo
+      enddo
+     print*, 'sum O: ', sum(coll_rad_matrix%O), diagonal_O, 'max: ', maxval(coll_rad_matrix%O)
+     print*, 'sum D: ', sum(coll_rad_matrix%D), diagonal_D, 'max: ', maxval(coll_rad_matrix%D)
+     write(6, '(a7, 2(e14.7, 2x), a5, (e14.7, 2x), 2(a11, e14.7, 2x) )')                    &
+              'sum M: ', sum(coll_rad_matrix%M), diagonal_M,             &
+              'max: ', maxval(coll_rad_matrix%M),                        &
+              'sum O + D: ', sum(coll_rad_matrix%O+coll_rad_matrix%D),   &
+              'max O + D: ', maxval(coll_rad_matrix%M)
+    
+    
+    
+    ! test 2: population test
     !   do ini = 1, nlev
     !        write(6,'(a11, i3, e14.7)') 'population:', ini, y%pop(ini)
     !   enddo

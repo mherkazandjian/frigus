@@ -75,7 +75,7 @@ module collisions
                     vf=rr%vfc(i)
                     jf=rr%jfc(i)
                     dE = abs(e%en_lique(vi,ji)-e%en_lique(vf,jf))
-                     do it =  30, 30 !1, ntemp
+                     do it = 30, 30!ntemp
                         rr%matrix_lique(rr%couple1c(i),rr%couple2c(i),it) = &
                                        rr%reading(vi,ji,vf,jf,it)
                         rr21%matrix_lique(rr%couple1c(i),rr%couple2c(i),it) = &

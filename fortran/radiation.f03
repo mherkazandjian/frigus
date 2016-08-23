@@ -99,9 +99,9 @@ module radiation
                             b21%M_lique(ini, fin) =                                         &
                                         (c**3/(8.d0*pi*hp*e%freq_lique(ini, fin)**3))*      &
                                         a21%M_lique(ini,fin)
-                            r21%M_lique(ini, fin) = &!a21%M_lique(ini, fin) +          &
-                                                         b21%M_lique(ini, fin) *          &
-                                                         jnu%M_lique(ini, fin)
+                            r21%M_lique(ini, fin) = a21%M_lique(ini, fin) +          &
+                                                    b21%M_lique(ini, fin) *          &
+                                                    jnu%M_lique(ini, fin)
                             !! print*, ini, fin, b21%M_lique(ini,fin),                    &
                             !! a21%M_lique(ini, fin), r21%M_lique(ini,fin)                &
                             ! write(6,'(2(i2, 2x),2(e14.7, 2x))')                         &

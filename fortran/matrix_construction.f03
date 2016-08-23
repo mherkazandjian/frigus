@@ -10,22 +10,29 @@ module matrix_construction
 
     contains
 
-    subroutine matrix_builder(rad, rr, it, coll_rad_matrix)
+    subroutine matrix_builder(rad, rr, id_t, coll_rad_matrix)
 
-               type(radiative_coeffs)   :: rad
-               type(collisional_coeffs) :: rr
-               type(reaction_matrix)    :: coll_rad_matrix
-               integer :: it
+                 type(radiative_coeffs)   :: rad
+                 type(collisional_coeffs) :: rr
+                 type(reaction_matrix)    :: coll_rad_matrix
+                 integer :: it
                
-!                do it = 1, ntemp
-!                coll_rad_matrix%M = 0.d0
-!                do row = 1, nlev_lique
-!                   do col = 1, nlev_lique
-!                      if(row.ne.col) then 
-!                         coll_rad_matrix%M(row,col) = coll_rad_matrix%M(row, col)   &
-!                                                      +
-!                                                               -rad%M_lique(row, fin)                &
-!                                                               -rr%matrix(row, fin, it) * nb(1)
+!              do it = 1, ntemp
+                 coll_rad_matrix%M = 0.d0 ! full matrix
+                 coll_rad_matrix%O = 0.d0 ! off-diagonal terms
+                 coll_rad_matrix%D = 0.d0 ! diagonal terms
+                 do row = 1, nlev_lique
+                     do col = 1, nlev_lique
+                         if(row.ne.col) then 
+                             coll_rad_matrix%O(row, col, id_t) = coll_rad_matrix%O(row, col, id_t)   &
+                                                             + rad%M_lique(row, col)             &
+                                                             + rr%matrix_lique(row, col, id_t) 
+                       endif
+                     enddo
+                 enddo
+                
+                
+
 !                                   else
 !                                  coll_rad_matrix%A(row,col) = coll_rad_matrix%A(row, col)   &
 !                                                             + 0.d0
