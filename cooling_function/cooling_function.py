@@ -16,17 +16,22 @@ Limitations
 """
 
 import pylab
+
+import numpy
+from numpy import zeros, log10, unique
+
+from astropy import units as u
+
+import matplotlib.pyplot as plt
+
+# .. todo:: organize these imports
 import read_einstien_coefficient
 from read_collision_coefficients import read_collision_coefficients
 import read_levels
 import population
 from population import cooling_rate, fit_glover
-import matplotlib.pyplot as plt
 
-import numpy
-from numpy import zeros
 import pdb
-from numpy import log10, unique
 
 #
 # .. todo:: use proper units and standardize them or use astropy units..etc..
@@ -34,10 +39,10 @@ from numpy import log10, unique
 #
 
 # density of the colliding species, in m^3
-nc = 1.e14
+nc = 1.e14 * u.meter**3
 
 # the kinetic temperature of the gas
-T_kin = 5000.0
+T_kin = 5000.0 * u.Kelvin
 
 # read the energy levels (v, j, energy)
 #

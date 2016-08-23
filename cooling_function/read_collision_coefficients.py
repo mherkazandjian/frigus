@@ -7,8 +7,10 @@ import numpy
 from numpy import (loadtxt, arange, int32, zeros, unique, void,
                    ascontiguousarray, dtype, hstack, fabs, exp)
 from scipy.constants import Boltzmann, elementary_charge
-
 from scipy import interpolate
+
+from astropy import units as u
+
 import pylab
 from IPython.core.debugger import Tracer
 
@@ -98,11 +100,11 @@ def read_collision_coefficients(fname):
     # declare the array where the data will be stored
     nv, nj, nvp, njp = v.max()+1, j.max()+1, vp.max()+1, jp.max()+1
     nv_max, nj_max = int(max(nv, nvp)), int(max(nj, njp))
-    data = zeros((T.size, nv_max, nj_max, nv_max, nj_max), 'f8')
+    data_5D_matrix = zeros((T.size, nv_max, nj_max, nv_max, nj_max), 'f8')
 
     # copy the read data into the container array
     for i, cri in enumerate(cr.T):
-        data[:, v[i], j[i], vp[i], jp[i]] = cri
+        data_5D_matrix[:, v[i], j[i], vp[i], jp[i]] = cri
         ini[:, i] = v[i], j[i]
         fin[:, i] = vp[i], jp[i]
 
@@ -110,7 +112,8 @@ def read_collision_coefficients(fname):
     unique_levels = unique_level_pairs(hstack((unique_level_pairs(ini),
                                                unique_level_pairs(fin))))
 
-    return data*1e-6, T, (ini, fin, unique_levels, cr*1e-6)
+
+    return data_5D_matrix*1e-6, T, (ini, fin, unique_levels, cr*1e-6)
 
 
 def compute_lower_to_upper_collision_coefficients(cr,

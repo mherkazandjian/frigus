@@ -5,6 +5,9 @@ read the Einstein coefficients
 
 import numpy
 from numpy import zeros, testing, array
+
+from astropy import units as u
+
 from IPython.core.debugger import Tracer
 
 
@@ -122,11 +125,19 @@ def read_einstein():
     A = zeros((vmax + 1, jmax + 1, vmax + 1, jmax + 1), 'f8')
 
     read_j2j_x('Read/j2jdown', A, delta_j=-2, skip_rows=3)
-    read_j2j_x('Read/j2j',     A, delta_j=0 , skip_rows=1)
-    read_j2j_x('Read/j2jup',   A, delta_j=2 , skip_rows=1)
+    read_j2j_x('Read/j2j',     A, delta_j=0, skip_rows=1)
+    read_j2j_x('Read/j2jup',   A, delta_j=2, skip_rows=1)
 
     testing.assert_approx_equal(A.sum(), 9.3724e-4, significant=4)
     testing.assert_approx_equal(A[7, 2, 4, 2], 4.133e-7, significant=4)
 
-    return A, (array(vp_nnz, 'i4'), array(jp_nnz, 'i4'),
-               array(vpp_nnz, 'i4'), array(jpp_nnz, 'i4'), array(A_nnz, 'f8'))
+    # setting units to the Einstein coefficients that will be returned
+    A_with_units = A / u.second
+    A_nnz_with_units = A_nnz / u.second
+
+    return A_with_units,\
+           (array(vp_nnz, 'i4'),
+            array(jp_nnz, 'i4'),
+            array(vpp_nnz, 'i4'),
+            array(jpp_nnz, 'i4'),
+            A_nnz_with_units)
