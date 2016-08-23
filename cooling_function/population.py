@@ -206,6 +206,10 @@ def compute_B_J_nu_matrix_from_A_matrix(energy_levels, A_matrix, T):
     """given the energy levels, returns the stimulated emission and absorption
     coefficients matrix.
     https://en.wikipedia.org/wiki/Einstein_coefficients
+    http://www.ifa.hawaii.edu/users/kud/teaching_12/3_Radiative_transfer.pdf
+
+    .. todo:: replace the J_nu in the name of this function and in the body
+    .. todo:: to something that represents energy density like u_nu
 
     :param energy_levels: The energy levels .. todo:: add doc
     :param A_matrix: The spontaneous emission coefficients matrix (A in the

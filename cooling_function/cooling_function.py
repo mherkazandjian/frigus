@@ -27,7 +27,7 @@ import matplotlib.pyplot as plt
 # .. todo:: organize these imports
 import read_einstien_coefficient
 from read_collision_coefficients import read_collision_coefficients
-import read_levels
+import read_energy_levels
 import population
 from population import cooling_rate, fit_glover
 
@@ -46,7 +46,7 @@ T_kin = 3000.0 * u.Kelvin
 
 # read the energy levels (v, j, energy)
 #
-energy_levels = read_levels.read_levels_lique(
+energy_levels = read_energy_levels.read_levels_lique(
                        'Read/H2Xvjlevels_francois_mod.cs')
 # en_H2 = read_levels.read_levels("Read/H2Xvjlevels.cs")
 # print('{:3}{:3}{:10}'.format('v', 'j', 'E(eV)'))
