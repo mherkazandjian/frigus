@@ -338,9 +338,7 @@ def solveEquilibrium(M_matrix):
 
     x = linalg.solve(A, b)
 
-    # the fractional population density
-    f = x
-    return f
+    return x
 
 
 #def Tg2Tr(Tg):
