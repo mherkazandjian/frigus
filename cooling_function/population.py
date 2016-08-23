@@ -14,15 +14,15 @@ from astropy.analytic_functions import blackbody_nu as B_nu
 
 import pdb
 
-import read_einstien_coefficient
-import read_collision_coefficients
-import read_levels
-
 from utils import linear_2d_index, find_matching_indices
 
 
 def find_v_max_j_max_from_data(A_einstein_nnz, cr_coefficients_nnz):
-    """"""
+    """
+    :param A_einstein_nnz: .. todo:: add doc
+    :param cr_coefficients_nnz:  .. todo:: add doc
+    :return:  .. todo:: add doc
+    """
 
     # find the non zeros elements and their corresponding indices of the
     # Einstein coefficients
@@ -69,7 +69,7 @@ def reduce_einstein_coefficients_slow(A_info_nnz, energy_levels):
      increasing order in the energy. This array can be obtained e.g. from
      read_levels.read_levels_lique()
     :return: A 2D matrix of shape (energy_levels.size, energy_levels.size) that
-     is a lower triangular matrix containing the Einstien coefficients.
+     is a lower triangular matrix containing the Einstein coefficients.
     """
 
     check_self_transitions_in_Einstien_nnz_data(A_info_nnz)
@@ -167,6 +167,7 @@ def reduce_einstein_coefficients(A, energy_levels):
 def compute_delta_energy_matrix(levels):
     """Given the energy levels, returns the delta energy matrix
      \Delta E = E - E^T that is documented in the notebook.
+    :param levels:  .. todo:: add doc
     :return: square matrix of shape n x n where n is the number of energy
      levels.
     """
@@ -184,6 +185,7 @@ def compute_delta_energy_matrix(levels):
 def compute_degeneracy_matrix(levels):
     """Given the energy levels, returns the degeneracy matrix R that is
      strictly upper triangular that is documented in the notebook.
+    :param levels:  .. todo:: add doc
     :return: square matrix of shape n x n.
     """
     n = len(levels.data)
@@ -205,10 +207,10 @@ def compute_B_J_nu_matrix_from_A_matrix(energy_levels, A_matrix, T):
     coefficients matrix.
     https://en.wikipedia.org/wiki/Einstein_coefficients
 
+    :param energy_levels: The energy levels .. todo:: add doc
     :param A_matrix: The spontaneous emission coefficients matrix (A in the
      ipython notebook)
-    :param energy_levels: The energy levels
-    :return: The B matrix defined in the notebook
+    :return: The B matrix defined in the notebook multiplied by J_nu
     """
     delta_e = compute_delta_energy_matrix(energy_levels)
 
@@ -237,7 +239,9 @@ def compute_B_J_nu_matrix_from_A_matrix(energy_levels, A_matrix, T):
 def reduce_collisional_coefficients_slow(cr_info_nnz, energy_levels):
     """
 
-    :return:
+    :param cr_info_nnz: .. todo:: add doc
+    :param energy_levels: .. todo:: add doc
+    :return: .. todo:: add doc
     """
     # check_self_transitions_in_Einstien_nnz_data(A_info_nnz)
 
@@ -285,17 +289,23 @@ def reduce_collisional_coefficients_slow(cr_info_nnz, energy_levels):
 
 
 def reduce_collisional_coefficients(cr, energy_levels):
-    """
+    """.. todo:: add doc
 
-    :return:
+    :param cr: .. todo:: add doc
+    :param energy_levels: .. todo:: add doc
+    :return: .. todo:: add doc
     """
     raise NotImplementedError("not implemented yet")
 
 
 def compute_K_matrix_from_K_dex_matrix(energy_levels, K_dex, T_range, T):
-    """
+    """ .. todo:: add doc
 
-    :return:
+    :param energy_levels: .. todo:: add doc
+    :param K_dex:  .. todo:: add doc
+    :param T_range: .. todo:: add doc
+    :param T: .. todo:: add doc
+    :return: .. todo:: add doc
     """
     delta_e_matrix = fabs(compute_delta_energy_matrix(energy_levels))
 
@@ -316,10 +326,12 @@ def compute_K_matrix_from_K_dex_matrix(energy_levels, K_dex, T_range, T):
 
 
 def solveEquilibrium(M_matrix):
-    """solve for the equilibrium population densities.
+    """solve for the equilibrium population densities. .. todo:: add doc
 
     i.e solving A.x = b
     where M_matrix = A
+    :param M_matrix: .. todo:: add doc
+    :return: .. todo:: add doc
     """
 
     sz = M_matrix.shape[0]
@@ -355,9 +367,15 @@ def cooling_rate_at_steady_state(A_matrix,
                                  T_rng,
                                  T_kin,
                                  collider_density):
-    """
+    """.. todo:: add doc
 
-    :return:
+    :param A_matrix: .. todo:: add doc
+    :param energy_levels: .. todo:: add doc
+    :param K_dex_matrix: .. todo:: add doc
+    :param T_rng: .. todo:: add doc
+    :param T_kin: .. todo:: add doc
+    :param collider_density: .. todo:: add doc
+    :return: .. todo:: add doc
     """
 
     # compute the stimulated emission and absorption coefficients matrix
@@ -383,10 +401,10 @@ def cooling_rate_at_steady_state(A_matrix,
     M_matrix = O_matrix + D_matrix
 
     # solve the equilibrium population densities
-    x_vj_equilibrium = solveEquilibrium(M_matrix.si.value)
+    x_equilibrium = solveEquilibrium(M_matrix.si.value)
 
     # compute the cooling rate (per particle)
-    c_rate = cooling_rate(x_vj_equilibrium, energy_levels, A_matrix)
+    c_rate = cooling_rate(x_equilibrium, energy_levels, A_matrix)
 
     return c_rate
 
@@ -394,10 +412,10 @@ def cooling_rate_at_steady_state(A_matrix,
 def cooling_rate(population_densities, energy_levels, A_matrix):
     """compute the cooling rate due to the spontaneous transitions
 
-    :param population_densities:
-    :param energy_levels:
-    :param A_matrix:
-    :return:
+    :param population_densities: .. todo:: add doc
+    :param energy_levels: .. todo:: add doc
+    :param A_matrix: .. todo:: add doc
+    :return: .. todo:: add doc
     """
     delta_e_matrix = fabs(compute_delta_energy_matrix(energy_levels)).si.value
     A_matrix = A_matrix.si.value
@@ -411,9 +429,10 @@ def fit_glover(T):
     """
     fit of the cooling rate of H2 as a function of temperature (in K) in units
     of erg/s/cm^3
+    .. todo:: add ref
 
-    :param T:
-    :return:
+    :param T: .. todo:: add doc
+    :return: .. todo:: add doc
     """
     if 100.0 <= T and T <= 1000:
       retval = 10**(-24.311209
