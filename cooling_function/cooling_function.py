@@ -42,7 +42,7 @@ import pdb
 nc = 1.e10 * u.meter**-3
 
 # the kinetic temperature of the gas
-T_kin = 5000.0 * u.Kelvin
+T_kin = 100.0 * u.Kelvin
 
 # read the energy levels (v, j, energy)
 #
@@ -96,11 +96,16 @@ print('this')
 lambda_vs_T_kin = []
 for T_kin in T_rng:
     print(T_kin)
-    lambda_vs_T_kin.append(cooling_rate_at_steady_state_T_kin_nc(T_kin, nc).value)
+    lambda_vs_T_kin += [cooling_rate_at_steady_state_T_kin_nc(T_kin, nc)]
 
-pylab.loglog(T_rng.value, lambda_vs_T_kin, '-o', label='cooling H2')
-pylab.loglog(T_rng.value, [fit_glover(T_kin) for T_kin in T_rng.value],
+lambda_vs_T_kin = u.Quantity(lambda_vs_T_kin)
+lambda_vs_T_kin_glover = u.Quantity([fit_glover(T_kin) for T_kin in
+                                     T_rng.value])
+
+pylab.loglog(T_rng.value, lambda_vs_T_kin.si.value, '-o', label='cooling H2')
+pylab.loglog(T_rng.value, lambda_vs_T_kin_glover.si.value,
            'r--', label='cooling H2 glover')
+pylab.legend()
 pylab.show()
 
 pdb.set_trace()

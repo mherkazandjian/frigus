@@ -10,19 +10,13 @@ from astropy import units as u
 from astropy.constants import c as c_light
 from astropy.constants import h as h_planck
 from astropy.constants import k_B as kb
-from astropy.constants import hbar as hbar_planck
-from scipy.constants import electron_volt as ev
+from astropy.analytic_functions import blackbody_nu as B_nu
 
 import pdb
-
-from IPython.core.debugger import Tracer
 
 import read_einstien_coefficient
 import read_collision_coefficients
 import read_levels
-
-
-from Leiden_ISM.ismUtils import planck_function as B_nu
 
 from utils import linear_2d_index, find_matching_indices
 
@@ -225,7 +219,10 @@ def compute_B_J_nu_matrix_from_A_matrix(energy_levels, A_matrix, T):
 
     R_matrix = compute_degeneracy_matrix(energy_levels)
 
-    J_nu_matrix = (4.0*pi/c_light)*B_nu(h_planck, nu_matrix, kb, T, c_light)
+    # B_nu is the planck function, when multiplied by 4pi/c we obtain the
+    # spectral energy density usually called u_i and that has dimensions
+    # of Energy / Length^3 / Hz
+    J_nu_matrix = (4.0*pi*u.sr/c_light)*B_nu(nu_matrix, T)
     numpy.fill_diagonal(J_nu_matrix, 0.0)
 
     B_a_matrix = B_e_matrix.T * R_matrix
@@ -407,26 +404,32 @@ def cooling_rate(population_densities, energy_levels, A_matrix):
 
     retval = dot(dot(A_matrix, delta_e_matrix), population_densities).sum()
 
-    return retval * u.Joule / u.second
+    return retval * u.Joule * u.second**-1 * u.meter**-3
 
 
 def fit_glover(T):
     """
+    fit of the cooling rate of H2 as a function of temperature (in K) in units
+    of erg/s/cm^3
 
     :param T:
     :return:
     """
-    if 100 < T and T <= 1000:
-      return   10**(-24.311209
+    if 100.0 <= T and T <= 1000:
+      retval = 10**(-24.311209
                +3.5692468*log10(T/1000.)
                -11.332860*(log10(T/1000.))**2
                -27.850082*(log10(T/1000.))**3
                -21.328264*(log10(T/1000.))**4
                -4.2519023*(log10(T/1000.))**5)
     elif 1000 < T and T <=6000:
-      return 10**(-24.311209
+      retval = 10**(-24.311209
                +4.6450521*log10(T/1000.)
                -3.7209846*log10((T/1000.))**2
                +5.9369081*log10((T/1000.))**3
                -5.5108047*log10((T/1000.))**4
                +1.5538288*log10((T/1000.))**5)
+    else:
+        raise ValueError("""out of bound""")
+
+    return retval * u.erg * u.s**-1 * u.cm**-3
