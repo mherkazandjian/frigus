@@ -89,7 +89,7 @@ def read_collision_coefficients(fname):
 
     # the temperature in the data file is not provided explicitly. It
     # it provided as a range. So we refine the temperature and an array
-    T = arange(100.0, 5000.1, 100.0)
+    T_values = arange(100.0, 5000.1, 100.0) * u.Kelvin
 
     # read the data from the original ascii file
     data_read = loadtxt(fname, unpack=True, skiprows=10)
@@ -100,11 +100,11 @@ def read_collision_coefficients(fname):
     # declare the array where the data will be stored
     nv, nj, nvp, njp = v.max()+1, j.max()+1, vp.max()+1, jp.max()+1
     nv_max, nj_max = int(max(nv, nvp)), int(max(nj, njp))
-    data_5D_matrix = zeros((T.size, nv_max, nj_max, nv_max, nj_max), 'f8')
+    data = zeros((T_values.size, nv_max, nj_max, nv_max, nj_max), 'f8')
 
     # copy the read data into the container array
     for i, cri in enumerate(cr.T):
-        data_5D_matrix[:, v[i], j[i], vp[i], jp[i]] = cri
+        data[:, v[i], j[i], vp[i], jp[i]] = cri
         ini[:, i] = v[i], j[i]
         fin[:, i] = vp[i], jp[i]
 
@@ -113,7 +113,15 @@ def read_collision_coefficients(fname):
                                                unique_level_pairs(fin))))
 
 
-    return data_5D_matrix*1e-6, T, (ini, fin, unique_levels, cr*1e-6)
+    # set the units of the data to be returned
+    data_with_units = data * (u.cm**3 / u.second)
+    cr_with_units = cr * (u.cm**3 / u.second)
+
+    # convert the units to m^3/s
+    data_with_units = data_with_units.to(u.m**3 / u.second)
+    cr_with_units = cr_with_units.to(u.m**3 / u.second)
+
+    return data_with_units, T_values, (ini, fin, unique_levels, cr_with_units)
 
 
 def compute_lower_to_upper_collision_coefficients(cr,
