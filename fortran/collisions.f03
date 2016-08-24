@@ -21,7 +21,7 @@ module collisions
                                                  vfmax, jfmax,          &
                                                  ntemp, ntrans,         &
                                                  vi, ji, vf, jf,        &
-                                                 kb, nb
+                                                 kb, nb, id_temp
  
                  type(collisional_coeffs) :: rr, rr21, rr12       ! reaction rate
                  type(energy_lev) :: e
@@ -75,7 +75,7 @@ module collisions
                     vf=rr%vfc(i)
                     jf=rr%jfc(i)
                     dE = abs(e%en_lique(vi,ji)-e%en_lique(vf,jf))
-                     do it = 30, 30!ntemp
+                     do it = id_temp, id_temp !1, ntemp
                         rr%matrix_lique(rr%couple1c(i),rr%couple2c(i),it) = &
                                        rr%reading(vi,ji,vf,jf,it)
                         rr21%matrix_lique(rr%couple1c(i),rr%couple2c(i),it) = &
@@ -94,7 +94,7 @@ module collisions
                  rr21%matrix_lique = rr21%matrix_lique*1.d-6                                  
                  rr12%matrix_lique = rr12%matrix_lique*1.d-6
 
- 
+
       end subroutine reading_data_collisions
 
 

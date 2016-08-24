@@ -1,16 +1,17 @@
 module types_and_parameters
 
     !PHYSICAL PARAMETERS
-    real*8, parameter                           :: kb = 1.38064852d-23  !J/K Boltzmann constant
-    real*8, parameter                           :: hp = 6.62607004d-34  !J s Planck constant
+    real*8, parameter                           :: kb = 1.3806488d-23  !J/K Boltzmann constant
+    real*8, parameter                           :: hp = 6.62606957d-34  !J s Planck constant
     real*8, parameter                           :: c  = 2.99792458d8    !speed of light m/s
-    real*8, parameter                           :: q  = 1.60217662d-19  !charge of electron in C
+    real*8, parameter                           :: q  = 1.602176565d-19  !charge of electron in C
     real*8, parameter                           :: pi = 3.14159265359
 
     !GENERAL PURPOSE INDEXES DEFITION 
     integer                                     :: i, l, m, n, i0, i1, i2, i3
     integer                                     :: lower, upper, ini, fin, row, col, it
     integer                                     :: vi, ji, vf, jf ! integers for identifying coll transitions
+    integer, parameter                          :: id_temp = 30
     real*8                                      :: xm, ym
 
     ! GAS DENSITY AND RADIATION TEMPERATURE
@@ -75,10 +76,10 @@ module types_and_parameters
     
 
     type :: reaction_matrix
-        real*8 :: A(1:nlev, 1:nlev)    
-        real*8 :: M(1:nlev_lique, 1:nlev_lique, 1:ntemp)        
-        real*8 :: O(1:nlev_lique, 1:nlev_lique, 1:ntemp)        
-        real*8 :: D(1:nlev_lique, 1:nlev_lique, 1:ntemp)                
+        real*8 :: A(1:nlev, 1:nlev)
+        real*8 :: M(1:nlev_lique, 1:nlev_lique)
+        real*8 :: O(1:nlev_lique, 1:nlev_lique)
+        real*8 :: D(1:nlev_lique, 1:nlev_lique)
     end type reaction_matrix
     
     

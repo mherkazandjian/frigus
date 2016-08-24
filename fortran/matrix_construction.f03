@@ -10,11 +10,12 @@ module matrix_construction
 
     contains
 
-    subroutine matrix_builder(rad, rr, id_t, coll_rad_matrix)
+    subroutine matrix_builder(rad, rr, id_temp, coll_rad_matrix)
 
                  type(radiative_coeffs)   :: rad
                  type(collisional_coeffs) :: rr
                  type(reaction_matrix)    :: coll_rad_matrix
+                 real*8, dimension(1:nlev_lique) :: temp
                  integer :: it
                
 !              do it = 1, ntemp
@@ -24,14 +25,43 @@ module matrix_construction
                  do row = 1, nlev_lique
                      do col = 1, nlev_lique
                          if(row.ne.col) then 
-                             coll_rad_matrix%O(row, col, id_t) = coll_rad_matrix%O(row, col, id_t)   &
-                                                             + rad%M_lique(row, col)             &
-                                                             + rr%matrix_lique(row, col, id_t) 
+                             coll_rad_matrix%O(row, col) = coll_rad_matrix%O(row, col)      &
+                                                         + rad%M_lique(col, row)            &
+                                                         + rr%matrix_lique(col, row, id_temp) 
                        endif
                      enddo
                  enddo
+
+                print*, shape(sum(coll_rad_matrix%O, dim = 1))
+
+                 !do i = 1, nlev_lique
+                 !   do j = 1, nlev_lique
+                 !write(6, '(a2, 2(i2, 2x), a3, e14.7)') 'O(',i, j, '): ',coll_rad_matrix%O(i,j)
+                 !   enddo
+                 !enddo
                 
-                
+                 do row = 1, nlev_lique
+                     do col = 1, nlev_lique
+                         if(row.eq.col) then
+                              temp = sum(coll_rad_matrix%O, dim = 1)
+                              coll_rad_matrix%D(row, col) = -temp(row)
+                         endif
+                     enddo
+                 enddo
+                 
+                 !do i = 1, nlev_lique
+                 !   do j = 1, nlev_lique
+                 !write(6, '(a2, 2(i2, 2x), a3, e14.7)') 'D(',i, j, '): ',coll_rad_matrix%D(i,j)
+                 !   enddo
+                 !enddo
+                 
+                 coll_rad_matrix%M = coll_rad_matrix%O + coll_rad_matrix%D
+                 !coll_rad_matrix%M(:, nlev_lique) = 1.d0
+
+!                         elseif(row.eq.nlev) then
+!                              do fin = 1, nlev
+!                                 coll_rad_matrix%A(row,fin) = 1.d0    ! normalization equation
+!                              enddo                
 
 !                                   else
 !                                  coll_rad_matrix%A(row,col) = coll_rad_matrix%A(row, col)   &
@@ -62,11 +92,11 @@ module matrix_construction
      subroutine initialize_level_population(x)
          type(population) :: x
          
-         do i = 1, nlev-1
+         do i = 1, nlev_lique-1
             x%pop(i) = 0.d0 !1.d-3
          enddo
          
-         x%pop(nlev) = 1.d0 !1.d0 - sum(x%pop)
+         x%pop(nlev_lique) = 1.d0 !1.d0 - sum(x%pop)
          
      end subroutine initialize_level_population
     
