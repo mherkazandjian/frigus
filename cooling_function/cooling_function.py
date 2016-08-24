@@ -30,6 +30,7 @@ from read_collision_coefficients import read_collision_coefficients
 import read_energy_levels
 import population
 from population import cooling_rate, fit_glover
+import utils
 
 import pdb
 
@@ -92,21 +93,24 @@ def cooling_rate_at_steady_state_T_kin_nc(T_kin, nc):
 
 cooling_rate = cooling_rate_at_steady_state_T_kin_nc(T_kin, nc_H)
 
-print('this')
-lambda_vs_T_kin = []
-for T_kin in T_rng:
-    print(T_kin)
-    lambda_vs_T_kin += [cooling_rate_at_steady_state_T_kin_nc(T_kin, nc_H)]
+utils.load_ascii_matrix_data()
 
-lambda_vs_T_kin = u.Quantity(lambda_vs_T_kin)
-lambda_vs_T_kin_glover = u.Quantity([fit_glover(T_kin) for T_kin in
-                                     T_rng.value])
+if False:
+    print('this')
+    lambda_vs_T_kin = []
+    for T_kin in T_rng:
+        print(T_kin)
+        lambda_vs_T_kin += [cooling_rate_at_steady_state_T_kin_nc(T_kin, nc_H)]
 
-pylab.loglog(T_rng.value, lambda_vs_T_kin.si.value, '-o', label='cooling H2')
-# pylab.loglog(T_rng.value, lambda_vs_T_kin_glover.si.value,
-#            'r--', label='cooling H2 glover')
-pylab.legend()
-pylab.show()
+    lambda_vs_T_kin = u.Quantity(lambda_vs_T_kin)
+    lambda_vs_T_kin_glover = u.Quantity([fit_glover(T_kin) for T_kin in
+                                         T_rng.value])
+
+    pylab.loglog(T_rng.value, lambda_vs_T_kin.si.value, '-o', label='cooling H2')
+    # pylab.loglog(T_rng.value, lambda_vs_T_kin_glover.si.value,
+    #            'r--', label='cooling H2 glover')
+    pylab.legend()
+    pylab.show()
 
 pdb.set_trace()
 
