@@ -40,7 +40,7 @@ module level_population
         
         call radiative_downwards(energy, Trad, a21, b21, r21)
             
-         call radiative_upwards(energy, Trad, a21, b21, b12, jnu, r12)
+        call radiative_upwards(energy, Trad, a21, b21, b12, jnu, r12)
 
 !         ! building the total radiative matrix, including both stimulated and spontaneous
 !         ! transitions; according to the convention adopted:
@@ -75,10 +75,10 @@ module level_population
     end subroutine multiplication_by_nc
     
     subroutine solve_steady_state(energy, coll_rad_matrix, x)
-        type(energy_lev) :: energy    
+        type(energy_lev) :: energy
         type(reaction_matrix)  :: coll_rad_matrix
         type(population) :: x, y
-        
+
           call initialize_level_population(y)
 
           ! normalizing the sum of the fractional abundances to 1
@@ -88,10 +88,10 @@ module level_population
  
           print*, 'before', x%pop
     
-          call dgesv(ndim, nrhs, coll_rad_matrix, lda, ipiv, x, ldb, info)
+          call dgesv(ndim, nrhs, coll_rad_matrix%M, lda, ipiv, x, ldb, info)
  
           do i = 1, nlev_lique
-              write(6,'(3(i3), 2(e14.7))') i, energy%vl(i), energy%jl(i), x%pop(i), y%pop(i)
+              write(6,'(3(i3), e14.7)') i, energy%vl(i), energy%jl(i), x%pop(i)
           enddo
 
         return
