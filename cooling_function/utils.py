@@ -190,14 +190,14 @@ def load_ascii_matrix_data():
 
     rel_diff_O = 1.0 - O_matrix_carla / O_matrix_mher
     rel_diff_O[numpy.where(numpy.isnan(rel_diff_O))] = 0.0
-    # assert numpy.fabs(rel_diff_O).max() < 1e-12
+    assert numpy.fabs(rel_diff_O).max() < 1e-12
 
     rel_diff_D = 1.0 - D_matrix_carla / D_matrix_mher
     rel_diff_D[numpy.where(numpy.isnan(rel_diff_D))] = 0.0
-    # assert numpy.fabs(rel_diff_D).max() < 1e-12
+    assert numpy.fabs(rel_diff_D).max() < 1e-12
 
     rel_diff_M = 1.0 - M_matrix_carla / M_matrix_mher
     rel_diff_M[numpy.where(numpy.isnan(rel_diff_M))] = 0.0
-    # assert numpy.fabs(rel_diff_M).max() < 1e-12
+    assert numpy.fabs(rel_diff_M).max() < 1e-12
 
     print('done checking')
