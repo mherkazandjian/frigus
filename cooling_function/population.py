@@ -315,30 +315,27 @@ def compute_K_dex_matrix_interpolator(K_dex_vs_T, T_range):
     # that is the same shape of K_dex[..., 0]
     K_dex_interpolator = scipy.interpolate.interp1d(T_range, K_dex_vs_T)
 
-    return K_dex_interpolator
+    return lambda T_kin: K_dex_interpolator(T_kin)*K_dex_vs_T.unit
 
 
-def compute_K_matrix_from_K_dex_matrix(energy_levels, K_dex, T_range, T):
+def compute_K_matrix_from_K_dex_matrix(energy_levels,
+                                       K_dex_matrix_interpolator,
+                                       T_kin):
     """ .. todo:: add doc
 
     :param energy_levels: .. todo:: add doc
-    :param K_dex:  .. todo:: add doc
+    :param K_dex_matrix_interpolator:  .. todo:: add doc
     :param T_range: .. todo:: add doc
-    :param T: .. todo:: add doc
+    :param T_kin: .. todo:: add doc
     :return: .. todo:: add doc
     """
     delta_e_matrix = fabs(compute_delta_energy_matrix(energy_levels))
 
     R_matrix = compute_degeneracy_matrix(energy_levels)
 
-    # get the linear interpolator of the upper to lower collision rates as a
-    # function of temperature (the last axis). This function returns an array
-    # that is the same shape of K_dex[..., 0]
-    K_dex_interpolator = scipy.interpolate.interp1d(T_range, K_dex)
-
     # R*K_{dex}^T(T) to be multiplied by the exp(-dE/kb*T) in the loop
-    K_dex_T = K_dex_interpolator(T) * K_dex.unit
-    K_ex_T = R_matrix * K_dex_T.T * exp(-delta_e_matrix/(kb * T))
+    K_dex_T = K_dex_matrix_interpolator(T_kin)
+    K_ex_T = R_matrix * K_dex_T.T * exp(-delta_e_matrix/(kb * T_kin))
 
     K_matrix = K_dex_T + K_ex_T
 
@@ -383,15 +380,14 @@ def solveEquilibrium(M_matrix):
 
 def cooling_rate_at_steady_state(A_matrix,
                                  energy_levels,
-                                 K_dex_matrix,
-                                 T_rng,
+                                 K_dex_matrix_interpolator,
                                  T_kin,
                                  collider_density):
     """.. todo:: add doc
 
     :param A_matrix: .. todo:: add doc
     :param energy_levels: .. todo:: add doc
-    :param K_dex_matrix: .. todo:: add doc
+    :param K_dex_matrix_interpolator: .. todo:: add doc
     :param T_rng: .. todo:: add doc
     :param T_kin: .. todo:: add doc
     :param collider_density: .. todo:: add doc
@@ -404,12 +400,10 @@ def cooling_rate_at_steady_state(A_matrix,
                                                         T_kin)
 
     # get the K matrix for a certain temperature in the tabulated range
-    K_matrix = compute_K_matrix_from_K_dex_matrix(energy_levels,
-                                                  K_dex_matrix,
-                                                  T_rng,
-                                                  T_kin)
-    # assert (numpy.fabs(1.0 - K_matrix.sum() / 1.8873371663e-08) < 1e-10,
-    #         "asdadasd")
+    K_matrix = compute_K_matrix_from_K_dex_matrix(
+                                energy_levels,
+                                K_dex_matrix_interpolator,
+                                T_kin)
 
     # compute the M matrix that can be used to compute the equilibrium state of
     # the levels (see notebook)

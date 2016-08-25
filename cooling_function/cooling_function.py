@@ -83,12 +83,13 @@ K_dex_matrix = population.reduce_collisional_coefficients_slow(
                                           energy_levels)
 
 # compute the interpolator that produces K_dex at a certain temperature
+K_dex_matrix_interpolator = population.compute_K_dex_matrix_interpolator(
+                                                         K_dex_matrix, T_rng)
 
 def cooling_rate_at_steady_state_T_kin_nc(T_kin, nc):
     return population.cooling_rate_at_steady_state(A_matrix,
                                                    energy_levels,
-                                                   K_dex_matrix,
-                                                   T_rng,
+                                                   K_dex_matrix_interpolator,
                                                    T_kin,
                                                    nc)
 
