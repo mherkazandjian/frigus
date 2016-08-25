@@ -17,26 +17,17 @@ Limitations
 
 import pylab
 
-import numpy
-from numpy import zeros, log10, unique
-
 from astropy import units as u
 
 import matplotlib.pyplot as plt
 
-# .. todo:: organize these imports
-import read_einstien_coefficient
-from read_collision_coefficients import read_collision_coefficients
-import read_energy_levels
 import population
-from population import cooling_rate, fit_glover
+from population import fit_glover
+import utils
 
 import pdb
 
-#
-# .. todo:: use proper units and standardize them or use astropy units..etc..
-# .. todo:: to make sure that there are no errors done in unit conversion
-#
+from readers import DataLoader
 
 # density of the colliding species, in m^3
 nc_H = 1e14 * u.meter**-3
@@ -44,69 +35,36 @@ nc_H = 1e14 * u.meter**-3
 # the kinetic temperature of the gas
 T_kin = 3000.0 * u.Kelvin
 
-# read the energy levels (v, j, energy)
-#
-energy_levels = read_energy_levels.read_levels_lique(
-                       'Read/H2Xvjlevels_francois_mod.cs')
-# en_H2 = read_levels.read_levels("Read/H2Xvjlevels.cs")
-# print('{:3}{:3}{:10}'.format('v', 'j', 'E(eV)'))
-# for level in levels:
-#     print('{:<3}{:<3}{:<10}'.format(level['v'], level['j'], level['E']))
-
-#
-# read the einstein coefficients for the H2 transitions
-#
-A, A_info_nnz = read_einstien_coefficient.read_einstein()
-
-# read the collisional rates for H2 with H
-collision_rates, T_rng, collision_rates_info_nnz = read_collision_coefficients(
-                                                      "Read/Rates_H_H2.dat")
-
-# find the maximum v and j from the Einstein and collisional rates data sets
-# and adjust the labels of the energy levels according to that
-v_max_data, j_max_data = population.find_v_max_j_max_from_data(
-                                          A_info_nnz,
-                                          collision_rates_info_nnz)
-energy_levels.set_labels(v_max=v_max_data+1)
-
-#
-# reduce the Einstein coefficients to a 2D matrix (construct the A matrix)
-# [n_levels, n_levels]
-# A_reduced_slow = population.reduce_einstein_coefficients_slow(A_info_nnz,
-#                                                               energy_levels)
-A_matrix = population.reduce_einstein_coefficients(A, energy_levels)
-
-# getting the collisional de-excitation matrix (K_dex) (for all tabulated
-# values)  [n_level, n_level, n_T_kin_values]
-K_dex_matrix = population.reduce_collisional_coefficients_slow(
-                                          collision_rates_info_nnz,
-                                          energy_levels)
+h2_lique_data = DataLoader().load('H2_lique')
 
 def cooling_rate_at_steady_state_T_kin_nc(T_kin, nc):
-    return population.cooling_rate_at_steady_state(A_matrix,
-                                                   energy_levels,
-                                                   K_dex_matrix,
-                                                   T_rng,
-                                                   T_kin,
-                                                   nc)
+    return population.cooling_rate_at_steady_state(
+                h2_lique_data.A_matrix,
+                h2_lique_data.energy_levels,
+                h2_lique_data.K_dex_interpolator,
+                T_kin,
+                nc)
 
 cooling_rate = cooling_rate_at_steady_state_T_kin_nc(T_kin, nc_H)
 
-print('this')
-lambda_vs_T_kin = []
-for T_kin in T_rng:
-    print(T_kin)
-    lambda_vs_T_kin += [cooling_rate_at_steady_state_T_kin_nc(T_kin, nc_H)]
+utils.load_ascii_matrix_data()
 
-lambda_vs_T_kin = u.Quantity(lambda_vs_T_kin)
-lambda_vs_T_kin_glover = u.Quantity([fit_glover(T_kin) for T_kin in
-                                     T_rng.value])
+if False:
+    print('this')
+    lambda_vs_T_kin = []
+    for T_kin in T_rng:
+        print(T_kin)
+        lambda_vs_T_kin += [cooling_rate_at_steady_state_T_kin_nc(T_kin, nc_H)]
 
-pylab.loglog(T_rng.value, lambda_vs_T_kin.si.value, '-o', label='cooling H2')
-# pylab.loglog(T_rng.value, lambda_vs_T_kin_glover.si.value,
-#            'r--', label='cooling H2 glover')
-pylab.legend()
-pylab.show()
+    lambda_vs_T_kin = u.Quantity(lambda_vs_T_kin)
+    lambda_vs_T_kin_glover = u.Quantity([fit_glover(T_kin) for T_kin in
+                                         T_rng.value])
+
+    pylab.loglog(T_rng.value, lambda_vs_T_kin.si.value, '-o', label='cooling H2')
+    # pylab.loglog(T_rng.value, lambda_vs_T_kin_glover.si.value,
+    #            'r--', label='cooling H2 glover')
+    pylab.legend()
+    pylab.show()
 
 pdb.set_trace()
 
