@@ -70,7 +70,16 @@ class DataSetBase(object):
 
 class DataSetH2Lique(DataSetBase):
     """
+    Data of H2 colliding with H using collisional data by F. Lique.
 
+      - energy levels of H2 (vibrational and rotational)
+      - collisional coefficients of H2 with H (K_ij)
+      - radiative coefficients (A_ij, B_ij, B_ji)
+
+    Limitations
+
+      - The smallest data set of (A, B, K) determines the number of states to
+       be inserted in the model.
     """
     def __init__(self):
         """
