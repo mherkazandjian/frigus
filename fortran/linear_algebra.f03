@@ -2,7 +2,7 @@ module linear_algebra
 
     use types_and_parameters, only: nlev, nlev_lique
     ! LAPACK SOLVER VARIABLES
-    integer, parameter :: ndim = nlev !nlev_lique
+    integer, parameter :: ndim = nlev_lique
     integer :: i, info
     integer, parameter :: lda = ndim, ldb = ndim ! leading dimension of a
                                                  ! leading dimension of b    

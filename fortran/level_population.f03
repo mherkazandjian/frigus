@@ -18,6 +18,9 @@ module level_population
     
     use matrix_construction, only: matrix_builder, initialize_level_population
     
+    use testing_data, only: tests, writing_files
+    
+    
 
     contains
     
@@ -27,7 +30,7 @@ module level_population
         type(radiative_coeffs) :: a21, b21, b12, jnu, r21, r12, rad
         type(collisional_coeffs) :: rr, rr21, rr12
         type(reaction_matrix)  :: coll_rad_matrix
-        type(population) :: x, y
+        type(population) :: x
 
         call reading_data_energies(energy)
 
@@ -37,7 +40,7 @@ module level_population
         
         call radiative_downwards(energy, Trad, a21, b21, r21)
             
-        call radiative_upwards(energy, Trad, a21, b21, b12, jnu, r12)
+         call radiative_upwards(energy, Trad, a21, b21, b12, jnu, r12)
 
 !         ! building the total radiative matrix, including both stimulated and spontaneous
 !         ! transitions; according to the convention adopted:
@@ -49,25 +52,14 @@ module level_population
 
          call multiplication_by_nc(rr, rr21, rr12, nb(1))
          
+         call matrix_builder(rad, rr, id_temp, coll_rad_matrix)
 
- 
-!          
-          call matrix_builder(rad, rr, id_temp, coll_rad_matrix)
-!  
-          call initialize_level_population(y)
-          
-          coll_rad_matrix%M(:, nlev_lique) = 1.d0
- 
-          x%pop = y%pop
- 
-          print*, 'before', x%pop
-    
-          call dgesv(ndim, nrhs, coll_rad_matrix, lda, ipiv, x, ldb, info)
- 
-          do i = 1, nlev_lique
-              write(6,'(3(i3), e14.7)') i, energy%vl(i), energy%jl(i), x%pop(i)
-          enddo
-     
+         call tests(energy, rr, rr21, rr12, a21, b21, r21, b12, jnu, r12, coll_rad_matrix, id_temp)
+         
+         call writing_files(a21, b21, b12, jnu, id_temp, rr, coll_rad_matrix)
+         
+         call solve_steady_state(energy, coll_rad_matrix, x)
+
         return
     end subroutine lev_pop
 
@@ -81,5 +73,28 @@ module level_population
         rr12%matrix_lique = rr12%matrix_lique * nc
         return
     end subroutine multiplication_by_nc
+    
+    subroutine solve_steady_state(energy, coll_rad_matrix, x)
+        type(energy_lev) :: energy    
+        type(reaction_matrix)  :: coll_rad_matrix
+        type(population) :: x, y
+        
+          call initialize_level_population(y)
+
+          ! normalizing the sum of the fractional abundances to 1
+          coll_rad_matrix%M(nlev_lique, 1:nlev_lique) = 1.d0
+ 
+          x%pop = y%pop
+ 
+          print*, 'before', x%pop
+    
+          call dgesv(ndim, nrhs, coll_rad_matrix, lda, ipiv, x, ldb, info)
+ 
+          do i = 1, nlev_lique
+              write(6,'(3(i3), 2(e14.7))') i, energy%vl(i), energy%jl(i), x%pop(i), y%pop(i)
+          enddo
+
+        return
+    end subroutine solve_steady_state
 
 end module level_population

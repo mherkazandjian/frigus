@@ -31,14 +31,8 @@ module matrix_construction
                      enddo
                  enddo
 
-                print*, shape(sum(coll_rad_matrix%O, dim = 1))
-
-                 !do i = 1, nlev_lique
-                 !   do j = 1, nlev_lique
-                 !write(6, '(a2, 2(i2, 2x), a3, e14.7)') 'O(',i, j, '): ',coll_rad_matrix%O(i,j)
-                 !   enddo
-                 !enddo
-                
+                 print*, shape(sum(coll_rad_matrix%O, dim = 1))
+ 
                  do row = 1, nlev_lique
                      do col = 1, nlev_lique
                          if(row.eq.col) then
@@ -50,36 +44,6 @@ module matrix_construction
                                   
                  coll_rad_matrix%M = coll_rad_matrix%O + coll_rad_matrix%D
 
-
-!                         elseif(row.eq.nlev) then
-!                              do fin = 1, nlev
-!                                 coll_rad_matrix%A(row,fin) = 1.d0    ! normalization equation
-!                              enddo                
-
-!                                   else
-!                                  coll_rad_matrix%A(row,col) = coll_rad_matrix%A(row, col)   &
-!                                                             + 0.d0
-!                                 endif
-!                              enddo
-!                         elseif(row.eq.nlev) then
-!                              do fin = 1, nlev
-!                                 coll_rad_matrix%A(row,fin) = 1.d0    ! normalization equation
-!                              enddo                        
-!                         else   ! the upwards and downwards transitions are already 
-!                                ! implemented in the proper way in the rr and rad matrix 
-!                                ! according to the indexes
-!                         !write(6,'(a2, i3, a1, i3, a9, i3, a1, i3, a5, i3, a1, i3, a1, i3, a4)')  &
-!                         !'M(', row, ',', col, ') = +r12(', row, ',', col, ') +c(',row,',', col, ',', it, ')*nb'
-!                          coll_rad_matrix%A(row,col) = rad%M(row, col) + rr%matrix(col, row, it)*nb(1)
-!                         ! CHECK ORDER IN THE INDEXES in the previous line
-! !                        elseif(row.lt.col) then  ! upper triangular matrix -> downward transitions
-! !                                 coll_rad_matrix%A(row,col) = rad%M(row, col) + rr%matrix(row, col, it)*nb(1)
-! !                        elseif(row.gt.col) then
-! !                                 coll_rad_matrix%A(row,col) = rad%M(row, col) + rr%matrix(row, col, it)*nb(1)
-!                         endif
-!                      enddo
-!                   enddo
-!                 !enddo
     end subroutine matrix_builder
 
      subroutine initialize_level_population(x)
