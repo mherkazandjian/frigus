@@ -411,21 +411,18 @@ def solveEquilibrium(M_matrix):
 #     return Tr
 
 
-def cooling_rate_at_steady_state(A_matrix,
-                                 energy_levels,
-                                 K_dex_matrix_interpolator,
-                                 T_kin,
-                                 collider_density):
-    """.. todo:: add doc
-
-    :param A_matrix: .. todo:: add doc
-    :param energy_levels: .. todo:: add doc
-    :param K_dex_matrix_interpolator: .. todo:: add doc
-    :param T_rng: .. todo:: add doc
-    :param T_kin: .. todo:: add doc
-    :param collider_density: .. todo:: add doc
-    :return: .. todo:: add doc
+def population_density_at_steady_state(data_set, T_kin, collider_density):
     """
+
+    :param data_set:
+    :param T_kin:
+    :param collider_density:
+    :return: The equilibrium population density
+    """
+
+    energy_levels = data_set.energy_levels
+    A_matrix = data_set.A_matrix
+    K_dex_matrix_interpolator = data_set.K_dex_matrix_interpolator
 
     # compute the stimulated emission and absorption coefficients matrix
     B_J_nu_matrix = compute_B_J_nu_matrix_from_A_matrix(energy_levels,
@@ -433,10 +430,9 @@ def cooling_rate_at_steady_state(A_matrix,
                                                         T_kin)
 
     # get the K matrix for a certain temperature in the tabulated range
-    K_matrix = compute_K_matrix_from_K_dex_matrix(
-                                energy_levels,
-                                K_dex_matrix_interpolator,
-                                T_kin)
+    K_matrix = compute_K_matrix_from_K_dex_matrix(energy_levels,
+                                                  K_dex_matrix_interpolator,
+                                                  T_kin)
 
     # compute the M matrix that can be used to compute the equilibrium state of
     # the levels (see notebook)
@@ -447,7 +443,7 @@ def cooling_rate_at_steady_state(A_matrix,
         O_matrix.si.value,
         fmt='%+-1.16e')
 
-    D_matrix = -numpy.eye(O_matrix.shape[0])*O_matrix.sum(axis=0)
+    D_matrix = -numpy.eye(O_matrix.shape[0]) * O_matrix.sum(axis=0)
     numpy.savetxt(
         os.path.expanduser(
             '~/dropbox/Dropbox/us/cooling_function/mher/D_matrix.txt'),
@@ -464,8 +460,26 @@ def cooling_rate_at_steady_state(A_matrix,
     # solve the equilibrium population densities
     x_equilibrium = solveEquilibrium(M_matrix.si.value)
 
+    return x_equilibrium
+
+
+def cooling_rate_at_steady_state(data_set, T_kin, collider_density):
+    """.. todo:: add doc
+
+    :param data_set: .. todo:: add doc
+    :param T_kin: .. todo:: add doc
+    :param collider_density: .. todo:: add doc
+    :return: the cooling rate
+    """
+
+    x_equilibrium = population_density_at_steady_state(data_set,
+                                                       T_kin,
+                                                       collider_density)
+
     # compute the cooling rate (per particle)
-    c_rate = cooling_rate(x_equilibrium, energy_levels, A_matrix)
+    c_rate = cooling_rate(x_equilibrium,
+                          data_set.energy_levels,
+                          data_set.A_matrix)
 
     return c_rate
 

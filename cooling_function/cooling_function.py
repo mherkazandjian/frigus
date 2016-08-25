@@ -1,18 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Calculates the cooling function of H2 colliding with H using collisional data
-by F. Lique.
-
-In calculating the cooling function, the required data are:
-
-  - energy levels of H2 (vibrational and rotational)
-  - collisional coefficients of H2 with H (K_ij)
-  - radiative coefficients (A_ij, B_ij, B_ji)
-
-Limitations
-
-  - The smallest data set of (A, B, K) determines the number of states to be
-    inserted in the model.
+calculate equilibrium population of species and the cooling function.
 """
 
 import pylab
@@ -22,7 +10,9 @@ from astropy import units as u
 import matplotlib.pyplot as plt
 
 import population
-from population import fit_glover
+from population import (fit_glover,
+                        cooling_rate_at_steady_state,
+                        population_density_at_steady_state)
 import utils
 
 import pdb
@@ -35,26 +25,20 @@ nc_H = 1e14 * u.meter**-3
 # the kinetic temperature of the gas
 T_kin = 3000.0 * u.Kelvin
 
-h2_lique_data = DataLoader().load('H2_lique')
+species_data = DataLoader().load('H2_lique')
 
-def cooling_rate_at_steady_state_T_kin_nc(T_kin, nc):
-    return population.cooling_rate_at_steady_state(
-                h2_lique_data.A_matrix,
-                h2_lique_data.energy_levels,
-                h2_lique_data.K_dex_interpolator,
-                T_kin,
-                nc)
-
-cooling_rate = cooling_rate_at_steady_state_T_kin_nc(T_kin, nc_H)
+cooling_rate = cooling_rate_at_steady_state(species_data, T_kin, nc_H)
 
 utils.load_ascii_matrix_data()
 
 if False:
     print('this')
     lambda_vs_T_kin = []
+    T_rng = species_data.raw_data.collision_rates_T_range
     for T_kin in T_rng:
         print(T_kin)
-        lambda_vs_T_kin += [cooling_rate_at_steady_state_T_kin_nc(T_kin, nc_H)]
+        lambda_vs_T_kin += [cooling_rate_at_steady_state(species_data,
+                                                         T_kin, nc_H)]
 
     lambda_vs_T_kin = u.Quantity(lambda_vs_T_kin)
     lambda_vs_T_kin_glover = u.Quantity([fit_glover(T_kin) for T_kin in

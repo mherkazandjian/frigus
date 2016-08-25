@@ -53,7 +53,7 @@ class DataSetBase(object):
         self.A_matrix = None
         """The matrix of the Einstein coefficients"""
 
-        self.K_dex_interpolator = None
+        self.K_dex_matrix_interpolator = None
         """An interpolation function that takes T_kin as an argument and
         returns an array of the same shape as self.A_matrix"""
 
@@ -151,7 +151,7 @@ class DataSetH2Lique(DataSetBase):
         # compute the interpolator that produces K_dex at a certain temperature
         K_dex_matrix_interpolator = population.compute_K_dex_matrix_interpolator(
             K_dex_matrix, self.raw_data.collision_rates_T_range)
-        self.K_dex_interpolator = K_dex_matrix_interpolator
+        self.K_dex_matrix_interpolator = K_dex_matrix_interpolator
 
 
 class DataLoader(object):
