@@ -303,6 +303,21 @@ def reduce_collisional_coefficients(cr, energy_levels):
     raise NotImplementedError("not implemented yet")
 
 
+def compute_K_dex_matrix_interpolator(K_dex_vs_T, T_range):
+    """
+
+    :param K_dex_vs_T:
+    :param T_range:
+    :return:
+    """
+    # get the linear interpolator of the upper to lower collision rates as a
+    # function of temperature (the last axis). This function returns an array
+    # that is the same shape of K_dex[..., 0]
+    K_dex_interpolator = scipy.interpolate.interp1d(T_range, K_dex_vs_T)
+
+    return K_dex_interpolator
+
+
 def compute_K_matrix_from_K_dex_matrix(energy_levels, K_dex, T_range, T):
     """ .. todo:: add doc
 
