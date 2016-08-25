@@ -1,4 +1,7 @@
 from __future__ import print_function
+
+import os
+
 import pylab
 
 import numpy
@@ -238,6 +241,30 @@ def compute_B_J_nu_matrix_from_A_matrix(energy_levels, A_matrix, T):
 
     B_J_nu_matrix = B_matrix * J_nu_matrix
 
+    numpy.savetxt(
+        os.path.expanduser(
+            '~/dropbox/Dropbox/us/cooling_function/mher/A_matrix.txt'),
+        A_matrix.si.value,
+        fmt='%+-1.16e')
+
+    numpy.savetxt(
+        os.path.expanduser(
+            '~/dropbox/Dropbox/us/cooling_function/mher/B_matrix.txt'),
+        B_matrix.si.value,
+        fmt='%+-1.16e')
+
+    numpy.savetxt(
+        os.path.expanduser(
+            '~/dropbox/Dropbox/us/cooling_function/mher/J_nu_matrix.txt'),
+        J_nu_matrix.to(u.N / u.m**2 * u.s).value,
+        fmt='%+-1.16e')
+
+    numpy.savetxt(
+        os.path.expanduser(
+            '~/dropbox/Dropbox/us/cooling_function/mher/B_J_nu_matrix.txt'),
+        B_J_nu_matrix.si.value,
+        fmt='%+-1.16e')
+
     return B_J_nu_matrix
 
 
@@ -339,6 +366,12 @@ def compute_K_matrix_from_K_dex_matrix(energy_levels,
 
     K_matrix = K_dex_T + K_ex_T
 
+    numpy.savetxt(
+        os.path.expanduser(
+            '~/dropbox/Dropbox/us/cooling_function/mher/K_nc_matrix.txt'),
+        K_matrix.si.value*1e14,
+        fmt='%+-1.16e')
+
     return K_matrix
 
 
@@ -408,10 +441,25 @@ def cooling_rate_at_steady_state(A_matrix,
     # compute the M matrix that can be used to compute the equilibrium state of
     # the levels (see notebook)
     O_matrix = (A_matrix + B_J_nu_matrix + K_matrix * collider_density).T
+    numpy.savetxt(
+        os.path.expanduser(
+            '~/dropbox/Dropbox/us/cooling_function/mher/O_matrix.txt'),
+        O_matrix.si.value,
+        fmt='%+-1.16e')
 
     D_matrix = -numpy.eye(O_matrix.shape[0])*O_matrix.sum(axis=0)
+    numpy.savetxt(
+        os.path.expanduser(
+            '~/dropbox/Dropbox/us/cooling_function/mher/D_matrix.txt'),
+        D_matrix.si.value,
+        fmt='%+-1.16e')
 
     M_matrix = O_matrix + D_matrix
+    numpy.savetxt(
+        os.path.expanduser(
+            '~/dropbox/Dropbox/us/cooling_function/mher/M_matrix.txt'),
+        M_matrix.si.value,
+        fmt='%+-1.16e')
 
     # solve the equilibrium population densities
     x_equilibrium = solveEquilibrium(M_matrix.si.value)
