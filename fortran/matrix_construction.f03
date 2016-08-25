@@ -6,7 +6,7 @@ module matrix_construction
                                     radiative_coeffs, collisional_coeffs, &
                                     reaction_matrix, population,          &
                                     Trad, nb,                             &
-                                    row, col, fin, it, ntemp, xm
+                                    row, col, fin, id_temp, ntemp, xm
 
     contains
 
@@ -16,9 +16,8 @@ module matrix_construction
                  type(collisional_coeffs) :: rr
                  type(reaction_matrix)    :: coll_rad_matrix
                  real*8, dimension(1:nlev_lique) :: temp
-                 integer :: it
+                 integer :: id_temp
                
-!              do it = 1, ntemp
                  coll_rad_matrix%M = 0.d0 ! full matrix
                  coll_rad_matrix%O = 0.d0 ! off-diagonal terms
                  coll_rad_matrix%D = 0.d0 ! diagonal terms
@@ -48,15 +47,9 @@ module matrix_construction
                          endif
                      enddo
                  enddo
-                 
-                 !do i = 1, nlev_lique
-                 !   do j = 1, nlev_lique
-                 !write(6, '(a2, 2(i2, 2x), a3, e14.7)') 'D(',i, j, '): ',coll_rad_matrix%D(i,j)
-                 !   enddo
-                 !enddo
-                 
+                                  
                  coll_rad_matrix%M = coll_rad_matrix%O + coll_rad_matrix%D
-                 !coll_rad_matrix%M(:, nlev_lique) = 1.d0
+
 
 !                         elseif(row.eq.nlev) then
 !                              do fin = 1, nlev

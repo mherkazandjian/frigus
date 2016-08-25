@@ -54,17 +54,19 @@ module level_population
 !          
           call matrix_builder(rad, rr, id_temp, coll_rad_matrix)
 !  
-!          call initialize_level_population(y)
+          call initialize_level_population(y)
+          
+          coll_rad_matrix%M(:, nlev_lique) = 1.d0
  
-!         x%pop = y%pop
+          x%pop = y%pop
  
-!         print*, 'before', x%pop
+          print*, 'before', x%pop
     
-!         call dgesv(ndim, nrhs, coll_rad_matrix, lda, ipiv, x, ldb, info)
+          call dgesv(ndim, nrhs, coll_rad_matrix, lda, ipiv, x, ldb, info)
  
-!         do i = 1, nlev_lique
-!             write(6,'(3(i3), e14.7)') i, energy%vl(i), energy%jl(i), x%pop(i)
-!         enddo
+          do i = 1, nlev_lique
+              write(6,'(3(i3), e14.7)') i, energy%vl(i), energy%jl(i), x%pop(i)
+          enddo
      
         return
     end subroutine lev_pop
