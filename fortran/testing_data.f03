@@ -10,7 +10,7 @@ module testing_data
 
  contains
  
-    subroutine writing_files(a21, b21, b12, jnu, it, rr, coll_rad_matrix)
+    subroutine writing_files(a21, b21, b12, jnu, id_temp, rr, coll_rad_matrix)
         type(radiative_coeffs) :: a21, b21, b12, jnu
         type(collisional_coeffs) :: rr
         type(reaction_matrix) :: coll_rad_matrix
@@ -29,6 +29,7 @@ module testing_data
         
         do j = 1, nlev_lique
            write(30, '(58(ES21.15, 1x))') (a21%M_lique(i, j), i = 1, nlev_lique)
+           
            write(31, '(58(ES23.15, 1x))') (b21%M_lique(i, j)+b12%M_lique(i, j), i = 1, nlev_lique)
            write(32, '(58(ES21.15, 1x))') (jnu%M_lique(i, j), i = 1, nlev_lique)
            write(33, '(58(ES25.15, 1x))') (rr%matrix_lique(i, j, id_temp), i = 1, nlev_lique)
