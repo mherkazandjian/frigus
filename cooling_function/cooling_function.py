@@ -27,6 +27,7 @@ T_kin = 3000.0 * u.Kelvin
 
 species_data = DataLoader().load('H2_lique')
 
+pop_dens_equ = population_density_at_steady_state(species_data,T_kin, nc_H)
 cooling_rate = cooling_rate_at_steady_state(species_data, T_kin, nc_H)
 
 utils.load_ascii_matrix_data()
