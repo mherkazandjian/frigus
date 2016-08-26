@@ -2,6 +2,9 @@
 module that provides functions to load various data in a standard format.
 """
 
+import numpy
+from astropy import units as u
+
 import read_energy_levels
 import read_einstien_coefficient
 from read_collision_coefficients import read_collision_coefficients
@@ -53,7 +56,7 @@ class DataSetBase(object):
         self.A_matrix = None
         """The matrix of the Einstein coefficients"""
 
-        self.K_dex_interpolator = None
+        self.K_dex_matrix_interpolator = None
         """An interpolation function that takes T_kin as an argument and
         returns an array of the same shape as self.A_matrix"""
 
@@ -70,7 +73,16 @@ class DataSetBase(object):
 
 class DataSetH2Lique(DataSetBase):
     """
+    Data of H2 colliding with H using collisional data by F. Lique.
 
+      - energy levels of H2 (vibrational and rotational)
+      - collisional coefficients of H2 with H (K_ij)
+      - radiative coefficients (A_ij, B_ij, B_ji)
+
+    Limitations
+
+      - The smallest data set of (A, B, K) determines the number of states to
+       be inserted in the model.
     """
     def __init__(self):
         """
@@ -102,7 +114,9 @@ class DataSetH2Lique(DataSetBase):
         self.raw_data.A = A
         self.raw_data.A_info_nnz = A_info_nnz
 
+        #
         # read the collisional rates for H2 with H
+        #
         collision_rates, T_rng, collision_rates_info_nnz =\
             read_collision_coefficients("Read/Rates_H_H2.dat")
         self.raw_data.collision_rates = collision_rates
@@ -111,6 +125,7 @@ class DataSetH2Lique(DataSetBase):
 
     def reduce_raw_data(self):
         """
+        use the raw data in self.raw_data to populate the A and K_dex matrices
         """
 
         # find the maximum v and j from the Einstein and collisional rates data
@@ -142,7 +157,51 @@ class DataSetH2Lique(DataSetBase):
         # compute the interpolator that produces K_dex at a certain temperature
         K_dex_matrix_interpolator = population.compute_K_dex_matrix_interpolator(
             K_dex_matrix, self.raw_data.collision_rates_T_range)
-        self.K_dex_interpolator = K_dex_matrix_interpolator
+        self.K_dex_matrix_interpolator = K_dex_matrix_interpolator
+
+
+class DataSetTwoLevel_1(DataSetBase):
+    """
+    Data of a synthetic two level system
+    """
+    def __init__(self):
+        """
+        constructor. The raw data is already reduced and in usable form without
+        the need to reducing it.
+        """
+        super(DataSetTwoLevel_1, self).__init__()
+        self.read_raw_data()
+
+    def read_raw_data(self):
+        """read the raw two level system data"""
+
+        #
+        # read the energy levels (v, j, energy)
+        #
+        energy_levels = read_energy_levels.read_levels_two_levels_test_1(
+            '../data/two_levels_1/energy_levels.txt'
+        )
+        self.energy_levels = energy_levels
+        self.raw_data.energy_levels = energy_levels
+
+        #
+        # read the einstein coefficients
+        #
+        A_matrix = numpy.loadtxt('../data/two_levels_1/A_matrix.txt')
+        A_matrix = A_matrix / u.second
+        self.A_matrix = A_matrix
+        self.raw_data.A = self.A_matrix / u.second
+
+        #
+        # read the collisional rates for H2 with H
+        #
+        collision_rates = numpy.loadtxt('../data/two_levels_1/K_dex_matrix.txt')
+        collision_rates = collision_rates * u.m**3 / u.second
+        T_rng = 0.0 * u.K, 1e6 * u.K
+
+        self.K_dex_matrix_interpolator = lambda T_kin: collision_rates
+        self.raw_data.collision_rates = collision_rates
+        self.raw_data.collision_rates_T_range = T_rng
 
 
 class DataLoader(object):
@@ -162,3 +221,5 @@ class DataLoader(object):
         """
         if name == 'H2_lique':
             return DataSetH2Lique()
+        if name == 'two_level_1':
+            return DataSetTwoLevel_1()
