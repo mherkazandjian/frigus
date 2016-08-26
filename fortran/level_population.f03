@@ -7,11 +7,6 @@ module level_population
                                     population,                           &
                                     Trad, nb, ini, fin, it,               &
                                     nlev_lique, vi, vf, ji, jf
-                                    
-    use energy_levels, only: reading_data_energies
-    use radiation,     only: reading_data_radiative,                      &
-                             radiative_downwards, radiative_upwards
-    use collisions,    only: reading_data_collisions
 
     use linear_algebra, only: sparsity_calc,                              &
                               ndim, info, lda, ldb, nrhs, ipiv
@@ -26,26 +21,11 @@ module level_population
     
     subroutine lev_pop(energy, a21, b21, r21, b12, jnu, r12, rr, rr21, rr12, id_temp, coll_rad_matrix, x)
     
-        type(energy_lev) :: energy
-        type(radiative_coeffs) :: a21, b21, b12, jnu, r21, r12, rad
-        type(collisional_coeffs) :: rr, rr21, rr12
-        type(reaction_matrix)  :: coll_rad_matrix
-        type(population) :: x
-
-        call reading_data_energies(energy)
-
-        call reading_data_radiative(energy, a21)
-    
-        call reading_data_collisions(energy, rr, rr21, rr12)
-        
-        call radiative_downwards(energy, Trad, a21, b21, r21)
-            
-        call radiative_upwards(energy, Trad, a21, b21, b12, jnu, r12)
-
-!         ! building the total radiative matrix, including both stimulated and spontaneous
-!         ! transitions; according to the convention adopted:
-!         !     downward transitions -> upper triangular matrix
-!         !     upward transitions   -> lower triangular matrix
+         type(energy_lev) :: energy
+         type(radiative_coeffs) :: a21, b21, b12, jnu, r21, r12, rad
+         type(collisional_coeffs) :: rr, rr21, rr12
+         type(reaction_matrix)  :: coll_rad_matrix
+         type(population) :: x
 
          rad%M_lique = r21%M_lique + r12%M_lique
 
@@ -64,7 +44,7 @@ module level_population
     end subroutine lev_pop
 
     subroutine multiplication_by_nc(rr, rr21, rr12, nc) 
-        real*8 nc
+        real*8 :: nc
         type(collisional_coeffs) :: rr, rr21, rr12
         type(collisional_coeffs) :: rr_new, rr21_new, rr12_new
         print*, 'nc = ', nc

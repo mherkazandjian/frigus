@@ -1,9 +1,10 @@
 module radiation
     
     use energy_levels
-    use types_and_parameters, only: jmax, vi, ji, vf, jf, &
-                                    collisional_coeffs,   &
-                                    radiative_coeffs, energy_lev
+    use types_and_parameters, only: jmax, vi, ji, vf, jf,           &
+                                    collisional_coeffs,             &
+                                    radiative_coeffs, energy_lev,   &
+                                    Trad
 
     ! in this module the reading, indexes arrangement and calculations of
     ! stimulated coefficients are performed, starting from the data by
@@ -15,7 +16,7 @@ module radiation
     
     contains
 
-      subroutine reading_data_radiative(e, a21)
+     subroutine reading_data_radiative(e, a21)
                  use types_and_parameters, only: jmax, nlev, nlev_lique,      &
                                                  energy_lev, ini, fin
  
@@ -69,7 +70,7 @@ module radiation
                 return
       end subroutine reading_data_radiative
 
-       subroutine radiative_downwards(e, Tr, a21, b21, r21)
+     subroutine radiative_downwards(e, Trad, a21, b21, r21)
                   ! this subroutine returns the Einstein coefficients
                   ! for downward stimulated transitions
                   ! input: a21
@@ -81,9 +82,7 @@ module radiation
  
                   type(radiative_coeffs) :: a21, b21, r21, jnu
                   type(energy_lev) :: e
- 
-                  real*8 :: Tr
- 
+                  real*8 :: Trad                  
  
                   b21%M_lique = 0.d0
                   r21%M_lique = 0.d0
@@ -91,7 +90,7 @@ module radiation
                   do ini = 1, nlev_lique
                      do fin = 1, nlev_lique
                          if(ini.ne.fin) then
-                            jnu%M_lique(ini, fin) = (4.d0*pi/c)*planck(e%freq_lique(ini, fin), Tr)
+                            jnu%M_lique(ini, fin) = (4.d0*pi/c)*planck(e%freq_lique(ini, fin), Trad)
                          else
                             jnu%M_lique(ini, fin) = 0.d0
                          endif                     
@@ -120,16 +119,14 @@ module radiation
                  return
        end subroutine radiative_downwards 
 
-       
-       subroutine radiative_upwards(e, Tr, a21, b21, b12, jnu, r12)
+     subroutine radiative_upwards(e, Trad, a21, b21, b12, jnu, r12)
                   use types_and_parameters, only: hp, c, pi, nlev, nlev_lique,  &
                                                   energy_lev,                   &
                                                   ini, fin
-                                                  
-                  real*8  :: Tr
                   real*8  :: g1, g2
                   type(radiative_coeffs) :: a21, b21, b12, r21, r12, jnu
                   type(energy_lev) :: e
+                  real*8 :: Trad
                   
  
                   b12%M_lique = 0.d0
@@ -140,7 +137,7 @@ module radiation
                   do ini = 1, nlev_lique
                       do fin = 1, nlev_lique
                             if(ini.ne.fin) then
-                                jnu%M_lique(ini, fin) = (4.d0*pi/c)*planck(e%freq_lique(ini, fin), Tr)
+                                jnu%M_lique(ini, fin) = (4.d0*pi/c)*planck(e%freq_lique(ini, fin), Trad)
                             else
                                 jnu%M_lique(ini, fin) = 0.d0
                             endif
@@ -162,14 +159,13 @@ module radiation
                   return
        end subroutine radiative_upwards
 
-
-
-      real*8 function planck(ni, T)
+     real*8 function planck(ni, Trad)
     !    computes the planck function:
     !    inputs: frequencies, Trad
          use types_and_parameters, only: c, kb, hp
-         real*8 :: xx, yy, ni, T
-         xx = hp * ni / (kb * T)
+         real*8 :: xx, yy, ni
+         real*8 :: Trad
+         xx = hp * ni / (kb * Trad)
          yy = (2.d0*hp*ni**3)/c**2
          if(ni.eq.0.d0) planck = 0.d0
          if(xx.lt.0.6739d3) then 
@@ -179,8 +175,8 @@ module radiation
          endif
          !write(6,'(a13, 3(e10.4, 2x), a8, e10.4, 2x, a2, 2x, e10.4))') 'from planck: ', xx, yy, ni, 'planck  ', planck, 'yy', yy
          end      
-      
-      real*8 function planckOccupation(hp, nu, kb, T)
+
+     real*8 function planckOccupation(hp, nu, kb, T)
     !    computes the planck function for input parameters.
     !    keywords: nu, T
          !PHYSICAL PARAMETERS
@@ -189,9 +185,7 @@ module radiation
          planckOccupation = 1.0d0 / (dexp(x) - 1.0d0)
          end
 
-         
-         
-      subroutine tableh2(a,ivmax)
+     subroutine tableh2(a,ivmax)
 
         implicit real*8(a-h,o-z)
         parameter(jmax=31)
@@ -261,21 +255,6 @@ module radiation
         close(18)
         return
       end subroutine tableh2         
-         
-! 
-!                 !do i=1,nradtrans
-!                 !   vi=vrad(i)
-!                 !   ji=jrad(i)
-!                 !   vf=vprad(i)
-!                 !   jf=jprad(i)
-!                 !   if(en(vi,ji).gt.en(vf,jf)) then 
-!                 !      AA(coupler1(i),coupler2(i)) = a(vi,ji,vf,jf)+
-!                 !   else
-!                 !      AA(coupler1(i),coupler2(i)) =
-!                 !   endif
-!                 !!   write(6,*) vi,ji,vf,jf,a(vi,ji,vf,jf)
-!                 !enddo
-
 
     end module radiation
 

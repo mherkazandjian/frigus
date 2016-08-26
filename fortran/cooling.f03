@@ -2,8 +2,10 @@ program cooling
      use types_and_parameters, only: id_temp, energy_lev,                   &
                                      radiative_coeffs, collisional_coeffs,  &
                                      reaction_matrix, population,           &
-                                     ntemp, nlev_lique
+                                     ntemp, nlev_lique, Trad
 
+     use read_data, only: get_data                                     
+                                     
      use level_population, only: lev_pop
          
      type(energy_lev) :: energy
@@ -13,6 +15,7 @@ program cooling
      type(population) :: x
      real*8, dimension(1:ntemp) :: cooling_rate
     
+     call get_data(Trad, id_temp, energy, a21, b21, r21, b12, jnu, r12, rr, rr21, rr12)
 !     do itemp = 1, ntemp 
      itemp = 30
      call lev_pop(energy, a21, b21, r21, b12, jnu, r12, rr, rr21, rr12, itemp, coll_rad_matrix, x)     
