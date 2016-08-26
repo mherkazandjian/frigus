@@ -206,7 +206,10 @@ def compute_degeneracy_matrix(levels):
     return R
 
 
-def compute_B_J_nu_matrix_from_A_matrix(energy_levels, A_matrix, T):
+def compute_B_J_nu_matrix_from_A_matrix(energy_levels,
+                                        A_matrix,
+                                        T,
+                                        debug=False):
     """given the energy levels, returns the stimulated emission and absorption
     coefficients matrix.
     https://en.wikipedia.org/wiki/Einstein_coefficients
@@ -241,29 +244,30 @@ def compute_B_J_nu_matrix_from_A_matrix(energy_levels, A_matrix, T):
 
     B_J_nu_matrix = B_matrix * J_nu_matrix
 
-    numpy.savetxt(
-        os.path.expanduser(
-            '~/dropbox/Dropbox/us/cooling_function/mher/A_matrix.txt'),
-        A_matrix.si.value,
-        fmt='%+-1.16e')
+    if debug is True:
+        numpy.savetxt(
+            os.path.expanduser(
+                '~/dropbox/Dropbox/us/cooling_function/mher/A_matrix.txt'),
+            A_matrix.si.value,
+            fmt='%+-1.16e')
 
-    numpy.savetxt(
-        os.path.expanduser(
-            '~/dropbox/Dropbox/us/cooling_function/mher/B_matrix.txt'),
-        B_matrix.si.value,
-        fmt='%+-1.16e')
+        numpy.savetxt(
+            os.path.expanduser(
+                '~/dropbox/Dropbox/us/cooling_function/mher/B_matrix.txt'),
+            B_matrix.si.value,
+            fmt='%+-1.16e')
 
-    numpy.savetxt(
-        os.path.expanduser(
-            '~/dropbox/Dropbox/us/cooling_function/mher/J_nu_matrix.txt'),
-        J_nu_matrix.to(u.N / u.m**2 * u.s).value,
-        fmt='%+-1.16e')
+        numpy.savetxt(
+            os.path.expanduser(
+                '~/dropbox/Dropbox/us/cooling_function/mher/J_nu_matrix.txt'),
+            J_nu_matrix.to(u.N / u.m**2 * u.s).value,
+            fmt='%+-1.16e')
 
-    numpy.savetxt(
-        os.path.expanduser(
-            '~/dropbox/Dropbox/us/cooling_function/mher/B_J_nu_matrix.txt'),
-        B_J_nu_matrix.si.value,
-        fmt='%+-1.16e')
+        numpy.savetxt(
+            os.path.expanduser(
+                '~/dropbox/Dropbox/us/cooling_function/mher/B_J_nu_matrix.txt'),
+            B_J_nu_matrix.si.value,
+            fmt='%+-1.16e')
 
     return B_J_nu_matrix
 
@@ -347,7 +351,8 @@ def compute_K_dex_matrix_interpolator(K_dex_vs_T, T_range):
 
 def compute_K_matrix_from_K_dex_matrix(energy_levels,
                                        K_dex_matrix_interpolator,
-                                       T_kin):
+                                       T_kin,
+                                       debug=True):
     """ .. todo:: add doc
 
     :param energy_levels: .. todo:: add doc
@@ -366,11 +371,12 @@ def compute_K_matrix_from_K_dex_matrix(energy_levels,
 
     K_matrix = K_dex_T + K_ex_T
 
-    numpy.savetxt(
-        os.path.expanduser(
-            '~/dropbox/Dropbox/us/cooling_function/mher/K_nc_matrix.txt'),
-        K_matrix.si.value*1e14,
-        fmt='%+-1.16e')
+    if debug is True:
+        numpy.savetxt(
+            os.path.expanduser(
+                '~/dropbox/Dropbox/us/cooling_function/mher/K_nc_matrix.txt'),
+            K_matrix.si.value*1e14,
+            fmt='%+-1.16e')
 
     return K_matrix
 
@@ -411,7 +417,10 @@ def solveEquilibrium(M_matrix):
 #     return Tr
 
 
-def population_density_at_steady_state(data_set, T_kin, collider_density):
+def population_density_at_steady_state(data_set,
+                                       T_kin,
+                                       collider_density,
+                                       debug=False):
     """
 
     :param data_set:
@@ -427,35 +436,40 @@ def population_density_at_steady_state(data_set, T_kin, collider_density):
     # compute the stimulated emission and absorption coefficients matrix
     B_J_nu_matrix = compute_B_J_nu_matrix_from_A_matrix(energy_levels,
                                                         A_matrix,
-                                                        T_kin)
+                                                        T_kin,
+                                                        debug=debug)
 
     # get the K matrix for a certain temperature in the tabulated range
     K_matrix = compute_K_matrix_from_K_dex_matrix(energy_levels,
                                                   K_dex_matrix_interpolator,
-                                                  T_kin)
+                                                  T_kin,
+                                                  debug=debug)
 
     # compute the M matrix that can be used to compute the equilibrium state of
     # the levels (see notebook)
     O_matrix = (A_matrix + B_J_nu_matrix + K_matrix * collider_density).T
-    numpy.savetxt(
-        os.path.expanduser(
-            '~/dropbox/Dropbox/us/cooling_function/mher/O_matrix.txt'),
-        O_matrix.si.value,
-        fmt='%+-1.16e')
+    if debug is True:
+        numpy.savetxt(
+            os.path.expanduser(
+                '~/dropbox/Dropbox/us/cooling_function/mher/O_matrix.txt'),
+            O_matrix.si.value,
+            fmt='%+-1.16e')
 
     D_matrix = -numpy.eye(O_matrix.shape[0]) * O_matrix.sum(axis=0)
-    numpy.savetxt(
-        os.path.expanduser(
-            '~/dropbox/Dropbox/us/cooling_function/mher/D_matrix.txt'),
-        D_matrix.si.value,
-        fmt='%+-1.16e')
+    if debug is True:
+        numpy.savetxt(
+            os.path.expanduser(
+                '~/dropbox/Dropbox/us/cooling_function/mher/D_matrix.txt'),
+            D_matrix.si.value,
+            fmt='%+-1.16e')
 
     M_matrix = O_matrix + D_matrix
-    numpy.savetxt(
-        os.path.expanduser(
-            '~/dropbox/Dropbox/us/cooling_function/mher/M_matrix.txt'),
-        M_matrix.si.value,
-        fmt='%+-1.16e')
+    if debug is True:
+        numpy.savetxt(
+            os.path.expanduser(
+                '~/dropbox/Dropbox/us/cooling_function/mher/M_matrix.txt'),
+            M_matrix.si.value,
+            fmt='%+-1.16e')
 
     # solve the equilibrium population densities
     x_equilibrium = solveEquilibrium(M_matrix.si.value)
