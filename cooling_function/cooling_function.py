@@ -25,9 +25,10 @@ nc_H = 1e14 * u.meter**-3
 # the kinetic temperature of the gas
 T_kin = 3000.0 * u.Kelvin
 
-species_data = DataLoader().load('H2_lique')
+# species_data = DataLoader().load('H2_lique')
+species_data = DataLoader().load('two_level_1')
 
-pop_dens_equ = population_density_at_steady_state(species_data,T_kin, nc_H)
+pop_dens_equ = population_density_at_steady_state(species_data, T_kin, nc_H)
 cooling_rate = cooling_rate_at_steady_state(species_data, T_kin, nc_H)
 
 utils.load_ascii_matrix_data()
