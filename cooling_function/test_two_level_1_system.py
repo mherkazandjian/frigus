@@ -4,7 +4,7 @@ calculate equilibrium population of species and the cooling function.
 """
 
 import pylab
-from numpy import exp, fabs, logspace, array
+from numpy import exp, fabs, logspace, array, vstack
 
 from astropy import units as u
 from astropy.constants import k_B
@@ -46,40 +46,37 @@ def analytic_solution_no_radiation_field(species_data, T_kin, n_collider):
 
 T_kin_range = logspace(2.0, 6.0, 100)*u.K
 
-x_0_exact = []
-x_0_numerical = []
-x_1_exact = []
-x_1_numerical = []
-for T_kin in T_kin_range:
-    x_exact = analytic_solution_no_radiation_field(species_data, T_kin, nc)
-    x_numerical = population_density_at_steady_state(species_data, T_kin, nc)
-    x_0_exact.append(x_exact[0])
-    x_1_exact.append(x_exact[1])
-    x_0_numerical.append(x_numerical[0])
-    x_1_numerical.append(x_numerical[1])
+x_exact = array(
+    [analytic_solution_no_radiation_field(species_data, T_kin, nc)
+     for T_kin in T_kin_range], 'f8')
 
-x_0_exact = array(x_0_exact).flatten()
-x_1_exact = array(x_1_exact).flatten()
-x_0_numerical = array(x_0_numerical).flatten()
-x_1_numerical = array(x_1_numerical).flatten()
+x_numerical = array(
+    [population_density_at_steady_state(species_data, T_kin, nc)
+    for T_kin in T_kin_range], 'f8')[:, :, 0]
 
-if False:
+if True:
+    # plot the relative population densities as a function of temperatures
     pylab.figure()
-    pylab.loglog(T_kin_range, x_0_exact, 'r-')
-    pylab.loglog(T_kin_range, x_0_numerical, 'ro')
-    pylab.loglog(T_kin_range, x_1_exact, 'b-')
-    pylab.loglog(T_kin_range, x_1_numerical, 'bo')
+    pylab.loglog(T_kin_range, x_exact[:, 0], 'r-', label='x_0 exact')
+    pylab.loglog(T_kin_range, x_numerical[:, 0], 'ro', label='x_0 numerical')
+    pylab.loglog(T_kin_range, x_exact[:, 1], 'b-', label='x_1 exact')
+    pylab.loglog(T_kin_range, x_numerical[:, 1], 'bo', label='x_1 numerical')
+    pylab.legend()
+    pylab.title('fractional population densities of levels 0 and level 1')
     pylab.show()
-rel_error_x0 = fabs(1.0 - x_0_numerical / x_0_exact)
-rel_error_x1 = fabs(1.0 - x_1_numerical / x_1_exact)
 
-assert rel_error_x0.max() < 1e-13
-assert rel_error_x1.max() < 1e-13
+rel_errors = fabs(1.0 - x_numerical / x_exact)
 
-if False:
+assert rel_errors.max() < 1e-13
+
+if True:
+    # plot the relative errors in the relative population densities as a
+    # function of temperatures
     pylab.figure()
-    pylab.loglog(T_kin_range, rel_error_x0, 'r-')
-    pylab.loglog(T_kin_range, rel_error_x0, 'k-')
+    pylab.loglog(T_kin_range, rel_errors[:, 0], 'r-', label='x_0')
+    pylab.loglog(T_kin_range, rel_errors[:, 1], 'k-', label='x_1')
+    pylab.legend()
+    pylab.title('relative errors between numerical and exact solution')
     pylab.show()
 
 
