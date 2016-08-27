@@ -31,7 +31,7 @@ module matrix_construction
                      enddo
                  enddo
 
-                 print*, shape(sum(coll_rad_matrix%O, dim = 1))
+                !print*, shape(sum(coll_rad_matrix%O, dim = 1))
  
                  do row = 1, nlev_lique
                      do col = 1, nlev_lique

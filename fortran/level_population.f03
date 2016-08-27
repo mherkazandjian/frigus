@@ -46,8 +46,7 @@ module level_population
     subroutine multiplication_by_nc(rr, rr21, rr12, nc) 
         real*8 :: nc
         type(collisional_coeffs) :: rr, rr21, rr12
-        type(collisional_coeffs) :: rr_new, rr21_new, rr12_new
-        print*, 'nc = ', nc
+        !write(*,'(a5, ES23.15)') 'nc = ', nc
         rr%matrix_lique = rr%matrix_lique * nc
         rr21%matrix_lique = rr21%matrix_lique * nc
         rr12%matrix_lique = rr12%matrix_lique * nc
@@ -70,9 +69,9 @@ module level_population
     
           call dgesv(ndim, nrhs, coll_rad_matrix%M, lda, ipiv, x, ldb, info)
  
-          do i = 1, nlev_lique
-              write(6,'(3(i3), 2(ES23.15))') i, energy%vl(i), energy%jl(i), y%pop(i), x%pop(i)
-          enddo
+          !do i = 1, nlev_lique
+          !    write(6,'(3(i3), 2(ES23.15))') i, energy%vl(i), energy%jl(i), y%pop(i), x%pop(i)
+          !enddo
 
         return
     end subroutine solve_steady_state
