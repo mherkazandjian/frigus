@@ -208,7 +208,7 @@ def compute_degeneracy_matrix(levels):
 
 def compute_B_J_nu_matrix_from_A_matrix(energy_levels,
                                         A_matrix,
-                                        T,
+                                        T_rad,
                                         debug=False):
     """given the energy levels, returns the stimulated emission and absorption
     coefficients matrix.
@@ -221,6 +221,7 @@ def compute_B_J_nu_matrix_from_A_matrix(energy_levels,
     :param energy_levels: The energy levels .. todo:: add doc
     :param A_matrix: The spontaneous emission coefficients matrix (A in the
      ipython notebook)
+    :param T_rad: The radiation temperature
     :return: The B matrix defined in the notebook multiplied by J_nu
     """
     delta_e = compute_delta_energy_matrix(energy_levels)
@@ -235,7 +236,7 @@ def compute_B_J_nu_matrix_from_A_matrix(energy_levels,
     # B_nu is the planck function, when multiplied by 4pi/c we obtain the
     # spectral energy density usually called u_i and that has dimensions
     # of Energy / Length^3 / Hz
-    J_nu_matrix = (4.0*pi*u.sr/c_light)*B_nu(nu_matrix, T)
+    J_nu_matrix = (4.0*pi*u.sr/c_light)*B_nu(nu_matrix, T_rad)
     numpy.fill_diagonal(J_nu_matrix, 0.0)
 
     B_a_matrix = B_e_matrix.T * R_matrix
@@ -419,12 +420,14 @@ def solveEquilibrium(M_matrix):
 
 def population_density_at_steady_state(data_set,
                                        T_kin,
+                                       T_rad,
                                        collider_density,
                                        debug=False):
     """
 
     :param data_set:
     :param T_kin:
+    :param T_rad:
     :param collider_density:
     :return: The equilibrium population density
     """
@@ -436,7 +439,7 @@ def population_density_at_steady_state(data_set,
     # compute the stimulated emission and absorption coefficients matrix
     B_J_nu_matrix = compute_B_J_nu_matrix_from_A_matrix(energy_levels,
                                                         A_matrix,
-                                                        T_kin,
+                                                        T_rad,
                                                         debug=debug)
 
     # get the K matrix for a certain temperature in the tabulated range
@@ -477,17 +480,19 @@ def population_density_at_steady_state(data_set,
     return x_equilibrium
 
 
-def cooling_rate_at_steady_state(data_set, T_kin, collider_density):
+def cooling_rate_at_steady_state(data_set, T_kin, T_rad, collider_density):
     """.. todo:: add doc
 
     :param data_set: .. todo:: add doc
     :param T_kin: .. todo:: add doc
+    :param T_Rad: .. todo:: add doc
     :param collider_density: .. todo:: add doc
     :return: the cooling rate
     """
 
     x_equilibrium = population_density_at_steady_state(data_set,
                                                        T_kin,
+                                                       T_rad,
                                                        collider_density)
 
     # compute the cooling rate (per particle)

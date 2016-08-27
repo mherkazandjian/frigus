@@ -19,6 +19,7 @@ nc = 1e14 * u.meter**-3
 
 # the kinetic temperature of the gas
 T_kin = 3000.0 * u.Kelvin
+T_rad = 30.0 * u.Kelvin
 
 species_data = DataLoader().load('two_level_1')
 
@@ -51,7 +52,7 @@ x_exact = array(
      for T_kin in T_kin_range], 'f8')
 
 x_numerical = array(
-    [population_density_at_steady_state(species_data, T_kin, nc)
+    [population_density_at_steady_state(species_data, T_kin, 0.0, nc)
     for T_kin in T_kin_range], 'f8')[:, :, 0]
 
 if True:
