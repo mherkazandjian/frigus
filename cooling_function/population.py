@@ -509,9 +509,11 @@ def cooling_rate(population_densities, energy_levels, A_matrix):
     delta_e_matrix = fabs(compute_delta_energy_matrix(energy_levels)).si.value
     A_matrix = A_matrix.si.value
 
-    retval = dot(dot(A_matrix, delta_e_matrix), population_densities).sum()
+    retval = (A_matrix * delta_e_matrix * population_densities).sum()
 
-    return retval * u.Joule * u.second**-1 * u.meter**-3
+    retval = retval * u.Joule * u.second**-1
+
+    return retval
 
 
 def fit_glover(T):

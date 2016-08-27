@@ -20,20 +20,19 @@ import pdb
 from readers import DataLoader
 
 # density of the colliding species, in m^3
-nc_H = 1e14 * u.meter**-3
+nc_H = 1e2 * u.meter**-3
 
 # the kinetic temperature of the gas
-T_kin = 3000.0 * u.Kelvin
+T_kin = 100.0 * u.Kelvin
 
-# species_data = DataLoader().load('H2_lique')
-species_data = DataLoader().load('two_level_1')
+species_data = DataLoader().load('H2_lique')
 
 pop_dens_equ = population_density_at_steady_state(species_data, T_kin, nc_H)
 cooling_rate = cooling_rate_at_steady_state(species_data, T_kin, nc_H)
 
-utils.load_ascii_matrix_data()
+# utils.load_ascii_matrix_data()
 
-if False:
+if True:
     print('this')
     lambda_vs_T_kin = []
     T_rng = species_data.raw_data.collision_rates_T_range
@@ -47,8 +46,8 @@ if False:
                                          T_rng.value])
 
     pylab.loglog(T_rng.value, lambda_vs_T_kin.si.value, '-o', label='cooling H2')
-    # pylab.loglog(T_rng.value, lambda_vs_T_kin_glover.si.value,
-    #            'r--', label='cooling H2 glover')
+    pylab.loglog(T_rng.value, lambda_vs_T_kin_glover.si.value,
+               'r--', label='cooling H2 glover')
     pylab.legend()
     pylab.show()
 
