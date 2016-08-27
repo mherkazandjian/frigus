@@ -16,8 +16,8 @@ module types_and_parameters
 
     ! GAS DENSITY AND RADIATION TEMPERATURE
     integer, parameter                          :: ndensity = 1     ! dimension of the arra of density
-    real*8,  parameter                          :: Trad = 100.d0   ! radiation temperature in kelvin
-    real*8,  parameter, dimension(1:ndensity)   :: nb = 1.d10       ! baryon density [m-3]
+    real*8,  parameter                          :: Trad = 30.d0   ! radiation temperature in kelvin
+    real*8,  parameter, dimension(1:ndensity)   :: nb = 1.d6       ! baryon density [m-3]
     
     ! ENERGY LEVELS
     integer, parameter :: nlev = 301

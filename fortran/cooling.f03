@@ -48,7 +48,9 @@ program cooling
                                 -5.5108047*log10((rr%temp(itemp)/1000.))**4      &
                                 +1.5538288*log10((rr%temp(itemp)/1000.))**5)
         endif
-        glover(itemp) = glover(itemp)! * 1e-13
+        glover(itemp) = glover(itemp)*1.d-7
+        write(6,'(4(ES23.15))') Trad, rr%temp(itemp), cooling_rate(itemp)
+        
         write(40,'(4(ES23.15))') Trad, rr%temp(itemp), cooling_rate(itemp), glover(itemp)
      enddo
      

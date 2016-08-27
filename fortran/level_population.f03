@@ -34,9 +34,9 @@ module level_population
          
          call matrix_builder(rad, rr, id_temp, coll_rad_matrix)
 
-         call tests(energy, rr, rr21, rr12, a21, b21, r21, b12, jnu, r12, coll_rad_matrix, id_temp)
+         !call tests(energy, rr, rr21, rr12, a21, b21, r21, b12, jnu, r12, coll_rad_matrix, id_temp)
          
-         call writing_files(a21, b21, b12, jnu, id_temp, rr, coll_rad_matrix)
+         !call writing_files(a21, b21, b12, jnu, id_temp, rr, coll_rad_matrix)
          
          call solve_steady_state(energy, coll_rad_matrix, x)
 
@@ -66,12 +66,12 @@ module level_population
  
           x%pop = y%pop
  
-          print*, 'before', x%pop
+          !print*, 'before', x%pop
     
           call dgesv(ndim, nrhs, coll_rad_matrix%M, lda, ipiv, x, ldb, info)
  
           do i = 1, nlev_lique
-              write(6,'(3(i3), e14.7)') i, energy%vl(i), energy%jl(i), x%pop(i)
+              write(6,'(3(i3), 2(ES23.15))') i, energy%vl(i), energy%jl(i), y%pop(i), x%pop(i)
           enddo
 
         return
