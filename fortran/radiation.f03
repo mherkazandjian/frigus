@@ -119,12 +119,12 @@ module radiation
                  return
        end subroutine radiative_downwards 
 
-     subroutine radiative_upwards(e, Trad, a21, b21, b12, jnu, r12)
+     subroutine radiative_upwards(e, Trad, b21, b12, jnu, r12)
                   use types_and_parameters, only: hp, c, pi, nlev, nlev_lique,  &
                                                   energy_lev,                   &
                                                   ini, fin
                   real*8  :: g1, g2
-                  type(radiative_coeffs) :: a21, b21, b12, r21, r12, jnu
+                  type(radiative_coeffs) :: b21, b12, r12, jnu
                   type(energy_lev) :: e
                   real*8 :: Trad
                   
@@ -167,7 +167,10 @@ module radiation
          real*8 :: Trad
          xx = hp * ni / (kb * Trad)
          yy = (2.d0*hp*ni**3)/c**2
+         ! exceptions
          if(ni.eq.0.d0) planck = 0.d0
+         if(Trad.le.7.d0) planck = 0.d0
+         !if(xx.gt.log((1.d300+1.)/1.d300)) planck = 0.d0
          if(xx.lt.0.6739d3) then 
             planck = yy* 1.0d0 / (dexp(xx) - 1.0d0)
          else

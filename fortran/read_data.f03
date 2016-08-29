@@ -1,12 +1,13 @@
 module read_data
 
     use types_and_parameters, only: nlev, energy_lev, vmax, jmax,         &
-                                    ntrans, ntemp, i,                      &
+                                    ntrans, ntemp, i,                     &
                                     radiative_coeffs, collisional_coeffs, &
                                     reaction_matrix,                      &
                                     population,                           &
-                                    Trad, ini, fin, id_temp,               &
-                                    nlev_lique, vi, vf, ji, jf
+                                    Trad, ini, fin,                       &
+                                    nlev_lique, vi, vf, ji, jf,           &
+                                    id_temp, id_temp_test
                                     
     use energy_levels, only: reading_data_energies
     use radiation,     only: reading_data_radiative,                      &
@@ -32,11 +33,11 @@ module read_data
 
          call radiative_downwards(energy, Trad, a21, b21, r21)
 
-         call radiative_upwards(energy, Trad, a21, b21, b12, jnu, r12)
+         call radiative_upwards(energy, Trad, b21, b12, jnu, r12)
 
          !call tests(energy, rr, rr21, rr12, a21, b21, r21, b12, jnu, r12, coll_rad_matrix, id_temp)
 
-         !call writing_files(a21, b21, b12, jnu, id_temp, rr, coll_rad_matrix)
+         call writing_files(a21, b21, b12, jnu, id_temp, rr, coll_rad_matrix)
 
         return
      end subroutine get_data

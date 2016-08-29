@@ -11,13 +11,15 @@ module types_and_parameters
     integer                                     :: i, l, m, n, i0, i1, i2, i3
     integer                                     :: lower, upper, ini, fin, row, col, it
     integer                                     :: vi, ji, vf, jf ! integers for identifying coll transitions
-    integer, parameter                          :: id_temp = 1
+    integer                                     :: id_temp
+    integer, parameter                          :: id_temp_test = 22
     real*8                                      :: xm, ym
 
     ! GAS DENSITY AND RADIATION TEMPERATURE
     integer, parameter                          :: ndensity = 1     ! dimension of the arra of density
-    real*8,  parameter                          :: Trad = 10.d0 !2000.d0   ! radiation temperature in kelvin
-    real*8,  parameter, dimension(1:ndensity)   :: nb = 1.d7       ! baryon density [m-3]
+    real*8,  parameter                          :: Trad = 3000.d0   ! radiation temperature in kelvin
+    !real*8,  parameter, dimension(1:ndensity)   :: nb = 1.d7       ! baryon density [m-3]
+    real*8,  parameter                          :: nc = 1.d14       ! baryon density [m-3]
     
     ! ENERGY LEVELS
     integer, parameter :: nlev = 301

@@ -5,8 +5,9 @@ module matrix_construction
     use types_and_parameters, only: nlev_lique,                           &
                                     radiative_coeffs, collisional_coeffs, &
                                     reaction_matrix, population,          &
-                                    Trad, nb,                             &
-                                    row, col, fin, id_temp, ntemp, xm
+                                    Trad, nc,                             &
+                                    row, col, fin, ntemp, xm,             &
+                                    id_temp, id_temp_test
 
     contains
 
@@ -16,11 +17,10 @@ module matrix_construction
                  type(collisional_coeffs) :: rr
                  type(reaction_matrix)    :: coll_rad_matrix
                  real*8, dimension(1:nlev_lique) :: temp
-                 integer :: id_temp
-               
-                 coll_rad_matrix%M = 0.d0 ! full matrix
-                 coll_rad_matrix%O = 0.d0 ! off-diagonal terms
-                 coll_rad_matrix%D = 0.d0 ! diagonal terms
+
+                 !coll_rad_matrix%M = 0.d0 ! full matrix
+                 !coll_rad_matrix%O = 0.d0 ! off-diagonal terms
+                 !coll_rad_matrix%D = 0.d0 ! diagonal terms
                  do row = 1, nlev_lique
                      do col = 1, nlev_lique
                          if(row.ne.col) then 

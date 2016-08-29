@@ -1,20 +1,20 @@
 ! This program writes the matrices on files with name corresponding to the name of the matrices
 
 module testing_data
-    use types_and_parameters, only: energy_lev, vmax, jmax,               &
-                                    ntrans, ntemp, i,                     &
-                                    radiative_coeffs, collisional_coeffs, &
-                                    reaction_matrix,                      &
-                                    Trad, nb, ini, fin,                   &
-                                    nlev_lique, vi, vf, ji, jf, id_temp
+    use types_and_parameters, only: energy_lev, vmax, jmax,                  &
+                                    ntrans, ntemp, i,                        &
+                                    radiative_coeffs, collisional_coeffs,    &
+                                    reaction_matrix,                         &
+                                    Trad, nc, ini, fin,                      &
+                                    nlev_lique, vi, vf, ji, jf, id_temp_test
 
  contains
  
-    subroutine writing_files(a21, b21, b12, jnu, id_temp, rr, coll_rad_matrix)
+    subroutine writing_files(a21, b21, b12, jnu, id_temp_test, rr, coll_rad_matrix)
         type(radiative_coeffs) :: a21, b21, b12, jnu
         type(collisional_coeffs) :: rr
         type(reaction_matrix) :: coll_rad_matrix
-        character*58 :: command
+        character*59 :: command
         command = 'rm -fvr /home/carla/Dropbox/us/cooling_function/carla/*.txt'
 
         call system(command)
@@ -32,7 +32,7 @@ module testing_data
            
            write(31, '(58(ES23.15, 1x))') (b21%M_lique(i, j)+b12%M_lique(i, j), i = 1, nlev_lique)
            write(32, '(58(ES21.15, 1x))') (jnu%M_lique(i, j), i = 1, nlev_lique)
-           write(33, '(58(ES25.15, 1x))') (rr%matrix_lique(i, j, id_temp), i = 1, nlev_lique)
+           write(33, '(58(ES25.15, 1x))') (rr%matrix_lique(i, j, id_temp_test), i = 1, nlev_lique)
            write(34, '(58(ES25.15, 1x))') (coll_rad_matrix%O(i, j), i = 1, nlev_lique)
            write(35, '(58(ES25.15, 1x))') (coll_rad_matrix%D(i, j), i = 1, nlev_lique)
            write(36, '(58(ES25.15, 1x))') (coll_rad_matrix%M(i, j), i = 1, nlev_lique)
@@ -42,13 +42,14 @@ module testing_data
     end subroutine writing_files
 
 
-    subroutine tests(energy, rr, rr21, rr12, a21, b21, r21, b12, jnu, r12, coll_rad_matrix, it)
+    subroutine tests(energy, rr, rr21, rr12, a21, b21, r21, b12, jnu, r12, coll_rad_matrix, id_temp_test)
         real*8 :: diagonal_a21, diagonal_b21, diagonal_r21
         real*8 :: diagonal_b12, diagonal_r12
-        real*8 :: diagonal_rr21, diagonal_rr12      
+        real*8 :: diagonal_rr21, diagonal_rr12
+        real*8 :: diagonal_jnu
         real*8 :: diagonal_M, diagonal_O, diagonal_D
         type(energy_lev) :: energy
-        type(radiative_coeffs) :: a21, b21, r21, b12, r12, jnu, rad
+        type(radiative_coeffs) :: a21, b21, r21, b12, r12, jnu
         type(collisional_coeffs) :: rr, rr21, rr12
         type(reaction_matrix)  :: coll_rad_matrix
         !type(population) :: x, y    
@@ -184,7 +185,7 @@ module testing_data
       print*, 'sum r21', sum(r21%M_lique), diagonal_r21, 'max', maxval(r21%M_lique)
       print*, 'sum r12', sum(r12%M_lique), diagonal_r12, 'max', maxval(r12%M_lique)
       print*, 'sum r21+r12', sum(r21%M_lique+r12%M_lique), 'max', maxval(r21%M_lique+r12%M_lique)
-     
+    
     ! test 2: to check the read data and filled matrices
     !  do ini = 1, nlev_lique
     !     do fin = 1, nlev_lique
@@ -199,7 +200,7 @@ module testing_data
     !                                        ! to have them into the same line although for the reverse transition:
     !                   b12%M(fin, ini),                   &
     !                                        r12%M(fin, ini),                   &
-    !                                        rad%M(ini, fin)
+    !                                        rad%M(ini, fin) !!! to be defined
 
 !---------------------------------------------------------------------------------------------------
 

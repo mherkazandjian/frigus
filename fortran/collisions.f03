@@ -21,7 +21,7 @@ module collisions
                                                  vfmax, jfmax,          &
                                                  ntemp, ntrans,         &
                                                  vi, ji, vf, jf,        &
-                                                 kb, nb, id_temp
+                                                 kb, nc, id_temp
  
                  type(collisional_coeffs) :: rr, rr21, rr12       ! reaction rate
                  type(energy_lev) :: e

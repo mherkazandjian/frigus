@@ -5,7 +5,7 @@ module level_population
                                     radiative_coeffs, collisional_coeffs, &
                                     reaction_matrix,                      &
                                     population,                           &
-                                    Trad, nb, ini, fin, it,               &
+                                    Trad, nc, ini, fin, it,               &
                                     nlev_lique, vi, vf, ji, jf
 
     use linear_algebra, only: sparsity_calc,                              &
@@ -30,13 +30,13 @@ module level_population
          rad%M_lique = r21%M_lique + r12%M_lique
 
 
-         call multiplication_by_nc(rr, rr21, rr12, nb(1))
+         call multiplication_by_nc(rr, rr21, rr12, nc)
          
          call matrix_builder(rad, rr, id_temp, coll_rad_matrix)
 
-         !call tests(energy, rr, rr21, rr12, a21, b21, r21, b12, jnu, r12, coll_rad_matrix, id_temp)
+         call tests(energy, rr, rr21, rr12, a21, b21, r21, b12, jnu, r12, coll_rad_matrix, id_temp)
          
-         !call writing_files(a21, b21, b12, jnu, id_temp, rr, coll_rad_matrix)
+         call writing_files(a21, b21, b12, jnu, id_temp, rr, coll_rad_matrix)
          
          call solve_steady_state(energy, coll_rad_matrix, x)
 
