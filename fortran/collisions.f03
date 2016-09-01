@@ -30,7 +30,7 @@ module collisions
 
                  ! initializing the arrays
                  rr%reading = 0.d0
-                 rr%matrix = 0.d0
+                 rr%matrix_lique = 0.d0
                  rr%temp = [ (i, i=100,5000,100) ]
                  !do i = 1, ntemp
                  !   print*, 'temperature', i, rr%temp(i)

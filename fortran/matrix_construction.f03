@@ -9,18 +9,22 @@ module matrix_construction
                                     row, col, fin, ntemp, xm,             &
                                     id_temp, id_temp_test
 
+    use testing_data, only: tests, writing_files
+
+
     contains
 
     subroutine matrix_builder(rad, rr, id_temp, coll_rad_matrix)
 
                  type(radiative_coeffs)   :: rad
-                 type(collisional_coeffs) :: rr
+                 type(collisional_coeffs) :: rr, rr21, rr12
                  type(reaction_matrix)    :: coll_rad_matrix
                  real*8, dimension(1:nlev_lique) :: temp
 
-                 !coll_rad_matrix%M = 0.d0 ! full matrix
-                 !coll_rad_matrix%O = 0.d0 ! off-diagonal terms
-                 !coll_rad_matrix%D = 0.d0 ! diagonal terms
+                 coll_rad_matrix%M = 0.d0 ! full matrix
+                 coll_rad_matrix%O = 0.d0 ! off-diagonal terms
+                 coll_rad_matrix%D = 0.d0 ! diagonal terms
+
                  do row = 1, nlev_lique
                      do col = 1, nlev_lique
                          if(row.ne.col) then 
@@ -44,8 +48,12 @@ module matrix_construction
                                   
                  coll_rad_matrix%M = coll_rad_matrix%O + coll_rad_matrix%D
 
+
     end subroutine matrix_builder
 
+    
+    
+    
      subroutine initialize_level_population(x)
          type(population) :: x
          

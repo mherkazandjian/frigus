@@ -165,17 +165,24 @@ module radiation
          use types_and_parameters, only: c, kb, hp
          real*8 :: xx, yy, ni
          real*8 :: Trad
-         xx = hp * ni / (kb * Trad)
-         yy = (2.d0*hp*ni**3)/c**2
-         ! exceptions
-         if(ni.eq.0.d0) planck = 0.d0
-         if(Trad.le.7.d0) planck = 0.d0
-         !if(xx.gt.log((1.d300+1.)/1.d300)) planck = 0.d0
-         if(xx.lt.0.6739d3) then 
+         if(Trad.ge.1.d0) then
+            xx = hp * ni / (kb * Trad)
+            yy = (2.d0*hp*ni**3)/c**2
             planck = yy* 1.0d0 / (dexp(xx) - 1.0d0)
          else
-            planck = 1.d-250
+            xx = 0.d0
+            planck = 0.d0
          endif
+         
+         
+!         if(ni.eq.0.d0) planck = 0.d0
+
+!         if(xx.gt.log((1.d300+1.)/1.d300)) planck = 0.d0
+!          if(xx.lt.0.6739d3.and.xx.gt.0.d0) then 
+!             planck = yy* 1.0d0 / (dexp(xx) - 1.0d0)
+!          else
+!             planck = 1.d-250
+!          endif
          !write(6,'(a13, 3(e10.4, 2x), a8, e10.4, 2x, a2, 2x, e10.4))') 'from planck: ', xx, yy, ni, 'planck  ', planck, 'yy', yy
          end      
 

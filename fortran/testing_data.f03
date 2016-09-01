@@ -28,14 +28,13 @@ module testing_data
         open(36, file = '/home/carla/Dropbox/us/cooling_function/carla/M_matrix.txt', status = 'unknown')        
         
         do j = 1, nlev_lique
-           write(30, '(58(ES21.15, 1x))') (a21%M_lique(i, j), i = 1, nlev_lique)
-           
-           write(31, '(58(ES23.15, 1x))') (b21%M_lique(i, j)+b12%M_lique(i, j), i = 1, nlev_lique)
-           write(32, '(58(ES21.15, 1x))') (jnu%M_lique(i, j), i = 1, nlev_lique)
-           write(33, '(58(ES25.15, 1x))') (rr%matrix_lique(i, j, id_temp_test), i = 1, nlev_lique)
-           write(34, '(58(ES25.15, 1x))') (coll_rad_matrix%O(i, j), i = 1, nlev_lique)
-           write(35, '(58(ES25.15, 1x))') (coll_rad_matrix%D(i, j), i = 1, nlev_lique)
-           write(36, '(58(ES25.15, 1x))') (coll_rad_matrix%M(i, j), i = 1, nlev_lique)
+           write(30, '(58(ES25.15E3, 1x))') (a21%M_lique(i, j), i = 1, nlev_lique)
+           write(31, '(58(ES25.15E3, 1x))') (b21%M_lique(i, j)+b12%M_lique(i, j), i = 1, nlev_lique)
+           write(32, '(58(ES25.15E3, 1x))') (jnu%M_lique(i, j), i = 1, nlev_lique)
+           write(33, '(58(ES25.15E3, 1x))') (rr%matrix_lique(i, j, id_temp_test), i = 1, nlev_lique)
+           write(34, '(58(ES25.15E3, 1x))') (coll_rad_matrix%O(i, j), i = 1, nlev_lique)
+           write(35, '(58(ES25.15E3, 1x))') (coll_rad_matrix%D(i, j), i = 1, nlev_lique)
+           write(36, '(58(ES25.15E3, 1x))') (coll_rad_matrix%M(i, j), i = 1, nlev_lique)
         enddo
         
         return
@@ -110,23 +109,23 @@ module testing_data
 
     ! TEST COLLISIONAL COEFFICIENTS
     ! test 1: checks for comparison with the Python code
-    ! diagonal_rr21 = 0.d0
-    ! diagonal_rr12 = 0.d0    
-    ! do i = 1, ntrans
-    !    do itt = 1, ntemp
-    !        if(rr%couple1c(i).ge.rr%couple2c(i))  then
-    !            diagonal_rr21 = diagonal_rr21 + rr21%matrix_lique(rr%couple1c(i),rr%couple2c(i),itt)
-    !        else
-    !            diagonal_rr12 = diagonal_rr12 + rr12%matrix_lique(rr%couple2c(i),rr%couple1c(i),itt)
-    !        endif
-    !    enddo
-    !enddo
-    !print*, 'rr21', sum(rr21%matrix_lique), diagonal_rr21, 'max', maxval(rr21%matrix_lique)
-    !print*, 'rr12', sum(rr12%matrix_lique), diagonal_rr12, 'max', maxval(rr12%matrix_lique)
-    !print*, 'sum_collisional: ', sum(rr%matrix_lique),                        &
-    !        'sum(rr21+rr12):',sum(rr21%matrix_lique + rr12%matrix_lique)
-    !print*, 'max_collisional: ', maxval(rr%matrix_lique)
-    !print*, 'min_collisional: ', minval(rr%matrix_lique)    
+     diagonal_rr21 = 0.d0
+     diagonal_rr12 = 0.d0    
+     do i = 1, ntrans
+        do itt = 1, ntemp
+            if(rr%couple1c(i).ge.rr%couple2c(i))  then
+                diagonal_rr21 = diagonal_rr21 + rr21%matrix_lique(rr%couple1c(i),rr%couple2c(i),itt)
+            else
+                diagonal_rr12 = diagonal_rr12 + rr12%matrix_lique(rr%couple2c(i),rr%couple1c(i),itt)
+            endif
+        enddo
+    enddo
+    print*, 'rr21', sum(rr21%matrix_lique), diagonal_rr21, 'max', maxval(rr21%matrix_lique)
+    print*, 'rr12', sum(rr12%matrix_lique), diagonal_rr12, 'max', maxval(rr12%matrix_lique)
+    print*, 'sum_collisional: ', sum(rr%matrix_lique),                        &
+            'sum(rr21+rr12):',sum(rr21%matrix_lique + rr12%matrix_lique)
+    print*, 'max_collisional: ', maxval(rr%matrix_lique)
+    print*, 'min_collisional: ', minval(rr%matrix_lique)    
     
     ! test 2: checks with the read values from the input file + detailed balance
     ! do i = 1, ntrans

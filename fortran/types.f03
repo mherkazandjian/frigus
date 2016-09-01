@@ -12,7 +12,7 @@ module types_and_parameters
     integer                                     :: lower, upper, ini, fin, row, col, it
     integer                                     :: vi, ji, vf, jf ! integers for identifying coll transitions
     integer                                     :: id_temp
-    integer, parameter                          :: id_temp_test = 22
+    integer, parameter                          :: id_temp_test = 1
     real*8                                      :: xm, ym
 
     ! GAS DENSITY AND RADIATION TEMPERATURE

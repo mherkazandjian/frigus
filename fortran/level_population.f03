@@ -13,45 +13,27 @@ module level_population
     
     use matrix_construction, only: matrix_builder, initialize_level_population
     
-    use testing_data, only: tests, writing_files
-    
-    
-
     contains
     
-    subroutine lev_pop(energy, a21, b21, r21, b12, jnu, r12, rr, rr21, rr12, id_temp, coll_rad_matrix, x)
-    
+    subroutine lev_pop(energy, a21, b21, r21, b12, jnu, r12, rr, rr21, rr12, id_temp, nc, coll_rad_matrix, x)
          type(energy_lev) :: energy
          type(radiative_coeffs) :: a21, b21, b12, jnu, r21, r12, rad
          type(collisional_coeffs) :: rr, rr21, rr12
          type(reaction_matrix)  :: coll_rad_matrix
          type(population) :: x
+         real*8 :: nc
+         
 
          rad%M_lique = r21%M_lique + r12%M_lique
 
-
-         call multiplication_by_nc(rr, rr21, rr12, nc)
-         
          call matrix_builder(rad, rr, id_temp, coll_rad_matrix)
-
-         call tests(energy, rr, rr21, rr12, a21, b21, r21, b12, jnu, r12, coll_rad_matrix, id_temp)
-         
-         call writing_files(a21, b21, b12, jnu, id_temp, rr, coll_rad_matrix)
          
          call solve_steady_state(energy, coll_rad_matrix, x)
 
         return
     end subroutine lev_pop
 
-    subroutine multiplication_by_nc(rr, rr21, rr12, nc) 
-        real*8 :: nc
-        type(collisional_coeffs) :: rr, rr21, rr12
-        !write(*,'(a5, ES23.15)') 'nc = ', nc
-        rr%matrix_lique = rr%matrix_lique * nc
-        rr21%matrix_lique = rr21%matrix_lique * nc
-        rr12%matrix_lique = rr12%matrix_lique * nc
-        return
-    end subroutine multiplication_by_nc
+
     
     subroutine solve_steady_state(energy, coll_rad_matrix, x)
         type(energy_lev) :: energy
