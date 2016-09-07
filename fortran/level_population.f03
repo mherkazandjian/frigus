@@ -6,7 +6,8 @@ module level_population
                                     reaction_matrix,                      &
                                     population,                           &
                                     Trad, nc, ini, fin, it,               &
-                                    nlev_lique, vi, vf, ji, jf
+                                    nlev_lique, vi, vf, ji, jf,           &
+                                    ndensity
 
     use linear_algebra, only: sparsity_calc,                              &
                               ndim, info, lda, ldb, nrhs, ipiv
@@ -21,7 +22,7 @@ module level_population
          type(collisional_coeffs) :: rr, rr21, rr12
          type(reaction_matrix)  :: coll_rad_matrix
          type(population) :: x
-         real*8 :: nc
+         real*8, dimension(1:ndensity) :: nc
          
 
          rad%M_lique = r21%M_lique + r12%M_lique
