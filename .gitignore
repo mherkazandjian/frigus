@@ -9,4 +9,6 @@ cooling_glover.f90
 *.o
 fort.*
 *.cs
+*.eps
 fortran/Read/frequencies_lique
+fortran/cooling_nc=1.0E+*
