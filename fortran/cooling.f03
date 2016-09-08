@@ -18,19 +18,19 @@ program cooling
      type(reaction_matrix)  :: coll_rad_matrix
      type(population) :: x
      real*8, dimension(1:ntemp) :: cooling_rate, glover
-
-     open(40, file = 'cooling.txt', status = 'unknown')
+     character*7 :: char1
+     character*19 :: filename
 
      call get_data(Trad, id_temp_test, energy, a21, b21, r21, b12, jnu, r12, rr, rr21, rr12)
 
      do idensity = 1, ndensity
-        write(*,'(a5, ES23.15)') 'nc = ', nc(1)
-        rr%matrix_lique = rr%matrix_lique * nc(1)
-        rr21%matrix_lique = rr21%matrix_lique * nc(1)
-        rr12%matrix_lique = rr12%matrix_lique * nc(1)
+        write(*,'(a5, ES23.15)') 'nc = ', nc(idensity)
+        rr%matrix_lique = rr%matrix_lique * nc(idensity)
+        rr21%matrix_lique = rr21%matrix_lique * nc(idensity)
+        rr12%matrix_lique = rr12%matrix_lique * nc(idensity)
 
         do id_temp = 1, ntemp 
-            call lev_pop(energy, a21, b21, r21, b12, jnu, r12, rr, rr21, rr12, id_temp, nc(1), coll_rad_matrix, x)    
+            call lev_pop(energy, a21, b21, r21, b12, jnu, r12, rr, rr21, rr12, id_temp, nc(idensity), coll_rad_matrix, x)    
             write(6, '(a17, ES23.15)') 'gas temperature: ', rr%temp(id_temp)
             cooling_rate(id_temp) = 0.d0
             glover(id_temp) = 0.d0
@@ -61,10 +61,15 @@ program cooling
             endif
             glover(id_temp) = glover(id_temp)*1.d-7
             !call tests(energy, rr, rr21, rr12, a21, b21, r21, b12, jnu, r12, coll_rad_matrix, id_temp)
-
             !call writing_files(a21, b21, b12, jnu, id_temp, rr, coll_rad_matrix)
-            write(40,'(4(ES23.15))') Trad, rr%temp(id_temp), cooling_rate(id_temp), glover(id_temp)            
+             write(char1, '(ES7.1)') nc(idensity)
+             filename = 'cooling_nc=' // char1
+             open(40, file = filename, status = 'unknown')
+             write(40,'(4(ES23.15))') Trad, rr%temp(id_temp), cooling_rate(id_temp), glover(id_temp)            
         enddo ! loop on the kinetic temperatures
+        rr%matrix_lique = rr%matrix_lique / nc(idensity)
+        rr21%matrix_lique = rr21%matrix_lique / nc(idensity)
+        rr12%matrix_lique = rr12%matrix_lique / nc(idensity)
      enddo ! loop on the density
 
 end program cooling

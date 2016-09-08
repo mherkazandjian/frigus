@@ -8,9 +8,7 @@ set ylabel "cooling function"
 #set xrange [2.e3:2e1]
 #set yrange [1e-20:1.e-5]
 set key bottom right
-plot 'cooling_nc=1.0E+04' u 2:3 w l ti 'nc = 1.0E+04', \
-'cooling_nc=1.0E+05' u 2:3 w l ti 'nc = 1.0E+05',      \
-'cooling_nc=1.0E+06' u 2:3 w l ti 'nc = 1.0E+06',      \
+plot 'cooling_nc=1.0E+06' u 2:3 w l ti 'nc = 1.0E+06', \
 'cooling_nc=1.0E+07' u 2:3 w l ti 'nc = 1.0E+07',      \
 'cooling_nc=1.0E+08' u 2:3 w l ti 'nc = 1.0E+08',      \
 'cooling_nc=1.0E+09' u 2:3 w l ti 'nc = 1.0E+09',      \

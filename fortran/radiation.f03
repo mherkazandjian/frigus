@@ -165,7 +165,7 @@ module radiation
          use types_and_parameters, only: c, kb, hp
          real*8 :: xx, yy, ni
          real*8 :: Trad
-         if(Trad.ge.1.d0) then
+         if(Trad.gt.2.725d0) then
             xx = hp * ni / (kb * Trad)
             yy = (2.d0*hp*ni**3)/c**2
             planck = yy* 1.0d0 / (dexp(xx) - 1.0d0)
