@@ -36,9 +36,13 @@ module collisions
                  !   print*, 'temperature', i, rr%temp(i)
                  !enddo
 
+!                 open (20, file='Read/Rates_H_H2.dat', status = 'unknown')
                  open (20, file='Read/Rates_H_H2.dat', status = 'unknown')
 
-                 do i=1,10 
+!                 do i=1,10 ! data by francois
+!                    read(20,*) 
+!                 enddo
+                 do i=1,8   ! data by wrathmall
                     read(20,*) 
                  enddo
                  do i=1,ntrans

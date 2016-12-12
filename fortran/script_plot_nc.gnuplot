@@ -17,4 +17,7 @@ plot 'cooling_nc=1.0E+06' u 2:3 w l ti 'nc = 1.0E+06', \
 'cooling_nc=1.0E+12' u 2:3 w l ti 'nc = 1.0E+12',      \
 'cooling_nc=1.0E+13' u 2:3 w l ti 'nc = 1.0E+13',      \
 'cooling_nc=1.0E+14' u 2:3 w l ti 'nc = 1.0E+14',      \
-'cooling.txt' u 2:4 w p ti 'glover', 'mher_cooling.txt' u 1:2 w p ti 'result by Mher @ T_r = 3000 K'
+'cooling_nc=1.0E+14' u 2:4 w l ti 'glover',      \
+'mher_cooling.txt' u 1:2 w p ti 'result by Mher @ T_r = 3000 K', \
+'cooling_rate.out' u 3:4 w p ti 'results by Mher @ T_r = 0 K'
+

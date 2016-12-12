@@ -17,7 +17,7 @@ module types_and_parameters
 
     ! GAS DENSITY AND RADIATION TEMPERATURE
     integer, parameter                          :: ndensity = 9     ! dimension of the arra of density
-    real*8,  parameter                          :: Trad = 3000.d0   ! radiation temperature in kelvin
+    real*8,  parameter                          :: Trad = 0.d0   ! radiation temperature in kelvin
     real*8,  parameter, dimension(1:ndensity)   :: nc = [1.d6, 1.d7, 1.d8, 1.d9, 1.d10, 1.d11, 1.d12, 1.d13, 1.d14]       ! baryon density [m-3]
     !real*8,  parameter                          :: nc = 1.d14       ! baryon density [m-3]
     
@@ -33,6 +33,7 @@ module types_and_parameters
     ! COLLISIONAL TRANSITIONS
     integer, parameter :: vimax = 3, jimax = 18, vfmax = 3, jfmax = 17
     integer, parameter :: ntemp = 50, ntrans = 1653
+    integer, parameter :: ntemp_flower = 50, ntrans_flower = 307
 
 
     type :: energy_lev
