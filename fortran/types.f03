@@ -24,17 +24,19 @@ module types_and_parameters
     ! ENERGY LEVELS
     integer, parameter :: nlev = 301
     integer, parameter :: nlev_lique = 58
+    integer, parameter :: nlev_flower = 52
     integer, parameter :: jmax_lique = 18, vmax_lique = 3 
+    integer, parameter :: jmax_flower = 17, vmax_flower = 3
 
     ! RADIATIVE TRANSITIONS
-    integer, parameter :: jmax=31
-    integer, parameter :: vmax=14
+    integer, parameter :: jmax = 31
+    integer, parameter :: vmax = 14
 
     ! COLLISIONAL TRANSITIONS
     integer, parameter :: vimax = 3, jimax = 18, vfmax = 3, jfmax = 17
     integer, parameter :: ntemp = 50, ntrans = 1653
-    integer, parameter :: ntemp_flower = 50, ntrans_flower = 307
-
+    integer, parameter :: vimax_flower = 3, jimax_flower = 17, vfmax_flower = 2, jfmax_flower = 16
+    integer, parameter :: ntemp_flower = 50, ntrans_flower = 664, ntras_flower_tot = 1305 ! 24 * 24 + 27 * 27
 
     type :: energy_lev
         real*8, dimension(:,:), allocatable         :: en         ! per pair (v,j)
@@ -49,6 +51,7 @@ module types_and_parameters
         real*8, dimension(:,:), allocatable         :: freq_lique       ! frequencies, obtained as differences between 
                                                                   !              each couple of energy levels
         integer, allocatable, dimension(:)          :: vl_lique, jl_lique     ! labels for the levels (for the final ordering)
+        integer, allocatable, dimension(:)          :: vl_flower, jl_flower
         integer  :: jmax_lique
         integer  :: vmax_lique        
     end type energy_lev
@@ -66,15 +69,36 @@ module types_and_parameters
     end type radiative_coeffs
 
 
+    type :: parameter_collisional_coeff
+        integer :: ntrans, ntemp, nlev, vimax, jimax, vfmax, jfmax
+    end type parameter_collisional_coeff
+ 
+ 
+!     type :: generic_collisional_coeffs
+!         real*8, dimension(:), allocatable :: temp    ! temperatures @ which collisional data are given
+!         integer, dimension(:), allocatable  :: vic, jic, vfc, jfc ! in and fin rovibrational levels (transitions order)
+!         real*8, dimension(:,:,:,:,:)  :: reading
+!         integer, dimension(:) :: couple1c,couple2c
+!         real*8, dimension(:,:,:)  :: matrix           ! n.b.: it includes the detailed balance of the read data
+!     end type generic_collisional_coeffs
+    
+    
+    
     type :: collisional_coeffs
         integer  :: ntemp   ! # of temperatures @ which collisional data are given
-        real*8, dimension(1:ntemp)  :: temp    ! temperatures @ which collisional data are given
+        real*8, dimension(1:ntemp)  :: temp, temp_flower   ! temperatures @ which collisional data are given
         integer, dimension(1:ntrans)  :: vic, jic, vfc, jfc ! initial and final rovibrational levels (transitions          
                                                         ! order)
+
+        integer, dimension(1:ntrans_flower)  :: vic_flower, jic_flower, vfc_flower, jfc_flower ! initial and final rovibrational levels (transitions order)
         real*8  :: reading(0:vimax, 0:jimax, 0:vfmax, 0:jfmax, 1:ntemp)
+        real*8  :: reading_flower(0:vimax_flower, 0:jimax_flower, 0:vfmax_flower, &
+                                  0:jfmax_flower, 1:ntemp_flower)
         integer :: couple1c(1:ntrans),couple2c(1:ntrans)
+        integer :: couple1c_flower(1:ntrans_flower),couple2c_flower(1:ntrans_flower)        
         real*8  :: matrix(1:nlev,1:nlev, 1:ntemp) ! n.b.: it includes the detailed balance of the read data
         real*8  :: matrix_lique(1:nlev_lique,1:nlev_lique, 1:ntemp) ! n.b.: it includes the detailed balance of the read data        
+        real*8  :: matrix_flower(1:nlev_flower,1:nlev_flower, 1:ntemp_flower) ! n.b.: it includes the detailed balance of the read data                
     end type collisional_coeffs
     
 
