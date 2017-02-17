@@ -16,27 +16,29 @@ module types_and_parameters
     real*8                                      :: xm, ym
 
     ! GAS DENSITY AND RADIATION TEMPERATURE
-    integer, parameter                          :: ndensity = 9     ! dimension of the arra of density
+    integer, parameter                          :: ndensity = 10     ! dimension of the arra of density
     real*8,  parameter                          :: Trad = 0.d0   ! radiation temperature in kelvin
-    real*8,  parameter, dimension(1:ndensity)   :: nc = [1.d6, 1.d7, 1.d8, 1.d9, 1.d10, 1.d11, 1.d12, 1.d13, 1.d14]       ! baryon density [m-3]
+    real*8,  parameter, dimension(1:ndensity)   :: nc = [1.d1, 1.d6, 1.d7, 1.d8, 1.d9, 1.d10, 1.d11, 1.d12, 1.d13, 1.d14]       ! baryon density [m-3]
     !real*8,  parameter                          :: nc = 1.d14       ! baryon density [m-3]
     
     ! ENERGY LEVELS
     integer, parameter :: nlev = 301
-    integer, parameter :: nlev_lique = 58
-    integer, parameter :: nlev_flower = 52
-    integer, parameter :: jmax_lique = 18, vmax_lique = 3 
-    integer, parameter :: jmax_flower = 17, vmax_flower = 3
+    integer, parameter :: nlev_lique = 108 ! 58 lique, 108 flower
+    integer, parameter :: jmax_lique = 23  ! 18 lique,  23 flower
+    integer, parameter :: vmax_lique = 6   ! 3  lique,   6 flower
 
     ! RADIATIVE TRANSITIONS
     integer, parameter :: jmax = 31
     integer, parameter :: vmax = 14
 
     ! COLLISIONAL TRANSITIONS
-    integer, parameter :: vimax = 3, jimax = 18, vfmax = 3, jfmax = 17
-    integer, parameter :: ntemp = 50, ntrans = 1653
-    integer, parameter :: vimax_flower = 3, jimax_flower = 17, vfmax_flower = 2, jfmax_flower = 16
-    integer, parameter :: ntemp_flower = 50, ntrans_flower = 664, ntras_flower_tot = 1305 ! 24 * 24 + 27 * 27
+    integer, parameter :: vimax = 6    ! 3 lique,   6 flower
+    integer, parameter :: jimax = 23   ! 18 lique, 23 flower
+    integer, parameter :: vfmax = 6    !  3 lique,  6 flower
+    integer, parameter :: jfmax = 23   ! 17 lique, 23 flower
+    integer, parameter :: ntemp = 50   ! 50 lique, 50 flower
+    integer, parameter :: ntrans = 5797 ! 1653 lique 664 flower, tot 1305 24*24+27*27
+
 
     type :: energy_lev
         real*8, dimension(:,:), allocatable         :: en         ! per pair (v,j)
@@ -89,16 +91,10 @@ module types_and_parameters
         real*8, dimension(1:ntemp)  :: temp, temp_flower   ! temperatures @ which collisional data are given
         integer, dimension(1:ntrans)  :: vic, jic, vfc, jfc ! initial and final rovibrational levels (transitions          
                                                         ! order)
-
-        integer, dimension(1:ntrans_flower)  :: vic_flower, jic_flower, vfc_flower, jfc_flower ! initial and final rovibrational levels (transitions order)
         real*8  :: reading(0:vimax, 0:jimax, 0:vfmax, 0:jfmax, 1:ntemp)
-        real*8  :: reading_flower(0:vimax_flower, 0:jimax_flower, 0:vfmax_flower, &
-                                  0:jfmax_flower, 1:ntemp_flower)
         integer :: couple1c(1:ntrans),couple2c(1:ntrans)
-        integer :: couple1c_flower(1:ntrans_flower),couple2c_flower(1:ntrans_flower)        
-        real*8  :: matrix(1:nlev,1:nlev, 1:ntemp) ! n.b.: it includes the detailed balance of the read data
+        !real*8  :: matrix(1:nlev,1:nlev, 1:ntemp) ! n.b.: it includes the detailed balance of the read data
         real*8  :: matrix_lique(1:nlev_lique,1:nlev_lique, 1:ntemp) ! n.b.: it includes the detailed balance of the read data        
-        real*8  :: matrix_flower(1:nlev_flower,1:nlev_flower, 1:ntemp_flower) ! n.b.: it includes the detailed balance of the read data                
     end type collisional_coeffs
     
 

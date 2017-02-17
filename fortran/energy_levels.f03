@@ -3,14 +3,14 @@ module energy_levels
        ! module that reads, converts to the appropriate units and 
        ! and store the energy levels of H2 (rovibrational); 
        ! input data from Stancil
-       use types_and_parameters, only: hp, nlev, jmax, vmax, energy_lev
+       use types_and_parameters, only: hp, kb, nlev, jmax, vmax, energy_lev
        use sorting, only: piksrt
 
     contains
 
         subroutine reading_data_energies(e)
                    use types_and_parameters, only: nlev, jmax, vmax,       &
-                                                   energy_lev, hp,         &
+                                                   energy_lev, hp, kb,     &
                                                    ini, fin, q,            &
                                                    jmax_lique, vmax_lique, &
                                                    nlev_lique
@@ -18,11 +18,16 @@ module energy_levels
                    
                    
                    open (21, file='Read/H2Xvjlevels.cs', status = 'unknown')
-                   open (22, file='Read/H2Xvjlevels_francois_mod.cs', status = 'unknown') ! modified version of
+                   open (22, file='Read/H2Xvjlevels_flower.cs', status = 'unknown') ! modified version of
                                                                                           ! data from lique;
                                                                                           ! keeping only the
                                                                                           ! actual levels given in ! the reaction rates 
                                                                                           ! file
+!                    open (22, file='Read/H2Xvjlevels_francois_mod.cs', status = 'unknown') ! modified version of
+!                                                                                           ! data from lique;
+!                                                                                           ! keeping only the
+!                                                                                           ! actual levels given in ! the reaction rates 
+!                                                                                           ! file
                    open (23, file='Read/lev_labels', status = 'unknown')
                    open (24, file='Read/lev_labels_lique', status = 'unknown')
                    open (26, file='Read/frequencies_lique', status = 'unknown')
@@ -63,22 +68,50 @@ module energy_levels
                         enddo
                     enddo
 
+!                     ! reading lique data
+!                     do i = 1, 3
+!                         read(22,*)
+!                     enddo
+!                     do i = 1, nlev_lique
+!                         read(22,*) b, b, e%vl_lique(i), e%jl_lique(i), b,    &
+!                                    e%en_lique(e%vl_lique(i), e%jl_lique(i))
+!                         e%ene_lique(i) = e%en_lique(e%vl_lique(i), e%jl_lique(i))
+!                         !   write(6,'(i3,2x,i2,2x,i2,2x,e10.4)') i, vl(i), jl(i), en(vl(i),jl(i))
+!                     enddo
+!                     !conversion eV -->  Joule
+!                     e%en_lique = e%en_lique*q
+!                     e%ene_lique = e%ene_lique*q
+! 
+!                     e%ene = -e%ene   ! to revert the actual way the energies are given
+!                                      ! Emax @ (v=0,j=0) --> Emin @ (v=0,j=0)
+! 
+!                                      
+!                     ! ordering the levels according to their energies 
+!                     ! (for subsequent construction of the matrix in the 
+!                     ! linear system of equations to be solved)
+!                      call piksrt(nlev, nlev_lique, e)                                     
+! 
+!                     ! evaluation of the frequencies
+!                     e%freq_lique = 0.d0
+!                     do ini = 1, nlev_lique
+!                         do fin = 1, nlev_lique
+!                             e%freq_lique(ini, fin) = dabs(e%ene_lique(ini)-e%ene_lique(fin))/hp
+!                         enddo
+!                     enddo                     
 
-
-
-                    ! reading lique data
-                    do i = 1, 3
+                    ! reading flower data
+                    do i = 1, 1
                         read(22,*)
                     enddo
                     do i = 1, nlev_lique
-                        read(22,*) b, b, e%vl_lique(i), e%jl_lique(i), b,    &
+                        read(22,*) b, e%vl_lique(i), e%jl_lique(i),     &
                                    e%en_lique(e%vl_lique(i), e%jl_lique(i))
                         e%ene_lique(i) = e%en_lique(e%vl_lique(i), e%jl_lique(i))
                         !   write(6,'(i3,2x,i2,2x,i2,2x,e10.4)') i, vl(i), jl(i), en(vl(i),jl(i))
                     enddo
-                    !conversion eV -->  Joule
-                    e%en_lique = e%en_lique*q
-                    e%ene_lique = e%ene_lique*q
+                    !conversion K -->  Joule
+                    e%en_lique = e%en_lique*kb
+                    e%ene_lique = e%ene_lique*kb
 
                     e%ene = -e%ene   ! to revert the actual way the energies are given
                                      ! Emax @ (v=0,j=0) --> Emin @ (v=0,j=0)
@@ -96,7 +129,7 @@ module energy_levels
                             e%freq_lique(ini, fin) = dabs(e%ene_lique(ini)-e%ene_lique(fin))/hp
                         enddo
                     enddo                     
-                     
+
                      
                      do i=1,nlev                     
                         write(23,'(3(i3,2x))') i, e%vl(i), e%jl(i)

@@ -12,3 +12,4 @@ fort.*
 *.eps
 fortran/Read/frequencies_lique
 fortran/cooling_nc=1.0E+*
+fortran/Read/wrathmall/flower_data.ods
