@@ -5,7 +5,7 @@ set term postscript eps monochrome enhanced "Helvetica" 20
 set format y "10^{%T}" 
 set xlabel "T_g"
 set ylabel "cooling function"
-#set xrange [2.e3:2e1]
+#set xrange [2.e1:2e3]
 #set yrange [1e-20:1.e-5]
 set key bottom right
 # plot 'cooling_nc=1.0E+06' u 2:3 w l ti 'nc = 1.0E+06', \
