@@ -37,8 +37,8 @@ module collisions
                  !enddo
 
                  open (19, file='Read/wrathmall/Rates_H_H2_flower_new.dat', status = 'unknown')                 
-                 open (20, file='Read/Rates_H_H2.dat', status = 'unknown')
                  open (21, file='Read/wrathmall/Rates_H_H2_flower_new_downwards.dat', status = 'unknown')
+                 open (20, file='Read/Rates_H_H2.dat', status = 'unknown')                 
 
                  ndownwards = 0
                  do i = 1, 10
@@ -73,7 +73,8 @@ module collisions
                     read(21,*)
                  enddo
                  ! lique's data
-                 do i=1, ndownwards!ntrans
+                 do i=1, ndownwards!ntrans                 
+                 !do i=1, ntrans ! for lique's data
                     read(21,*) rr%vic(i),rr%jic(i),rr%vfc(i),rr%jfc(i),      &
                     (rr%reading(rr%vic(i),rr%jic(i),rr%vfc(i),rr%jfc(i),it), &
                      it=1,ntemp)
@@ -127,4 +128,5 @@ module collisions
 
 
     end module collisions
+
 
