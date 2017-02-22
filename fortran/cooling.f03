@@ -98,7 +98,9 @@ program cooling
              write(char1, '(ES7.1)') nc(idensity)
              filename = 'cooling_nc=' // char1
              open(40, file = filename, status = 'unknown')
-             write(40,'(4(ES23.15))') Trad, rr%temp(id_temp), cooling_rate(id_temp), glover(id_temp)            
+             open(41, file = 'to_be_fitted.dat', status = 'unknown')             
+             write(40,'(4(ES23.15))') Trad, rr%temp(id_temp), cooling_rate(id_temp), glover(id_temp)
+             write(41,'(4(ES23.15))') Trad, nc(idensity), rr%temp(id_temp), cooling_rate(id_temp)
         enddo ! loop on the kinetic temperatures
         rr%matrix_lique = rr%matrix_lique / nc(idensity)
         rr21%matrix_lique = rr21%matrix_lique / nc(idensity)
