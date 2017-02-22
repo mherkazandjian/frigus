@@ -16,28 +16,28 @@ module types_and_parameters
     real*8                                      :: xm, ym
 
     ! GAS DENSITY AND RADIATION TEMPERATURE
-    integer, parameter                          :: ndensity = 10     ! dimension of the arra of density
+    integer, parameter                          :: ndensity = 9     ! dimension of the arra of density
     real*8,  parameter                          :: Trad = 0.d0   ! radiation temperature in kelvin
-    real*8,  parameter, dimension(1:ndensity)   :: nc = [1.d1, 1.d6, 1.d7, 1.d8, 1.d9, 1.d10, 1.d11, 1.d12, 1.d13, 1.d14]       ! baryon density [m-3]
+    real*8,  parameter, dimension(1:ndensity)   :: nc = [1.d6, 1.d7, 1.d8, 1.d9, 1.d10, 1.d11, 1.d12, 1.d13,1.d14]       ! baryon density [m-3]
     !real*8,  parameter                          :: nc = 1.d14       ! baryon density [m-3]
     
     ! ENERGY LEVELS
     integer, parameter :: nlev = 301
-    integer, parameter :: nlev_lique = 108 ! 58 lique, 108 flower
-    integer, parameter :: jmax_lique = 23  ! 18 lique,  23 flower
-    integer, parameter :: vmax_lique = 6   ! 3  lique,   6 flower
+    integer, parameter :: nlev_lique = 58 ! 58 lique, 108 flower
+    integer, parameter :: jmax_lique = 18  ! 18 lique,  23 flower
+    integer, parameter :: vmax_lique = 3   ! 3  lique,   6 flower
 
     ! RADIATIVE TRANSITIONS
     integer, parameter :: jmax = 31
     integer, parameter :: vmax = 14
 
     ! COLLISIONAL TRANSITIONS
-    integer, parameter :: vimax = 6    ! 3 lique,   6 flower
-    integer, parameter :: jimax = 23   ! 18 lique, 23 flower
-    integer, parameter :: vfmax = 6    !  3 lique,  6 flower
-    integer, parameter :: jfmax = 23   ! 17 lique, 23 flower
+    integer, parameter :: vimax = 3    ! 3 lique,   6 flower
+    integer, parameter :: jimax = 18   ! 18 lique, 23 flower
+    integer, parameter :: vfmax = 3    !  3 lique,  6 flower
+    integer, parameter :: jfmax = 17   ! 17 lique, 23 flower
     integer, parameter :: ntemp = 50   ! 50 lique, 50 flower
-    integer, parameter :: ntrans = 5797 ! 1653 lique 664 flower, tot 1305 24*24+27*27
+    integer, parameter :: ntrans = 1653 ! 1653 lique 5797 flower, tot 1305 24*24+27*27
 
 
     type :: energy_lev
