@@ -43,19 +43,97 @@ module collisions
 
 
 
-                  ! reading data by lique
+!                   ! reading data by lique
+!                   do i = 1, 10   ! data by wrathmall
+!                      read(20,*)
+!                   enddo
+!                   ! lique's data
+!                   do i=1,ntrans
+!                      read(20,*) rr%vic(i),rr%jic(i),rr%vfc(i),rr%jfc(i),      &
+!                      (rr%reading(rr%vic(i),rr%jic(i),rr%vfc(i),rr%jfc(i),it), &
+!                       it=1,ntemp)
+!                      vi=rr%vic(i)
+!                      ji=rr%jic(i)
+!                      vf=rr%vfc(i)
+!                      jf=rr%jfc(i)
+!                       do l=1, nlev_lique
+!                           if(vi.eq.e%vl_lique(l)) then
+!                               if(ji.eq.e%jl_lique(l)) then
+!                                  rr%couple1c(i) = l
+!                               endif
+!                           endif
+!                           if(vf.eq.e%vl_lique(l)) then
+!                               if(jf.eq.e%jl_lique(l)) then
+!                                  rr%couple2c(i) = l
+!                               endif
+!                           endif
+!                       enddo
+!                   enddo
+!                  ! detailed balance implementation (lique)
+!                     do i=1, ntrans
+!                        vi=rr%vic(i)
+!                        ji=rr%jic(i)
+!                        vf=rr%vfc(i)
+!                        jf=rr%jfc(i)
+!                        dE = abs(e%en_lique(vi,ji)-e%en_lique(vf,jf))
+!                         do it = 1, ntemp
+!                            rr%matrix_lique(rr%couple1c(i),rr%couple2c(i),it) = &
+!                                           rr%reading(vi,ji,vf,jf,it)
+!                            rr21%matrix_lique(rr%couple1c(i),rr%couple2c(i),it) = &
+!                              rr%matrix_lique(rr%couple1c(i),rr%couple2c(i),it)
+!                              
+!                            rr%matrix_lique(rr%couple2c(i),rr%couple1c(i),it) =       &
+!                              dexp(-dE/(kb*rr%temp(it))) * rr%reading(vi,ji,vf,jf,it) &
+!                              * ((2.*ji+1.))/(2.*jf+1.)
+!                            rr12%matrix_lique(rr%couple2c(i),rr%couple1c(i),it) = &
+!                              rr%matrix_lique(rr%couple2c(i),rr%couple1c(i),it)
+!                         enddo
+!                     enddo
+                 
+! wrathmall version (start)
+                  ndownwards = 0
+                  do i = 1, 10
+                     write(21, *)
+                  enddo
+                  ! reading data and writing only downwards
                   do i = 1, 10   ! data by wrathmall
-                     read(20,*)
+                     read(19,*)
                   enddo
                   ! lique's data
                   do i=1,ntrans
-                     read(20,*) rr%vic(i),rr%jic(i),rr%vfc(i),rr%jfc(i),      &
+                     read(19,*) rr%vic(i),rr%jic(i),rr%vfc(i),rr%jfc(i),      &
                      (rr%reading(rr%vic(i),rr%jic(i),rr%vfc(i),rr%jfc(i),it), &
                       it=1,ntemp)
                      vi=rr%vic(i)
                      ji=rr%jic(i)
                      vf=rr%vfc(i)
                      jf=rr%jfc(i)
+                     if(e%en_lique(vi,ji)-e%en_lique(vf,jf).gt.0.d0) then 
+                        ndownwards = ndownwards + 1
+                        write(21, '(4i3, 1x, 50(e14.4,1x))') vi, ji, vf, jf, &
+                        (rr%reading(rr%vic(i),rr%jic(i),rr%vfc(i),rr%jfc(i),it), &
+                      it=1,ntemp)
+                     endif
+                  enddo                 
+                  write(21, *)
+                  rewind(21)
+ 
+ 
+                 ! reading data
+                  do i=1,10   ! data by wrathmall
+                     read(21,*)
+                  enddo
+                  ! lique's data
+                  do i=1, ndownwards!ntrans                 
+                  !do i=1, ntrans ! for lique's data
+                     read(21,*) rr%vic(i),rr%jic(i),rr%vfc(i),rr%jfc(i),      &
+                     (rr%reading(rr%vic(i),rr%jic(i),rr%vfc(i),rr%jfc(i),it), &
+                      it=1,ntemp)
+                     vi=rr%vic(i)
+                     ji=rr%jic(i)
+                     vf=rr%vfc(i)
+                     jf=rr%jfc(i)
+                     print*, vi, ji, vf, jf
                       do l=1, nlev_lique
                           if(vi.eq.e%vl_lique(l)) then
                               if(ji.eq.e%jl_lique(l)) then
@@ -70,7 +148,7 @@ module collisions
                       enddo
                   enddo
                  ! detailed balance implementation (lique)
-                    do i=1, ntrans
+                    do i=1, ndownwards !ntrans
                        vi=rr%vic(i)
                        ji=rr%jic(i)
                        vf=rr%vfc(i)
@@ -89,84 +167,6 @@ module collisions
                              rr%matrix_lique(rr%couple2c(i),rr%couple1c(i),it)
                         enddo
                     enddo
-                 
-! wrathmall version (start)
-!                  ndownwards = 0
-!                  do i = 1, 10
-!                     write(21, *)
-!                  enddo
-!                  ! reading data and writing only downwards
-!                  do i = 1, 10   ! data by wrathmall
-!                     read(19,*)
-!                  enddo
-!                  ! lique's data
-!                  do i=1,ntrans
-!                     read(19,*) rr%vic(i),rr%jic(i),rr%vfc(i),rr%jfc(i),      &
-!                     (rr%reading(rr%vic(i),rr%jic(i),rr%vfc(i),rr%jfc(i),it), &
-!                      it=1,ntemp)
-!                     vi=rr%vic(i)
-!                     ji=rr%jic(i)
-!                     vf=rr%vfc(i)
-!                     jf=rr%jfc(i)
-!                     if(e%en_lique(vi,ji)-e%en_lique(vf,jf).gt.0.d0) then 
-!                        ndownwards = ndownwards + 1
-!                        write(21, '(4i3, 1x, 50(e14.4,1x))') vi, ji, vf, jf, &
-!                        (rr%reading(rr%vic(i),rr%jic(i),rr%vfc(i),rr%jfc(i),it), &
-!                      it=1,ntemp)
-!                     endif
-!                  enddo                 
-!                  write(21, *)
-!                  rewind(21)
-! 
-! 
-!                  ! reading data
-!                  do i=1,10   ! data by wrathmall
-!                     read(21,*)
-!                  enddo
-!                  ! lique's data
-!                  do i=1, ndownwards!ntrans                 
-!                  !do i=1, ntrans ! for lique's data
-!                     read(21,*) rr%vic(i),rr%jic(i),rr%vfc(i),rr%jfc(i),      &
-!                     (rr%reading(rr%vic(i),rr%jic(i),rr%vfc(i),rr%jfc(i),it), &
-!                      it=1,ntemp)
-!                     vi=rr%vic(i)
-!                     ji=rr%jic(i)
-!                     vf=rr%vfc(i)
-!                     jf=rr%jfc(i)
-!                     print*, vi, ji, vf, jf
-!                      do l=1, nlev_lique
-!                          if(vi.eq.e%vl_lique(l)) then
-!                              if(ji.eq.e%jl_lique(l)) then
-!                                 rr%couple1c(i) = l
-!                              endif
-!                          endif
-!                          if(vf.eq.e%vl_lique(l)) then
-!                              if(jf.eq.e%jl_lique(l)) then
-!                                 rr%couple2c(i) = l
-!                              endif
-!                          endif
-!                      enddo
-!                  enddo
-!                 ! detailed balance implementation (lique)
-!                    do i=1, ndownwards !ntrans
-!                       vi=rr%vic(i)
-!                       ji=rr%jic(i)
-!                       vf=rr%vfc(i)
-!                       jf=rr%jfc(i)
-!                       dE = abs(e%en_lique(vi,ji)-e%en_lique(vf,jf))
-!                        do it = 1, ntemp
-!                           rr%matrix_lique(rr%couple1c(i),rr%couple2c(i),it) = &
-!                                          rr%reading(vi,ji,vf,jf,it)
-!                           rr21%matrix_lique(rr%couple1c(i),rr%couple2c(i),it) = &
-!                             rr%matrix_lique(rr%couple1c(i),rr%couple2c(i),it)
-!                             
-!                           rr%matrix_lique(rr%couple2c(i),rr%couple1c(i),it) =       &
-!                             dexp(-dE/(kb*rr%temp(it))) * rr%reading(vi,ji,vf,jf,it) &
-!                             * ((2.*ji+1.))/(2.*jf+1.)
-!                           rr12%matrix_lique(rr%couple2c(i),rr%couple1c(i),it) = &
-!                             rr%matrix_lique(rr%couple2c(i),rr%couple1c(i),it)
-!                        enddo
-!                    enddo
 ! wrathmall version (end)
 
                  !units conversion: cm3 s-1 -> m3 s-1

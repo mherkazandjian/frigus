@@ -18,12 +18,12 @@ module energy_levels
                    
                    
                    open (21, file='Read/H2Xvjlevels.cs', status = 'unknown')
-!                   open (22, file='Read/H2Xvjlevels_flower.cs', status = 'unknown') ! modified version of
+                   open (22, file='Read/H2Xvjlevels_flower.cs', status = 'unknown') ! modified version of
                                                                                           ! data from lique;
                                                                                           ! keeping only the
                                                                                           ! actual levels given in ! the reaction rates 
                                                                                           ! file
-                    open (22, file='Read/H2Xvjlevels_francois_mod.cs', status = 'unknown') ! modified version of
+!                    open (22, file='Read/H2Xvjlevels_francois_mod.cs', status = 'unknown') ! modified version of
 !                                                                                           ! data from lique;
 !                                                                                           ! keeping only the
 !                                                                                           ! actual levels given in ! the reaction rates 
@@ -68,19 +68,50 @@ module energy_levels
                         enddo
                     enddo
 
-                     ! reading lique data
-                     do i = 1, 3
+!                      ! reading lique data
+!                      do i = 1, 3
+!                          read(22,*)
+!                      enddo
+!                      do i = 1, nlev_lique
+!                          read(22,*) b, b, e%vl_lique(i), e%jl_lique(i), b,    &
+!                                     e%en_lique(e%vl_lique(i), e%jl_lique(i))
+!                          e%ene_lique(i) = e%en_lique(e%vl_lique(i), e%jl_lique(i))
+!                          !   write(6,'(i3,2x,i2,2x,i2,2x,e10.4)') i, vl(i), jl(i), en(vl(i),jl(i))
+!                      enddo
+!                      !conversion eV -->  Joule
+!                      e%en_lique = e%en_lique*q
+!                      e%ene_lique = e%ene_lique*q
+!  
+!                      e%ene = -e%ene   ! to revert the actual way the energies are given
+!                                       ! Emax @ (v=0,j=0) --> Emin @ (v=0,j=0)
+!  
+!                                       
+!                      ! ordering the levels according to their energies 
+!                      ! (for subsequent construction of the matrix in the 
+!                      ! linear system of equations to be solved)
+!                       call piksrt(nlev, nlev_lique, e)                                     
+!  
+!                      ! evaluation of the frequencies
+!                      e%freq_lique = 0.d0
+!                      do ini = 1, nlev_lique
+!                          do fin = 1, nlev_lique
+!                              e%freq_lique(ini, fin) = dabs(e%ene_lique(ini)-e%ene_lique(fin))/hp
+!                          enddo
+!                      enddo                     
+
+                     ! reading flower data
+                     do i = 1, 1
                          read(22,*)
                      enddo
                      do i = 1, nlev_lique
-                         read(22,*) b, b, e%vl_lique(i), e%jl_lique(i), b,    &
+                         read(22,*) b, e%vl_lique(i), e%jl_lique(i),     &
                                     e%en_lique(e%vl_lique(i), e%jl_lique(i))
                          e%ene_lique(i) = e%en_lique(e%vl_lique(i), e%jl_lique(i))
                          !   write(6,'(i3,2x,i2,2x,i2,2x,e10.4)') i, vl(i), jl(i), en(vl(i),jl(i))
                      enddo
-                     !conversion eV -->  Joule
-                     e%en_lique = e%en_lique*q
-                     e%ene_lique = e%ene_lique*q
+                     !conversion K -->  Joule
+                     e%en_lique = e%en_lique*kb
+                     e%ene_lique = e%ene_lique*kb
  
                      e%ene = -e%ene   ! to revert the actual way the energies are given
                                       ! Emax @ (v=0,j=0) --> Emin @ (v=0,j=0)
@@ -98,57 +129,24 @@ module energy_levels
                              e%freq_lique(ini, fin) = dabs(e%ene_lique(ini)-e%ene_lique(fin))/hp
                          enddo
                      enddo                     
-
-!                     ! reading flower data
-!                     do i = 1, 1
-!                         read(22,*)
-!                     enddo
-!                     do i = 1, nlev_lique
-!                         read(22,*) b, e%vl_lique(i), e%jl_lique(i),     &
-!                                    e%en_lique(e%vl_lique(i), e%jl_lique(i))
-!                         e%ene_lique(i) = e%en_lique(e%vl_lique(i), e%jl_lique(i))
-!                         !   write(6,'(i3,2x,i2,2x,i2,2x,e10.4)') i, vl(i), jl(i), en(vl(i),jl(i))
-!                     enddo
-!                     !conversion K -->  Joule
-!                     e%en_lique = e%en_lique*kb
-!                     e%ene_lique = e%ene_lique*kb
-! 
-!                     e%ene = -e%ene   ! to revert the actual way the energies are given
-!                                      ! Emax @ (v=0,j=0) --> Emin @ (v=0,j=0)
-! 
-!                                      
-!                     ! ordering the levels according to their energies 
-!                     ! (for subsequent construction of the matrix in the 
-!                     ! linear system of equations to be solved)
-!                      call piksrt(nlev, nlev_lique, e)                                     
-! 
-!                     ! evaluation of the frequencies
-!                     e%freq_lique = 0.d0
-!                     do ini = 1, nlev_lique
-!                         do fin = 1, nlev_lique
-!                             e%freq_lique(ini, fin) = dabs(e%ene_lique(ini)-e%ene_lique(fin))/hp
-!                         enddo
-!                     enddo                     
-
                      
-                     do i=1,nlev                     
-                        write(23,'(3(i3,2x))') i, e%vl(i), e%jl(i)
-                     enddo
-
+                    do i=1,nlev                     
+                       write(23,'(3(i3,2x))') i, e%vl(i), e%jl(i)
+                    enddo
                      write(24,'(a5, 2x, 2(a1,4x))') 'label', 'v' , 'j'
-                     do i=1,nlev_lique
-                        write(24,'(3(i3,2x),e14.7)') i, e%vl_lique(i), e%jl_lique(i), e%ene_lique(i)/q
-                     enddo
-                     
-                     write(26,'(a5, 2x, 4(a2,3x))') 'label', 'v' , 'j', 'vp' , 'jp'
-                     do i=1,nlev_lique
-                        do j=1,nlev_lique                     
-                            write(26,'(6(i3,2x),e14.7)') i, j,                            &
-                                                            e%vl_lique(i), e%jl_lique(i), &
-                                                            e%vl_lique(j), e%jl_lique(j), & 
-                                                            e%freq_lique(i,j)
-                        enddo
-                     enddo                     
+                    do i=1,nlev_lique
+                       write(24,'(3(i3,2x),e14.7)') i, e%vl_lique(i), e%jl_lique(i), e%ene_lique(i)/q
+                    enddo
+                    
+                    write(26,'(a5, 2x, 4(a2,3x))') 'label', 'v' , 'j', 'vp' , 'jp'
+                    do i=1,nlev_lique
+                       do j=1,nlev_lique                     
+                           write(26,'(6(i3,2x),e14.7)') i, j,                            &
+                                                           e%vl_lique(i), e%jl_lique(i), &
+                                                           e%vl_lique(j), e%jl_lique(j), & 
+                                                           e%freq_lique(i,j)
+                       enddo
+                    enddo                     
 
                     return
         end subroutine reading_data_energies
