@@ -2,7 +2,7 @@
 """
 calculate equilibrium population of species and the cooling function.
 """
-
+from __future__ import print_function
 import pylab
 import numpy
 
@@ -60,4 +60,4 @@ if True:
     pylab.legend()
     pylab.show()
 
-print 'done'
+print('done')
