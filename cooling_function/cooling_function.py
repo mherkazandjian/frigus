@@ -44,7 +44,7 @@ if False:
 if True:
 
     # density of the colliding species, in m^3
-    nc_H = 1e6 * u.meter ** -3
+    nc_H = 0.0 * u.meter ** -3
     T_kin = 100.0 * u.Kelvin
     T_rad = 0.0 * u.Kelvin
 
@@ -54,20 +54,21 @@ if True:
     lambda_vs_T_kin = []
     pop_dens_vs_T_kin = []
 
-    T_rng = species_data.raw_data.collision_rates_T_range[::5]
+    T_rng = species_data.raw_data.collision_rates_T_range
     for T_kin in T_rng:
 
         print(T_kin)
+
+        pop_dens_vs_T_kin += [population_density_at_steady_state(species_data,
+                                                                 T_kin,
+                                                                 T_rad,
+                                                                 nc_H)]
 
         lambda_vs_T_kin += [cooling_rate_at_steady_state(species_data,
                                                          T_kin,
                                                          T_rad,
                                                          nc_H)]
 
-        pop_dens_vs_T_kin += [population_density_at_steady_state(species_data,
-                                                                 T_kin,
-                                                                 T_rad,
-                                                                 nc_H)]
 
     lambda_vs_T_kin = u.Quantity(lambda_vs_T_kin)
     lambda_vs_T_kin_glover = u.Quantity([fit_glover(T_kin) for T_kin in
