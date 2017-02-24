@@ -93,7 +93,7 @@ module types_and_parameters
                                                         ! order)
         real*8  :: reading(0:vimax, 0:jimax, 0:vfmax, 0:jfmax, 1:ntemp)
         integer :: couple1c(1:ntrans),couple2c(1:ntrans)
-        !real*8  :: matrix(1:nlev,1:nlev, 1:ntemp) ! n.b.: it includes the detailed balance of the read data
+        real*8  :: matrix(1:nlev,1:nlev, 1:ntemp) ! n.b.: it includes the detailed balance of the read data
         real*8  :: matrix_lique(1:nlev_lique,1:nlev_lique, 1:ntemp) ! n.b.: it includes the detailed balance of the read data        
     end type collisional_coeffs
     
@@ -108,6 +108,7 @@ module types_and_parameters
     
     type :: population
         real*8 :: pop(1:nlev)
+        real*8 :: pop_linear_system(1:nlev,1)
         real*8 :: pop_t(1:nlev, 1:ntemp)
         real*8 :: pop_lique(1:nlev_lique)        
         real*8 :: pop_t_lique(1:nlev_lique, 1:ntemp)        

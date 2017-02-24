@@ -58,11 +58,11 @@ module matrix_construction
          type(population) :: x
          
          do i = 1, nlev_lique-1
-            x%pop(i) = 0.d0 !1.d-3
+            x%pop_lique(i) = 0.d0! 1.d-3
          enddo
          
-         x%pop(nlev_lique) = 1.d0 !1.d0 - sum(x%pop)
-         
+         x%pop_lique(nlev_lique) = 1.d0 !1.d0 - sum(x%pop)
+         return 
      end subroutine initialize_level_population
     
 end module matrix_construction

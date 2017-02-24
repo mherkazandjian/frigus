@@ -36,24 +36,32 @@ module level_population
 
 
     
-    subroutine solve_steady_state(energy, coll_rad_matrix, x)
+    subroutine solve_steady_state(energy, coll_rad_matrix, y)
         type(energy_lev) :: energy
         type(reaction_matrix)  :: coll_rad_matrix
-        type(population) :: x, y
+        type(population) :: y
+        real*8, dimension(1:nlev_lique,1) :: b
 
           call initialize_level_population(y)
 
           ! normalizing the sum of the fractional abundances to 1
           coll_rad_matrix%M(nlev_lique, 1:nlev_lique) = 1.d0
  
-          x%pop = y%pop
+          b(:,1) = y%pop_lique(:)
  
           !print*, 'before', x%pop
-    
-          call dgesv(ndim, nrhs, coll_rad_matrix%M, lda, ipiv, x, ldb, info)
+!          do i = 1, nlev_lique
+!            coll_rad_matrix%M(i,:) = coll_rad_matrix%M(i,:) /coll_rad_matrix%M(i,i)
+!          enddo
+          
+          call dgesv(ndim, nrhs, coll_rad_matrix%M, lda, ipiv, b, ldb, info)
+          
+          if(info.eq.0) print*, 'system solved'
+ 
+          y%pop_lique(:) = b(:,1)
  
           do i = 1, nlev_lique
-              write(6,'(3(i3), 2(ES23.15))') i, energy%vl(i), energy%jl(i), y%pop(i), x%pop(i)
+              write(6,'(3(i3), 2(ES23.15))') i, energy%vl(i), energy%jl(i), y%pop_lique(i)!, x%pop(i)
           enddo
 
         return

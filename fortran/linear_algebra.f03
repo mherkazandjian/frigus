@@ -7,7 +7,7 @@ module linear_algebra
     integer, parameter :: lda = ndim, ldb = ndim ! leading dimension of a
                                                  ! leading dimension of b    
     integer, parameter :: nrhs = 1 ! number of right hand sides in b
-    integer, dimension(1:ndim) :: ipiv
+    integer, dimension(ndim) :: ipiv
 
 
     contains
