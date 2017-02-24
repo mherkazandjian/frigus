@@ -52,9 +52,9 @@ module level_population
     
           call dgesv(ndim, nrhs, coll_rad_matrix%M, lda, ipiv, x, ldb, info)
  
-          !do i = 1, nlev_lique
-          !    write(6,'(3(i3), 2(ES23.15))') i, energy%vl(i), energy%jl(i), y%pop(i), x%pop(i)
-          !enddo
+          do i = 1, nlev_lique
+              write(6,'(3(i3), 2(ES23.15))') i, energy%vl(i), energy%jl(i), y%pop(i), x%pop(i)
+          enddo
 
         return
     end subroutine solve_steady_state

@@ -1,0 +1,5 @@
+The file cooling_rate_summer.out is the one with the output by Mher for which
+the comparison with my curves was ok.
+
+In February, reharsing the codes, the comparison is not good anymore; the
+cooling_rate.out is then the new output from Mher's codes.
