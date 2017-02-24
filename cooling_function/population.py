@@ -524,7 +524,7 @@ def cooling_rate(population_densities, energy_levels, A_matrix):
 def fit_glover(T):
     """
     fit of the cooling rate of H2 as a function of temperature (in K) in units
-    of erg/s/cm^3
+    of erg x cm^3 x s^-1
     .. todo:: add ref
 
     :param T: .. todo:: add doc
@@ -547,4 +547,4 @@ def fit_glover(T):
     else:
         raise ValueError("""out of bound""")
 
-    return retval * u.erg * u.s**-1 * u.cm**-3
+    return retval * u.erg * u.s**-1 * u.cm**3
