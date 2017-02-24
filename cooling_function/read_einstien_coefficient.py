@@ -11,7 +11,7 @@ from astropy import units as u
 from IPython.core.debugger import Tracer
 
 
-def read_einstein():
+def read_einstein_simbotin():
     """read the data provided by Simbotin from multiple files and returns the A
      matrix for transitions (v', j') -> (v'', j'') with the limitation that
      delta j i.e |j'' - j'| = 0 or 2
@@ -30,7 +30,7 @@ def read_einstein():
     .. code-block:: python
 
         # get the data as a 4D matrix
-        A = read_einstein()
+        A = read_einstein_simbotin()
 
         # get the Einstein coefficient for the transition (v'=3, j'=9) to
         # (v''=0, j''=18)

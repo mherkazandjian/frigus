@@ -7,7 +7,7 @@ from astropy import units as u
 
 import read_energy_levels
 import read_einstien_coefficient
-from read_collision_coefficients import read_collision_coefficients
+from read_collision_coefficients import read_collision_coefficients_lique
 import population
 
 
@@ -110,7 +110,7 @@ class DataSetH2Lique(DataSetBase):
         #
         # read the einstein coefficients for the H2 transitions
         #
-        A, A_info_nnz = read_einstien_coefficient.read_einstein()
+        A, A_info_nnz = read_einstien_coefficient.read_einstein_simbotin()
         self.raw_data.A = A
         self.raw_data.A_info_nnz = A_info_nnz
 
@@ -118,7 +118,7 @@ class DataSetH2Lique(DataSetBase):
         # read the collisional rates for H2 with H
         #
         collision_rates, T_rng, collision_rates_info_nnz =\
-            read_collision_coefficients("Read/Rates_H_H2.dat")
+            read_collision_coefficients_lique("Read/Rates_H_H2.dat")
         self.raw_data.collision_rates = collision_rates
         self.raw_data.collision_rates_T_range = T_rng
         self.raw_data.collision_rates_info_nnz = collision_rates_info_nnz

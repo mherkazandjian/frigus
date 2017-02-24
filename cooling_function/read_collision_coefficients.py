@@ -34,7 +34,7 @@ def unique_level_pairs(vj):
     return unique_a.T
 
 
-def read_collision_coefficients(fname):
+def read_collision_coefficients_lique(fname):
     """parse the collisional data by François. These are the coefficient rates
     K_ij where i > j (so these fill the lower triangular K matrix).
 
