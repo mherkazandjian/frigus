@@ -47,6 +47,15 @@ module matrix_construction
                  enddo
                                   
                  coll_rad_matrix%M = coll_rad_matrix%O + coll_rad_matrix%D
+                 open(40, file='carla_matrix_M', status = 'unknown')
+                 if(id_temp.eq.1) then
+                    do i = 1, nlev_lique
+                        do j = 1, nlev_lique
+                            write(40, '(i3, 1x, 2(es14.4,1x))')     &
+                              id_temp, rr%temp(id_temp), coll_rad_matrix%M(i,j)
+                        enddo
+                    enddo
+                endif
 
 
     end subroutine matrix_builder
