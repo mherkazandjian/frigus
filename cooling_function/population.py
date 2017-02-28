@@ -21,6 +21,9 @@ import pdb
 from utils import linear_2d_index, find_matching_indices
 
 
+dropbox_path = '~/dropbox/Dropbox/us/cooling_function/mher-1e6-100'
+
+
 def find_v_max_j_max_from_data(A_einstein_nnz, cr_coefficients_nnz):
     """
     :param A_einstein_nnz: .. todo:: add doc
@@ -248,25 +251,31 @@ def compute_B_J_nu_matrix_from_A_matrix(energy_levels,
     if debug is True:
         numpy.savetxt(
             os.path.expanduser(
-                '~/dropbox/Dropbox/us/cooling_function/mher/A_matrix.txt'),
+                os.path.join(
+                    dropbox_path, 'A_matrix.txt'))
+            ,
             A_matrix.si.value,
             fmt='%+-1.16e')
 
         numpy.savetxt(
             os.path.expanduser(
-                '~/dropbox/Dropbox/us/cooling_function/mher/B_matrix.txt'),
+                os.path.join(
+                    dropbox_path, 'B_matrix.txt'))
+            ,
             B_matrix.si.value,
             fmt='%+-1.16e')
 
         numpy.savetxt(
             os.path.expanduser(
-                '~/dropbox/Dropbox/us/cooling_function/mher/J_nu_matrix.txt'),
+                os.path.join(
+                    dropbox_path, 'J_nu_matrix.txt')),
             J_nu_matrix.to(u.N / u.m**2 * u.s).value,
             fmt='%+-1.16e')
 
         numpy.savetxt(
             os.path.expanduser(
-                '~/dropbox/Dropbox/us/cooling_function/mher/B_J_nu_matrix.txt'),
+                os.path.join(
+                    dropbox_path, 'B_J_nu_matrix.txt')),
             B_J_nu_matrix.si.value,
             fmt='%+-1.16e')
 
@@ -375,14 +384,15 @@ def compute_K_matrix_from_K_dex_matrix(energy_levels,
     if debug is True:
         numpy.savetxt(
             os.path.expanduser(
-                '~/dropbox/Dropbox/us/cooling_function/mher/K_nc_matrix.txt'),
+                os.path.join(
+                    dropbox_path, 'K_nc_matrix.txt')),
             K_matrix.si.value*1e14,
             fmt='%+-1.16e')
 
     return K_matrix
 
 
-def solveEquilibrium(M_matrix):
+def solveEquilibrium(M_matrix, debug=False):
     """solve for the equilibrium population densities. .. todo:: add doc
 
     i.e solving A.x = b
@@ -404,6 +414,13 @@ def solveEquilibrium(M_matrix):
     A, b = M_matrix, dxdt
     for i in arange(sz):
         A[i, :] = A[i, :] / A[i, i]
+
+    numpy.savetxt(
+        os.path.expanduser(
+            os.path.join(
+                dropbox_path, 'solver_matrix.txt')),
+                A,
+            fmt='%+-1.16e')
 
     x = linalg.solve(A, b)
 
@@ -454,7 +471,8 @@ def population_density_at_steady_state(data_set,
     if debug is True:
         numpy.savetxt(
             os.path.expanduser(
-                '~/dropbox/Dropbox/us/cooling_function/mher/O_matrix.txt'),
+                os.path.join(
+                    dropbox_path, 'O_matrix.txt')),
             O_matrix.si.value,
             fmt='%+-1.16e')
 
@@ -462,7 +480,8 @@ def population_density_at_steady_state(data_set,
     if debug is True:
         numpy.savetxt(
             os.path.expanduser(
-                '~/dropbox/Dropbox/us/cooling_function/mher/D_matrix.txt'),
+                os.path.join(
+                    dropbox_path, 'D_matrix.txt')),
             D_matrix.si.value,
             fmt='%+-1.16e')
 
@@ -470,12 +489,13 @@ def population_density_at_steady_state(data_set,
     if debug is True:
         numpy.savetxt(
             os.path.expanduser(
-                '~/dropbox/Dropbox/us/cooling_function/mher/M_matrix.txt'),
+                os.path.join(
+                    dropbox_path, 'M_matrix.txt')),
             M_matrix.si.value,
             fmt='%+-1.16e')
 
     # solve the equilibrium population densities
-    x_equilibrium = solveEquilibrium(M_matrix.si.value)
+    x_equilibrium = solveEquilibrium(M_matrix.si.value, debug=debug)
 
     return x_equilibrium
 

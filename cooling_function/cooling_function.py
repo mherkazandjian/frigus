@@ -22,7 +22,7 @@ species_data = DataLoader().load('H2_lique')
 
 # Calculate the population density and the cooling rate per particle
 # for one value of kinetic temperature and gas density of H
-if False:
+if True:
 
     # density of the colliding species, in m^3
     nc_H = 1e6 * u.meter ** -3
@@ -32,7 +32,8 @@ if False:
     pop_dens_equ = population_density_at_steady_state(species_data,
                                                       T_kin,
                                                       T_rad,
-                                                      nc_H)
+                                                      nc_H,
+                                                      debug=True)
 
     cooling_rate = cooling_rate_at_steady_state(species_data,
                                                 T_kin,
