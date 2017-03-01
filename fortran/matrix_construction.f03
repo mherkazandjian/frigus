@@ -50,10 +50,11 @@ module matrix_construction
                  open(40, file='carla_matrix_M', status = 'unknown')
                  if(id_temp.eq.1) then
                     do i = 1, nlev_lique
-                        do j = 1, nlev_lique
-                            write(40, '(i3, 1x, 2(es14.4,1x))')     &
-                              id_temp, rr%temp(id_temp), coll_rad_matrix%M(i,j)
-                        enddo
+!                        do j = 1, nlev_lique
+!                            write(40, '(3(i3), 1x, 59(es24.10,1x))')     &
+                            write(40, '(59(es24.16e3, 1x))')     &
+                              (coll_rad_matrix%M(i,j), j=1, nlev_lique)
+!                        enddo
                     enddo
                 endif
 
@@ -66,11 +67,12 @@ module matrix_construction
      subroutine initialize_level_population(x)
          type(population) :: x
          
-         do i = 1, nlev_lique-1
-            x%pop(i) = 0.d0 !1.d-3
-         enddo
-         
-         x%pop(nlev_lique) = 1.d0 !1.d0 - sum(x%pop)
+          do i = 2, nlev_lique
+             x%pop(i) = 0.d0
+          enddo
+          
+          x%pop(1) = 1.d0 
+
          
      end subroutine initialize_level_population
     

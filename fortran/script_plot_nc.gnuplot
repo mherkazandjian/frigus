@@ -1,6 +1,6 @@
 unset label
 set log
-set output "H2_cf.eps"
+set output "H2_cf_normalized.eps"
 set term postscript eps monochrome enhanced "Helvetica" 20
 set format y "10^{%T}" 
 set xlabel "T_g"

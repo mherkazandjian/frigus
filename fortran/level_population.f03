@@ -7,7 +7,7 @@ module level_population
                                     population,                           &
                                     Trad, nc, ini, fin, it,               &
                                     nlev_lique, vi, vf, ji, jf,           &
-                                    ndensity
+                                    ndensity, id_temp
 
     use linear_algebra, only: sparsity_calc,                              &
                               ndim, info, lda, ldb, nrhs, ipiv
@@ -38,24 +38,23 @@ module level_population
     
     subroutine solve_steady_state(energy, coll_rad_matrix, x)
         type(energy_lev) :: energy
-        type(reaction_matrix)  :: coll_rad_matrix
+        type(reaction_matrix)  :: coll_rad_matrix, coll_rad_matrix_mher
         type(population) :: x, y
 
           call initialize_level_population(y)
 
           ! normalizing the sum of the fractional abundances to 1
-          coll_rad_matrix%M(nlev_lique, 1:nlev_lique) = 1.d0
- 
-          x%pop = y%pop
- 
-          !print*, 'before', x%pop
-    
-          call dgesv(ndim, nrhs, coll_rad_matrix%M, lda, ipiv, x, ldb, info)
- 
-          do i = 1, nlev_lique
-              write(6,'(3(i3), 2(ES23.15))') i, energy%vl(i), energy%jl(i), y%pop(i), x%pop(i)
-          enddo
+          coll_rad_matrix%M(1, 1:nlev_lique) = 1.d0
 
+          x%pop = y%pop
+
+
+          call dgesv(ndim, nrhs, coll_rad_matrix%M, lda, ipiv, x, ldb, info)
+
+          do i = 1, nlev_lique
+              write(6,'(3(i3), 2(ES26.16E3))') i, energy%vl(i), energy%jl(i), y%pop(i), x%pop(i)
+          enddo
+          write(6,'(a26,es24.18)') 'sum fractional abundances:', sum(x%pop)
         return
     end subroutine solve_steady_state
 

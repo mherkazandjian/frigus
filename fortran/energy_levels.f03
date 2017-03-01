@@ -23,14 +23,14 @@ module energy_levels
                                                                                           ! keeping only the
                                                                                           ! actual levels given in ! the reaction rates 
                                                                                           ! file
-                    open (12, file='Read/H2Xvjlevels_francois_mod.cs', status = 'unknown') ! modified version of
+                    open(12, file='Read/H2Xvjlevels_francois_mod.cs', status = 'unknown') ! modified version of
 !                                                                                           ! data from lique;
 !                                                                                           ! keeping only the
 !                                                                                           ! actual levels given in ! the reaction rates 
 !                                                                                           ! file
-                   open (13, file='Read/lev_labels', status = 'unknown')
-                   open (14, file='Read/lev_labels_lique', status = 'unknown')
-                   open (15, file='Read/frequencies_lique', status = 'unknown')
+                   open(13, file='Read/lev_labels', status = 'unknown')
+                   open(14, file='Read/lev_labels_lique', status = 'unknown')
+                   open(15, file='Read/frequencies_lique', status = 'unknown')
                    
                     allocate(e%en(0:vmax,0:jmax))
                     allocate(e%ene(1:nlev))
