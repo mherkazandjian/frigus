@@ -1,6 +1,6 @@
 *.out
 *~
-.idea
+.idea/workspace.xml
 *.pyc
 *.pdf
 .ropeproject
