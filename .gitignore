@@ -13,3 +13,12 @@ fort.*
 fortran/Read/frequencies_lique
 fortran/cooling_nc=1.0E+*
 fortran/Read/wrathmall/flower_data.ods
+
+doc/level_populations.ipynb
+doc/level_populations_rate_equations_derivation.ipynb
+fortran/Read/lev_labels_lique
+fortran/Read/wrathmall/Rates_H_H2_flower_new_downwards.dat
+fortran/carla_matrix_M
+fortran/M_matrix_1e6100_mher.txt
+fortran/relative_diff_M_matrices.txt
+

@@ -67,12 +67,11 @@ module matrix_construction
      subroutine initialize_level_population(x)
          type(population) :: x
          
-          do i = 2, nlev_lique
+          do i = 1, nlev_lique-1
              x%pop(i) = 0.d0
           enddo
-          
-          x%pop(1) = 1.d0 
 
+          x%pop(nlev_lique) = 1.d0
          
      end subroutine initialize_level_population
     

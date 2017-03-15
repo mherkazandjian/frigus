@@ -37,9 +37,12 @@ program cooling
             do i = 1, nlev_lique
                 do j = 1, nlev_lique
                     if(i.gt.j) then
-                        cooling_rate(id_temp) = cooling_rate(id_temp) + a21%M_lique(i, j)                 &
-                                            * abs(energy%ene_lique(i)-energy%ene_lique(j))    &
-                                            * x%pop(i)
+                         cooling_rate(id_temp) = cooling_rate(id_temp) + a21%M_lique(i, j)                 &
+                                             * abs(energy%ene_lique(i)-energy%ene_lique(j))    &
+                                             * x%pop(i)
+!                         cooling_rate(id_temp) = cooling_rate(id_temp) + rr21%matrix_lique(i, j, id_temp)  &
+!                                             * abs(energy%ene_lique(i)-energy%ene_lique(j))    &
+!                                             * x%pop(i)
                     endif
                 enddo
             enddo
