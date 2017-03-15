@@ -2,7 +2,7 @@
 """
 Read the collisional rates (collision coefficients)
 """
-
+from StringIO import StringIO
 import numpy
 from numpy import (loadtxt, arange, int32, zeros, unique, void,
                    ascontiguousarray, dtype, hstack, fabs, exp)
@@ -34,7 +34,7 @@ def unique_level_pairs(vj):
     return unique_a.T
 
 
-def read_collision_coefficients_lique(fname):
+def read_collision_coefficients(fname):
     """parse the collisional data by François. These are the coefficient rates
     K_ij where i > j (so these fill the lower triangular K matrix).
 
@@ -81,9 +81,18 @@ def read_collision_coefficients_lique(fname):
            for each value of temperature in the T array.
     """
 
-    # the temperature in the data file is not provided explicitly. It
-    # it provided as a range. So we refine the temperature and an array
-    T_values = arange(100.0, 5000.1, 100.0) * u.Kelvin
+    def find_temperature_array():
+        """search the header of the data file and return the range of
+         temperatures used. The temperature range is assumed to be on the
+         10th line of the header"""
+        with open(fname) as fobj:
+            for line_num, line in enumerate(fobj):
+                if line_num == 8:
+                    T_values = loadtxt(StringIO(line), delimiter=',') * u.Kelvin
+                    break
+        return T_values
+
+    T_values = find_temperature_array()
 
     # read the data from the original ascii file
     data_read = loadtxt(fname, unpack=True, skiprows=10)
