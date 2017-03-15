@@ -19,6 +19,9 @@ doc/level_populations_rate_equations_derivation.ipynb
 fortran/Read/lev_labels_lique
 fortran/Read/wrathmall/Rates_H_H2_flower_new_downwards.dat
 fortran/carla_matrix_M
+fortran/solver_matrix
+fortran/solver_matrix.txt
+
 fortran/M_matrix_1e6100_mher.txt
 fortran/relative_diff_M_matrices.txt
 
