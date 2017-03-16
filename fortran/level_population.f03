@@ -36,7 +36,7 @@ module level_population
 
 
     
-    subroutine solve_steady_state(energy, coll_rad_matrix, y)
+    subroutine solve_steady_state(energy, coll_rad_matrix, x)
         type(energy_lev) :: energy
         type(reaction_matrix)  :: coll_rad_matrix, coll_rad_matrix_mher
         type(population) :: x, y
