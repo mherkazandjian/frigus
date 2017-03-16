@@ -1,6 +1,6 @@
 unset label
 set log
-set output "H2_cf_lipovka.eps"
+set output "h2_cf_normalized_flower.eps"
 set term postscript eps monochrome enhanced "Helvetica" 20
 set format y "10^{%T}" 
 set xlabel "T_g"
@@ -23,4 +23,4 @@ set key bottom right
 #'cooling_rate.out' u 3:4 w p ti 'results by Mher @ T_r = 0 K'
 
 plot 'cooling_nc=1.0E+06' u 2:3 w l ti 'nc = 1.0E+06', \
-'cooling_nc=1.0E+06' u 2:4 w l ti 'fit by Glover and Abel 2008'
+'cooling_nc=1.0E+14' u 2:4 w l ti 'fit by Glover and Abel 2008'

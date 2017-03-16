@@ -23,23 +23,25 @@ module types_and_parameters
     
     ! ENERGY LEVELS
     integer, parameter :: nlev = 301
-    integer, parameter :: nlev_lique = 58 ! 58 lique, 108 flower
-    integer, parameter :: jmax_lique = 18  ! 18 lique,  23 flower
-    integer, parameter :: vmax_lique = 3   ! 3  lique,   6 flower
+    integer, parameter :: nlev_lique = 108 ! 58 lique, 108 flower
+    integer, parameter :: jmax_lique = 23  ! 18 lique,  23 flower
+    integer, parameter :: vmax_lique = 6   ! 3  lique,   6 flower
 
     ! RADIATIVE TRANSITIONS
     integer, parameter :: jmax = 31
     integer, parameter :: vmax = 14
 
     ! COLLISIONAL TRANSITIONS
-    integer, parameter :: vimax = 3    ! 3 lique,   6 flower
-    integer, parameter :: jimax = 18   ! 18 lique, 23 flower
-    integer, parameter :: vfmax = 3    !  3 lique,  6 flower
-    integer, parameter :: jfmax = 17   ! 17 lique, 23 flower
-    integer, parameter :: ntemp = 50   ! 50 lique, 50 flower
-    integer, parameter :: ntrans = 1653 ! 1653 lique 5797 flower, tot 1305 24*24+27*27
+    integer, parameter :: vimax = 6    ! 3 lique,   6 flower
+    integer, parameter :: jimax = 23   ! 18 lique, 23 flower
+    integer, parameter :: vfmax = 6    !  3 lique,  6 flower
+    integer, parameter :: jfmax = 23   ! 17 lique, 23 flower
+    integer, parameter :: ntemp = 60   ! 50 lique, 60 flower
+    integer, parameter :: ntrans = 5797 ! 1653 lique 5797 flower, tot 1305 24*24+27*27
+    integer, parameter :: ilique_flag = 0 ! to switch from lique's to flower's data
 
-
+      
+    
     type :: energy_lev
         real*8, dimension(:,:), allocatable         :: en         ! per pair (v,j)
         real*8, dimension(:),   allocatable         :: ene        ! labelled according to the order in the file
@@ -75,17 +77,7 @@ module types_and_parameters
         integer :: ntrans, ntemp, nlev, vimax, jimax, vfmax, jfmax
     end type parameter_collisional_coeff
  
- 
-!     type :: generic_collisional_coeffs
-!         real*8, dimension(:), allocatable :: temp    ! temperatures @ which collisional data are given
-!         integer, dimension(:), allocatable  :: vic, jic, vfc, jfc ! in and fin rovibrational levels (transitions order)
-!         real*8, dimension(:,:,:,:,:)  :: reading
-!         integer, dimension(:) :: couple1c,couple2c
-!         real*8, dimension(:,:,:)  :: matrix           ! n.b.: it includes the detailed balance of the read data
-!     end type generic_collisional_coeffs
-    
-    
-    
+
     type :: collisional_coeffs
         integer  :: ntemp   ! # of temperatures @ which collisional data are given
         real*8, dimension(1:ntemp)  :: temp, temp_flower   ! temperatures @ which collisional data are given

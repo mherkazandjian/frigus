@@ -37,16 +37,12 @@ program cooling
             do i = 1, nlev_lique
                 do j = 1, nlev_lique
                     if(i.gt.j) then
-                        cooling_rate(id_temp) = cooling_rate(id_temp) + a21%M_lique(i, j)     &
-                                            * abs(energy%ene_lique(i)-energy%ene_lique(j))    &
-                                            * x%pop(i)
-!                         cooling_rate(id_temp) = cooling_rate(id_temp) +                       & !lipovka expression
-!                                             (a21%M_lique(i, j)                                &
+                         cooling_rate(id_temp) = cooling_rate(id_temp) + a21%M_lique(i, j)                 &
+                                             * abs(energy%ene_lique(i)-energy%ene_lique(j))    &
+                                             * x%pop(i)
+!                         cooling_rate(id_temp) = cooling_rate(id_temp) + rr21%matrix_lique(i, j, id_temp)  &
 !                                             * abs(energy%ene_lique(i)-energy%ene_lique(j))    &
-!                                             * x%pop(i)-                                       &
-!                                             a21%M_lique(j, i)                                 &
-!                                             * abs(energy%ene_lique(j)-energy%ene_lique(i))    &
-!                                             * x%pop(j))
+!                                             * x%pop(i)
                     endif
                 enddo
             enddo
@@ -104,10 +100,10 @@ program cooling
             !call writing_files(a21, b21, b12, jnu, id_temp, rr, coll_rad_matrix)
              write(char1, '(ES7.1)') nc(idensity)
              filename = 'cooling_nc=' // char1
-             open(40, file = filename, status = 'unknown')
-             open(41, file = 'to_be_fitted.dat', status = 'unknown')             
-             write(40,'(4(ES23.15))') Trad, rr%temp(id_temp), cooling_rate(id_temp), glover(id_temp)
-             write(41,'(4(ES23.15))') Trad, nc(idensity), rr%temp(id_temp), cooling_rate(id_temp)
+             open(50, file = filename, status = 'unknown')
+             open(51, file = 'to_be_fitted.dat', status = 'unknown')             
+             write(50,'(4(ES23.15))') Trad, rr%temp(id_temp), cooling_rate(id_temp), glover(id_temp)
+             write(51,'(4(ES23.15))') Trad, nc(idensity), rr%temp(id_temp), cooling_rate(id_temp)
         enddo ! loop on the kinetic temperatures
         rr%matrix_lique = rr%matrix_lique / nc(idensity)
         rr21%matrix_lique = rr21%matrix_lique / nc(idensity)
