@@ -1,12 +1,12 @@
-Supplementary Information for manuscript: 
-"Revisited study of the ro-vibrational excitation of H$_2$ by H: Towards a revision of the cooling of astrophysical media" 
-by François LIQUE
+Supplementary Information for manuscript:  "Revisited study of the ro-vibrational excitation of H$_2$ by H: Towards a revision of the cooling of astrophysical media" by François LIQUE
 
 The table contains the H2-H collisional rate coefficients
 
 v, v' : initial and final vibrational state
 j, j' : initial and final rotational state
 
+Temperature rage (T) , T= 100 to 5000K by steps of 100K  
+100.,   200.,   300.,   400.,   500.,   600.,   700.,   800., 900.,  1000.,  1100.,  1200.,  1300.,  1400.,  1500.,  1600., 1700.,  1800.,  1900.,  2000.,  2100.,  2200.,  2300.,  2400., 2500.,  2600.,  2700.,  2800.,  2900.,  3000.,  3100.,  3200., 3300.,  3400.,  3500.,  3600.,  3700.,  3800.,  3900.,  4000., 4100.,  4200.,  4300.,  4400.,  4500.,  4600.,  4700.,  4800., 4900.,  5000.
   v  j  v' j'    k(cm3 s-1) (T) , T= 100 to 5000K by steps of 100K  
   0  1  0  0  0.3098E-21  0.1521E-18  0.1791E-16  0.3164E-15  0.1962E-14  0.6824E-14  0.1679E-13  0.3307E-13  0.5605E-13  0.8537E-13  0.1203E-12  0.1597E-12  0.2026E-12  0.2481E-12  0.2951E-12  0.3429E-12  0.3908E-12  0.4384E-12  0.4852E-12  0.5309E-12  0.5752E-12  0.6180E-12  0.6592E-12  0.6985E-12  0.7361E-12  0.7719E-12  0.8059E-12  0.8381E-12  0.8685E-12  0.8973E-12  0.9244E-12  0.9499E-12  0.9739E-12  0.9964E-12  0.1017E-11  0.1037E-11  0.1056E-11  0.1073E-11  0.1089E-11  0.1104E-11  0.1118E-11  0.1131E-11  0.1143E-11  0.1154E-11  0.1164E-11  0.1173E-11  0.1182E-11  0.1190E-11  0.1197E-11  0.1204E-11
   0  2  0  0  0.6561E-13  0.7861E-13  0.9070E-13  0.1266E-12  0.2174E-12  0.3894E-12  0.6561E-12  0.1018E-11  0.1468E-11  0.1995E-11  0.2585E-11  0.3225E-11  0.3903E-11  0.4610E-11  0.5337E-11  0.6076E-11  0.6822E-11  0.7571E-11  0.8318E-11  0.9061E-11  0.9797E-11  0.1053E-10  0.1124E-10  0.1195E-10  0.1265E-10  0.1333E-10  0.1400E-10  0.1466E-10  0.1531E-10  0.1595E-10  0.1657E-10  0.1718E-10  0.1778E-10  0.1837E-10  0.1894E-10  0.1951E-10  0.2006E-10  0.2061E-10  0.2114E-10  0.2167E-10  0.2218E-10  0.2268E-10  0.2318E-10  0.2366E-10  0.2414E-10  0.2461E-10  0.2507E-10  0.2552E-10  0.2597E-10  0.2640E-10
