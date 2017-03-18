@@ -412,8 +412,12 @@ def solveEquilibrium(M_matrix, debug=False):
     # solving the system A.x = b
     # before solving, we will divide each row by the diagonal
     A, b = M_matrix, dxdt
+
+    # for i in arange(sz):
+    #     A[i, :] = A[i, :] / A[i, i]
+
     for i in arange(sz):
-        A[i, :] = A[i, :] / A[i, i]
+        A[i, :] /= (numpy.linalg.norm(A[i, :], 2)*numpy.linalg.norm(A[:, i], 2))
 
     numpy.savetxt(
         os.path.expanduser(
