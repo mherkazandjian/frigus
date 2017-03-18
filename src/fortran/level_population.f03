@@ -45,11 +45,13 @@ module level_population
 
           ! normalizing the sum of the fractional abundances to 1
           coll_rad_matrix%M(nlev_lique, 1:nlev_lique) = 1.d0
-
+          !coll_rad_matrix%M(1, 1:nlev_lique) = 1.d0
+          
           x%pop = y%pop
 
 
           call dgesv(ndim, nrhs, coll_rad_matrix%M, lda, ipiv, x, ldb, info)
+          !dgesvx
 
           do i = 1, nlev_lique
               write(6,'(3(i3), 2(ES26.16E3))') i, energy%vl(i), energy%jl(i), y%pop(i), x%pop(i)
