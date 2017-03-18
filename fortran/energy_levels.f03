@@ -70,71 +70,72 @@ module energy_levels
                     enddo
 
                     print*, 'ilique_flag in energy levels file:', ilique_flag
-
-                    if(ilique_flag.eq.1) then
-                     ! reading lique data
-                     do i = 1, 3
-                         read(11,*)
-                     enddo
-                     do i = 1, nlev_lique
-                         read(11,*) b, b, e%vl_lique(i), e%jl_lique(i), b,    &
-                                    e%en_lique(e%vl_lique(i), e%jl_lique(i))
-                         e%ene_lique(i) = e%en_lique(e%vl_lique(i), e%jl_lique(i))
-                         !   write(6,'(i3,2x,i2,2x,i2,2x,e10.4)') i, vl(i), jl(i), en(vl(i),jl(i))
-                     enddo
-                     !conversion eV -->  Joule
-                     e%en_lique = e%en_lique*q
-                     e%ene_lique = e%ene_lique*q
- 
-                     e%ene = -e%ene   ! to revert the actual way the energies are given
-                                      ! Emax @ (v=0,j=0) --> Emin @ (v=0,j=0)
- 
-                                      
-                     ! ordering the levels according to their energies 
-                     ! (for subsequent construction of the matrix in the 
-                     ! linear system of equations to be solved)
-                      call piksrt(nlev, nlev_lique, e)                                     
- 
-                     ! evaluation of the frequencies
-                     e%freq_lique = 0.d0
-                     do ini = 1, nlev_lique
-                         do fin = 1, nlev_lique
-                             e%freq_lique(ini, fin) = dabs(e%ene_lique(ini)-e%ene_lique(fin))/hp
-                         enddo
-                     enddo                     
-                    else
-                     ! reading flower data
-                     do i = 1, 1
-                         read(12,*)
-                     enddo
-                     do i = 1, nlev_lique
-                         read(12,*) b, e%vl_lique(i), e%jl_lique(i),     &
-                                    e%en_lique(e%vl_lique(i), e%jl_lique(i))
-                         e%ene_lique(i) = e%en_lique(e%vl_lique(i), e%jl_lique(i))
-                         !   write(6,'(i3,2x,i2,2x,i2,2x,e10.4)') i, vl(i), jl(i), en(vl(i),jl(i))
-                     enddo
-                     !conversion K -->  Joule
-                     e%en_lique = e%en_lique*kb
-                     e%ene_lique = e%ene_lique*kb
- 
-                     e%ene = -e%ene   ! to revert the actual way the energies are given
-                                      ! Emax @ (v=0,j=0) --> Emin @ (v=0,j=0)
- 
-                                      
-                     ! ordering the levels according to their energies 
-                     ! (for subsequent construction of the matrix in the 
-                     ! linear system of equations to be solved)
-                      call piksrt(nlev, nlev_lique, e)                                     
- 
-                     ! evaluation of the frequencies
-                     e%freq_lique = 0.d0
-                     do ini = 1, nlev_lique
-                         do fin = 1, nlev_lique
-                             e%freq_lique(ini, fin) = dabs(e%ene_lique(ini)-e%ene_lique(fin))/hp
-                         enddo
-                     enddo                     
-                    endif
-                     
+                   
+                   
+                     if(ilique_flag.eq.1) then
+                      ! reading lique data
+                      do i = 1, 3
+                          read(11,*)
+                      enddo
+                      do i = 1, nlev_lique
+                          read(11,*) b, b, e%vl_lique(i), e%jl_lique(i), b,    &
+                                     e%en_lique(e%vl_lique(i), e%jl_lique(i))
+                          e%ene_lique(i) = e%en_lique(e%vl_lique(i), e%jl_lique(i))
+                          !   write(6,'(i3,2x,i2,2x,i2,2x,e10.4)') i, vl(i), jl(i), en(vl(i),jl(i))
+                      enddo
+                      !conversion eV -->  Joule
+                      e%en_lique = e%en_lique*q
+                      e%ene_lique = e%ene_lique*q
+  
+                      e%ene = -e%ene   ! to revert the actual way the energies are given
+                                       ! Emax @ (v=0,j=0) --> Emin @ (v=0,j=0)
+  
+                                       
+                      ! ordering the levels according to their energies 
+                      ! (for subsequent construction of the matrix in the 
+                      ! linear system of equations to be solved)
+                       call piksrt(nlev, nlev_lique, e)                                     
+  
+                      ! evaluation of the frequencies
+                      e%freq_lique = 0.d0
+                      do ini = 1, nlev_lique
+                          do fin = 1, nlev_lique
+                              e%freq_lique(ini, fin) = dabs(e%ene_lique(ini)-e%ene_lique(fin))/hp
+                          enddo
+                      enddo                     
+                     else
+                      ! reading flower data
+                      do i = 1, 1
+                          read(12,*)
+                      enddo
+                      do i = 1, nlev_lique
+                          read(12,*) b, e%vl_lique(i), e%jl_lique(i),     &
+                                     e%en_lique(e%vl_lique(i), e%jl_lique(i))
+                          e%ene_lique(i) = e%en_lique(e%vl_lique(i), e%jl_lique(i))
+                          !   write(6,'(i3,2x,i2,2x,i2,2x,e10.4)') i, vl(i), jl(i), en(vl(i),jl(i))
+                      enddo
+                      !conversion K -->  Joule
+                      e%en_lique = e%en_lique*kb
+                      e%ene_lique = e%ene_lique*kb
+  
+                      e%ene = -e%ene   ! to revert the actual way the energies are given
+                                       ! Emax @ (v=0,j=0) --> Emin @ (v=0,j=0)
+  
+                                       
+                      ! ordering the levels according to their energies 
+                      ! (for subsequent construction of the matrix in the 
+                      ! linear system of equations to be solved)
+                       call piksrt(nlev, nlev_lique, e)                                     
+  
+                      ! evaluation of the frequencies
+                      e%freq_lique = 0.d0
+                      do ini = 1, nlev_lique
+                          do fin = 1, nlev_lique
+                              e%freq_lique(ini, fin) = dabs(e%ene_lique(ini)-e%ene_lique(fin))/hp
+                          enddo
+                      enddo                     
+                     endif
+                    
                      do i=1,nlev                     
                         write(13,'(3(i3,2x))') i, e%vl(i), e%jl(i)
                      enddo

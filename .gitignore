@@ -25,3 +25,7 @@ fortran/solver_matrix.txt
 fortran/M_matrix_1e6100_mher.txt
 fortran/relative_diff_M_matrices.txt
 
+
+fortran/population_test_good\.txt
+
+fortran/population_test\.txt
