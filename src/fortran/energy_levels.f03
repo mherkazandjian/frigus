@@ -18,20 +18,20 @@ module energy_levels
                    type(energy_lev) :: e
                    
                    
-                   open(10, file='Read/H2Xvjlevels.cs', status = 'unknown')
-                   open(11, file='Read/H2Xvjlevels_francois_mod.cs', status = 'unknown') ! modified version of
+                   open(10, file='../../data/read/H2Xvjlevels.cs', status = 'unknown')
+                   open(11, file='../../data/read/H2Xvjlevels_francois_mod.cs', status = 'unknown') ! modified version of
 !                                                                                           ! data from lique;
 !                                                                                           ! keeping only the
 !                                                                                           ! actual levels given in ! the reaction rates 
-                   open(12, file='Read/H2Xvjlevels_flower.cs', status = 'unknown') ! modified version of
+                   open(12, file='../../data/read/H2Xvjlevels_flower.cs', status = 'unknown') ! modified version of
                                                                                           ! data from lique;
                                                                                           ! keeping only the
                                                                                           ! actual levels given in ! the reaction rates 
                                                                                           ! file
                                                                  ! file
-                   open(13, file='Read/lev_labels', status = 'unknown')
-                   open(14, file='Read/lev_labels_lique', status = 'unknown')
-                   open(15, file='Read/frequencies_lique', status = 'unknown')
+                   open(13, file='../../data/read/lev_labels', status = 'unknown')
+                   open(14, file='../../data/read/lev_labels_lique', status = 'unknown')
+                   open(15, file='../../data/read/frequencies_lique', status = 'unknown')
                    
                     allocate(e%en(0:vmax,0:jmax))
                     allocate(e%ene(1:nlev))
@@ -105,7 +105,7 @@ module energy_levels
                       enddo                     
                      else
                       ! reading flower data
-                      do i = 1, 1
+                      do i = 1, 2
                           read(12,*)
                       enddo
                       do i = 1, nlev_lique

@@ -228,7 +228,7 @@ module radiation
             enddo
         enddo
 
-        open(16,file='Read/j2jdown')
+        open(16,file='../../data/read/j2jdown')
         read(16,*)k
         read(16,*) (jj,j=0,jmax)
         read(16,*) (ivmax(j),j=0,jmax)
@@ -239,7 +239,7 @@ module radiation
             enddo
         enddo
         close(16)
-        open(17,file='Read/j2j')
+        open(17,file='../../data/read/j2j')
         read(17,*)k
         do j=1,jmax-1
             read(17,*)(ii,i=ivmax(j),1,-1)
@@ -248,7 +248,7 @@ module radiation
             enddo
         enddo
         close(17)
-        open(18,file='Read/j2jup')
+        open(18,file='../../data/read/j2jup')
         read(18,*)k
         do j=0,jmax-2
             read(18,*)(ii,i=ivmax(j),1,-1)

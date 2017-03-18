@@ -38,9 +38,9 @@ module collisions
                  !   print*, 'temperature', i, rr%temp(i)
                  !enddo
 
-                 open (19, file='Read/wrathmall/Rates_H_H2_flower_new.dat', status = 'unknown')                 
-                 open (20, file='Read/wrathmall/Rates_H_H2_flower_new_downwards.dat', status = 'unknown')
-                 open (21, file='Read/Rates_H_H2.dat', status = 'unknown')                 
+                 open (19, file='../../data/read/wrathmall/Rates_H_H2_flower_new.dat', status = 'unknown')                 
+                 open (20, file='../../data/read/wrathmall/Rates_H_H2_flower_new_downwards.dat', status = 'unknown')
+                 open (21, file='../../data/read/Rates_H_H2.dat', status = 'unknown')                 
 
                  
 
