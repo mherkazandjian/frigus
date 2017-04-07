@@ -1,3 +1,13 @@
+7th April 2017
+Using the data by Wrathmall and Flower still causes negative population,
+both imposing the normalization condition on the first row and on the last; in
+the case of the data of Lique the condition to have positive level population
+is by imposing the normalization condition on the first row
+Such condition must be changed both in the file level_population.f03 and in
+matrix_construction.f03
+
+
+February 2017
 The file cooling_rate_summer.out is the one with the output by Mher for which
 the comparison with my curves was ok.
 
