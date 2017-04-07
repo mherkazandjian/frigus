@@ -23,21 +23,21 @@ module types_and_parameters
     
     ! ENERGY LEVELS
     integer, parameter :: nlev = 301
-    integer, parameter :: nlev_lique = 58 ! 58 lique, 108 flower
-    integer, parameter :: jmax_lique = 18  ! 18 lique,  23 flower
-    integer, parameter :: vmax_lique = 3   ! 3  lique,   6 flower
+    integer, parameter :: nlev_lique = 10 ! 58 lique, 108 flower, 10 lipovka
+    integer, parameter :: jmax_lique = 9  ! 18 lique,  23 flower, 9 lipovka
+    integer, parameter :: vmax_lique = 0   ! 3  lique,   6 flower, 0 lipovka
 
     ! RADIATIVE TRANSITIONS
     integer, parameter :: jmax = 31
     integer, parameter :: vmax = 14
 
     ! COLLISIONAL TRANSITIONS
-    integer, parameter :: vimax = 3    ! 3 lique,   6 flower
-    integer, parameter :: jimax = 18   ! 18 lique, 23 flower
-    integer, parameter :: vfmax = 3    !  3 lique,  6 flower
-    integer, parameter :: jfmax = 17   ! 17 lique, 23 flower
-    integer, parameter :: ntemp = 50   ! 50 lique, 60 flower
-    integer, parameter :: ntrans = 1653 ! 1653 lique 5797 flower, tot 1305 24*24+27*27
+    integer, parameter :: vimax = 0    ! 3 lique,   6 flower, 0 lipovka
+    integer, parameter :: jimax = 9   ! 18 lique, 23 flower, 9 lipovka
+    integer, parameter :: vfmax = 0    !  3 lique,  6 flower, 0 lipovka
+    integer, parameter :: jfmax = 8   ! 17 lique, 23 flower, 8 lipovka
+    integer, parameter :: ntemp = 96   ! 50 lique, 60 flower, 96 lipovka
+    integer, parameter :: ntrans = 1653 ! 1653 lique 5797 flower, tot 5832 54*54(ortho)+54*54(para), 100 lipovka
     integer, parameter :: ilique_flag = 1 ! to switch from lique's to flower's data
 
       
