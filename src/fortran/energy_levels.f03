@@ -19,19 +19,18 @@ module energy_levels
                    
                    
                    open(10, file='../../data/read/H2Xvjlevels.cs', status = 'unknown')
-                   open(11, file='../../data/read/H2Xvjlevels_francois_mod.cs', status = 'unknown') ! modified version of
-!                                                                                           ! data from lique;
-!                                                                                           ! keeping only the
-!                                                                                           ! actual levels given in ! the reaction rates 
-                   open(12, file='../../data/read/H2Xvjlevels_flower.cs', status = 'unknown') ! modified version of
-                                                                                          ! data from lique;
-                                                                                          ! keeping only the
-                                                                                          ! actual levels given in ! the reaction rates 
-                                                                                          ! file
-                                                                 ! file
+                   open(11, file='../../data/read/H2Xvjlevels_francois_mod.cs', status = 'unknown')
+                   ! modified version of data from lique keeping only the actual levels given in the  
+                   ! reaction rates 
+                   open(12, file='../../data/read/H2Xvjlevels_flower.cs', status = 'unknown')
+                   ! modified version of data from lique; keeping only the actual levels given in the 
+                   ! reaction rates file
+                   open(122, file='../../data/read/H2Xvjlevels_lipovka.cs', status = 'unknown')
+                   ! modified version of data from lique; keeping only the actual levels given in the 
+                   ! reaction rates file                   
                    open(13, file='../../data/read/lev_labels', status = 'unknown')
                    open(14, file='../../data/read/lev_labels_lique', status = 'unknown')
-                   open(15, file='../../data/read/frequencies_lique', status = 'unknown')
+                   open(15, file='../../data/read/frequencies_lique', status = 'unknown')                   
                    
                     allocate(e%en(0:vmax,0:jmax))
                     allocate(e%ene(1:nlev))
@@ -71,7 +70,7 @@ module energy_levels
 
                     print*, 'ilique_flag in energy levels file:', ilique_flag
                    
-                   
+             if(ilipovka_flag.eq.0) then
                      if(ilique_flag.eq.1) then
                       ! reading lique data
                       do i = 1, 3
@@ -103,8 +102,7 @@ module energy_levels
                               e%freq_lique(ini, fin) = dabs(e%ene_lique(ini)-e%ene_lique(fin))/hp
                           enddo
                       enddo                     
-                     else
-                      ! reading flower data
+                     else ! reading flower data
                       do i = 1, 2
                           read(12,*)
                       enddo
@@ -135,6 +133,26 @@ module energy_levels
                           enddo
                       enddo                     
                      endif
+             else    !reading and adopting the data used by lipovka for the HD calculation 
+                      do i = 1, 2
+                          read(122,*)
+                      enddo
+                      do i = 1, nlev_lique
+                          read(12,*) e%vl_lique(i), e%jl_lique(i),     &
+                                     e%en_lique(e%vl_lique(i), e%jl_lique(i))
+                          e%ene_lique(i) = e%en_lique(e%vl_lique(i), e%jl_lique(i))
+                          !   write(6,'(i3,2x,i2,2x,i2,2x,e10.4)') i, vl(i), jl(i), en(vl(i),jl(i))
+                      enddo
+                      !conversion K -->  Joule
+                      e%en_lique = e%en_lique*kb
+                      e%ene_lique = e%ene_lique*kb
+  
+                      !e%ene = -e%ene   ! to revert the actual way the energies are given
+                                       ! Emax @ (v=0,j=0) --> Emin @ (v=0,j=0)
+             endif
+             
+    
+             
                     
                      do i=1,nlev                     
                         write(13,'(3(i3,2x))') i, e%vl(i), e%jl(i)
