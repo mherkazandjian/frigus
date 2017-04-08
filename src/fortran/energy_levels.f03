@@ -4,7 +4,7 @@ module energy_levels
        ! and store the energy levels of H2 (rovibrational); 
        ! input data from Stancil
        use types_and_parameters, only: hp, kb, nlev, jmax, vmax, energy_lev, &
-                                       ilique_flag
+                                       ilique_flag, ilipovka_flag
        use sorting, only: piksrt
 
     contains
@@ -14,7 +14,8 @@ module energy_levels
                                                    energy_lev, hp, kb,     &
                                                    ini, fin, q,            &
                                                    jmax_lique, vmax_lique, &
-                                                   nlev_lique, ilique_flag
+                                                   nlev_lique, ilique_flag, &
+                                                   ilipovka_flag
                    type(energy_lev) :: e
                    
                    
@@ -138,7 +139,7 @@ module energy_levels
                           read(122,*)
                       enddo
                       do i = 1, nlev_lique
-                          read(12,*) e%vl_lique(i), e%jl_lique(i),     &
+                          read(122,*) e%vl_lique(i), e%jl_lique(i),     &
                                      e%en_lique(e%vl_lique(i), e%jl_lique(i))
                           e%ene_lique(i) = e%en_lique(e%vl_lique(i), e%jl_lique(i))
                           !   write(6,'(i3,2x,i2,2x,i2,2x,e10.4)') i, vl(i), jl(i), en(vl(i),jl(i))

@@ -24,8 +24,8 @@ module types_and_parameters
     ! ENERGY LEVELS
     integer, parameter :: nlev = 301
     integer, parameter :: nlev_lique = 10 ! 58 lique, 108 flower, 10 lipovka
-    integer, parameter :: jmax_lique = 9  ! 18 lique,  23 flower, 9 lipovka
     integer, parameter :: vmax_lique = 0   ! 3  lique,   6 flower, 0 lipovka
+    integer, parameter :: jmax_lique = 9  ! 18 lique,  23 flower, 9 lipovka
 
     ! RADIATIVE TRANSITIONS
     integer, parameter :: jmax = 31
