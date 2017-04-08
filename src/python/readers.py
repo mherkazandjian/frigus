@@ -1,5 +1,8 @@
 """
 module that provides functions to load various data in a standard format.
+No parsing is done in this module. The parsing is done in other modules
+that implement the specific readers and parsers for e.g. einstien coefficient,
+energy levels and collision reaction rates.
 """
 
 import numpy
@@ -7,7 +10,10 @@ from astropy import units as u
 
 import read_energy_levels
 import read_einstien_coefficient
-from read_collision_coefficients import read_collision_coefficients
+from read_collision_coefficients import (
+    read_collision_coefficients_lique_and_wrathmall,
+    read_collision_coefficients_lipovka)
+
 import population
 
 
@@ -65,10 +71,13 @@ class DataSetBase(object):
 
     def read_raw_data(self):
         """populate the self.raw_data object"""
-        pass
+        raise NotImplementedError("this method should be implemented by "
+                                  "the subclass")
 
     def reduce_raw_data(self):
         """use the raw data to produce the 2D matrices"""
+        raise NotImplementedError("this method should be implemented by "
+                                  "the subclass")
 
 
 class DataSetH2Lique(DataSetBase):
@@ -118,7 +127,8 @@ class DataSetH2Lique(DataSetBase):
         # read the collisional rates for H2 with H
         #
         collision_rates, T_rng, collision_rates_info_nnz = \
-            read_collision_coefficients("../../data/read/Rates_H_H2.dat")
+            read_collision_coefficients_lique_and_wrathmall(
+                "../../data/read/Rates_H_H2.dat")
         self.raw_data.collision_rates = collision_rates
         self.raw_data.collision_rates_T_range = T_rng
         self.raw_data.collision_rates_info_nnz = collision_rates_info_nnz
@@ -205,6 +215,93 @@ class DataSetTwoLevel_1(DataSetBase):
         self.raw_data.collision_rates_T_range = T_rng
 
 
+class DataSetHDLipovka(DataSetBase):
+    """
+    Data of H2 colliding with H using collisional data use by Lipovka.
+
+      - energy levels of HD (only rotational for v = 0)
+      - collisional coefficients of HD with H (K_ij)
+      - radiative coefficients (A_ij, B_ij, B_ji)
+
+    Limitations
+
+      - The smallest data set of (A, B, K) determines the number of states to
+       be inserted in the model.
+    """
+    def __init__(self):
+        """
+        constructor
+        """
+        super(DataSetHDLipovka, self).__init__()
+        self.read_raw_data()
+        self.reduce_raw_data()
+
+    def read_raw_data(self):
+        """read the raw HD data"""
+
+        #
+        # read the energy levels (v, j, energy)
+        #
+        energy_levels = read_energy_levels.read_levels_lipovka(
+            '../../data/read/lipovka/flower_roueff_data.dat')
+
+        self.raw_data.energy_levels = energy_levels
+
+        #
+        # read the einstein coefficients for the HD transitions
+        #
+        A, A_info_nnz = read_einstien_coefficient.read_einstein_coppola()
+        self.raw_data.A = A
+        self.raw_data.A_info_nnz = A_info_nnz
+
+        #
+        # read the collisional rates for HD with H
+        #
+        collision_rates, T_rng, collision_rates_info_nnz = \
+            read_collision_coefficients_lipovka(
+                '../../data/read/lipovka/flower_roueff_data.dat')
+
+        self.raw_data.collision_rates = collision_rates
+        self.raw_data.collision_rates_T_range = T_rng
+        self.raw_data.collision_rates_info_nnz = collision_rates_info_nnz
+
+    def reduce_raw_data(self):
+        """
+        use the raw data in self.raw_data to populate the A and K_dex matrices
+        """
+
+        # find the maximum v and j from the Einstein and collisional rates data
+        # sets and adjust the labels of the energy levels according to that
+        v_max_data, j_max_data = population.find_v_max_j_max_from_data(
+            self.raw_data.A_info_nnz,
+            self.raw_data.collision_rates_info_nnz)
+
+        self.energy_levels = self.raw_data.energy_levels
+        self.energy_levels.set_labels(v_max=v_max_data + 1)
+
+        #
+        # reduce the Einstein coefficients to a 2D matrix (construct the A
+        # matrix) [n_levels, n_levels]
+        # A_reduced_slow = population.reduce_einstein_coefficients_slow(
+        #                                 self.raw_data.A_info_nnz,
+        #                                 self.energy_levels)
+        A_matrix = population.reduce_einstein_coefficients(
+                          self.raw_data.A,
+                          self.energy_levels)
+        self.A_matrix = A_matrix
+
+        # getting the collisional de-excitation matrix (K_dex) (for all
+        # tabulated values)  [n_level, n_level, n_T_kin_values]
+        K_dex_matrix = population.reduce_collisional_coefficients_slow(
+                             self.raw_data.collision_rates_info_nnz,
+                             self.energy_levels)
+
+        # compute the interpolator that produces K_dex at a certain temperature
+        K_dex_matrix_interpolator = population.compute_K_dex_matrix_interpolator(
+            K_dex_matrix, self.raw_data.collision_rates_T_range)
+        self.K_dex_matrix_interpolator = K_dex_matrix_interpolator
+
+
 class DataLoader(object):
     """
     Load various data sets.
@@ -222,5 +319,12 @@ class DataLoader(object):
         """
         if name == 'H2_lique':
             return DataSetH2Lique()
-        if name == 'two_level_1':
+        elif name == 'two_level_1':
             return DataSetTwoLevel_1()
+        elif name == 'HD_lipovka':
+            return DataSetHDLipovka()
+        elif name == 'H2_wrathmall':
+            raise NotImplementedError('''not implemented''')
+        else:
+            msg = '''not data loader defined for {}'''.format(name)
+            raise ValueError(msg)

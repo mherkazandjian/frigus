@@ -203,6 +203,45 @@ def read_levels_lique(fname):
     return energy_levels
 
 
+def read_levels_lipovka(fname):
+    """
+    read the energy levels from the file "flower_roueff_data.dat" that is
+    recovered from the website:
+                                                                  v(?)      j (?)     j(?)    E (K? or cm-1?)
+      0.000     0.000     0.000     0.000     0.000     0.000     0.000     0.000     0.000     0.000
+      0.000     0.000     0.000     0.000     0.000     1.000     0.000     1.000     1.000   128.400
+
+    :param fname: The paths to the ascii file containing the levels
+     information.
+    :return: EnergyLevelsMolecule object
+    """
+    v, j, energies = [], [], []
+    with open(fname) as fobj:
+        linesold = fobj.readlines()
+        lines = []
+        for line_no, line in enumerate(linesold):
+            if line.isspace() is False and line_no >= 2 and line_no <= 12:
+                line_split = line.split()
+                v.append(0)
+                j.append(int(float(line_split[-2])))
+                energies.append(float(line_split[-1]))
+
+    v = numpy.array(v, 'i')
+    j = numpy.array(j, 'i')
+    energies = numpy.array(energies, 'f8')
+
+    # assume the data is sorted in increasing energy values
+    energy_levels = EnergyLevelsMolecule(energies.size, energy_unit=u.K)
+
+    energy_levels.data['v'] = v
+    energy_levels.data['j'] = j
+    energy_levels.data['g'] = 2*j + 1
+    energy_levels.data['E'] = energies*u.K
+    energy_levels.data['label'] = linear_2d_index(v, j)
+
+    return energy_levels
+
+
 def read_levels_two_levels_test_1(fname):
     """
     read the energy levels of the two_levels_test_1 system.

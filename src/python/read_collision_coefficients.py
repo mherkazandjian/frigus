@@ -34,7 +34,7 @@ def unique_level_pairs(vj):
     return unique_a.T
 
 
-def read_collision_coefficients(fname):
+def read_collision_coefficients_lique_and_wrathmall(fname):
     """parse the collisional data by François. These are the coefficient rates
     K_ij where i > j (so these fill the lower triangular K matrix).
 
@@ -110,6 +110,199 @@ def read_collision_coefficients(fname):
         data[:, v[i], j[i], vp[i], jp[i]] = cri
         ini[:, i] = v[i], j[i]
         fin[:, i] = vp[i], jp[i]
+
+    # find the unique levels from from the transitions
+    unique_levels = unique_level_pairs(hstack((unique_level_pairs(ini),
+                                               unique_level_pairs(fin))))
+
+    # set the units of the data to be returned
+    data_with_units = data * (u.cm**3 / u.second)
+    cr_with_units = cr * (u.cm**3 / u.second)
+
+    # convert the units to m^3/s
+    data_with_units = data_with_units.to(u.m**3 / u.second)
+    cr_with_units = cr_with_units.to(u.m**3 / u.second)
+
+    return data_with_units, T_values, (ini, fin, unique_levels, cr_with_units)
+
+
+def read_collision_coefficients_lipovka(fname):
+    """parse the collisional data used by lipovka. These are the coefficient
+     rates K_ij where i > j (so these fill the lower triangular K matrix).
+
+    The table contains the HD-H collisional rate coefficients
+
+    v, v' : initial and final vibrational state
+    j, j' : initial and final rotational state
+
+    v  j  v' j'    k(cm3 s-1) (T) , T= 100 to 5000K by steps of 100K
+
+    0  1  0  0     0.3098E-21  0.1521E-18  0.1791E-16  0.3164E-15.....
+    0  2  0  0     0.6561E-13  0.7861E-13  0.9070E-13  0.1266E-12.....
+
+    :param string fname: The path to the ascii data.
+    :return: a tuple of 3 elements.
+      The first element is a 5D array that holds all the rate coefficients.
+      K[v, j, v', j', T_index] ( in m3/s)
+
+      The second element is a 1D temperature array (T) corresponding to the
+      rate coefficients in the 5D array. This array has the same size as the
+      last dimension of K (i.e K[0,0,0,0,:].size = T.size
+
+      The third element is a tuple of 4 elements:
+
+         - The first element is a 2D array of shape (2, n_transitions) (ini).
+           The columns of this array (v, j = ini) are the initial v and j of
+           the transitions for a certain T section. i.e. the number of non-zero
+           elements in K for a certain temperature is equal to the number of
+           elements in the v or j columns. It is assumed that 'ini' are the 
+           same for each temperature value. 
+           v.size = j.size = where(K[..., 0] > 0)[0].size
+
+         - The second element is the same of the first element but for the
+           final transitions (v', j' = fin)
+
+         - The third element is a 2D array of shape (2, n_unique_transitions)
+           that are the unique levels involved in all the transitions.
+
+         - The last element is an array of shape (T.size, n_transitions)
+           which are the collisional coefficient rates with non-zero values
+           for each value of temperature in the T array. Each row corresponds
+           to the ini, fin collision rates of the first and second element
+           in the tuple mentioned earlier.
+    """
+
+    class Reader(object):
+        """parse the  data by Flower and Roueff contained in the file
+           flower_roueff_data.dat downloaded from http://massey.dur.ac.uk/drf/HD_H
+
+           A block of data (for a certain temperature) is defined as everything
+           between:
+
+           100
+           (0,0) (0,1) (0,2) (0,3) (0,4) (0,5) (0,6) (0,7) (0,8) (0, 9)
+           1.0D-09 1.5D-11 5.4D-13 4.0D-14 7.8D-15 6.1D-16 2.4D-17 8.7D-18 2.2D-18 2.3D-19
+           ...
+           ...
+
+        .. code-block:: python
+
+            reader = read_cr_lipovka.Reader('path_to_the_file')
+
+            # print all the collision rates for the transition (v,j) -> (vp,jp)
+            # for
+            # all the temperatures
+            print reader.data[v, j, vp, jp, :]
+        """
+        def __init__(self, fname, tiny=1e-70):
+            """constructor"""
+
+            self.fname = fname
+            self.data = None  #: the collision rates for all the transitions for all the tempratures
+            self.ini = None  #: the initial v,j of all the transitions
+            self.fin = None  #: the final v,j of all the transitions
+            self.tkin = None  #: the temperatures at which the collisional data are given
+
+            self.read_data()
+
+        def read_data(self):
+            """read all the data to temporary storage in self.data"""
+
+            with open(self.fname) as fobj:
+                linesold = fobj.readlines()
+                lines = []
+                for line_no, line in enumerate(linesold):
+                    if line.isspace() is False and line_no >= 12:
+                        lines.append(line)
+                raw_data = ''.join(lines)
+
+            cr, ini, fin, tkin = self.parse_data(raw_data)
+            self.data = cr
+            self.ini = ini
+            self.fin = fin
+            self.tkin = tkin
+
+        def parse_data(self, raw_data):
+            """parses the read data into blocks, one block for each temperature"""
+
+            # split the raw data into blocks
+            blocks = raw_data.split('T =')[1:]
+
+            tkin = zeros(len(blocks), 'f8')
+            cr_tkin = []
+            ini_tkin = []
+            fin_tkin = []
+
+            for ib, block in enumerate(blocks):
+                ini, fin, t, cr = self.parse_block(block)
+                tkin[ib] = t
+                cr_tkin.append(cr)
+                ini_tkin.append(ini)
+                fin_tkin.append(fin)
+
+            return cr_tkin, ini_tkin, fin_tkin, tkin
+
+        def parse_block(self, block):
+            """parse a block of data and return the temperature, the levels
+            and the collision rates"""
+            lines = iter(block.split('\n'))
+            # get the temperature
+            T = lines.next()
+            assert 'K' in T
+            tkin = T.replace('K', '')
+            # print T, tkin
+
+            # get the header (levels)
+            levels = lines.next().replace(' ', '').replace(')(', ':')[
+                     1:-1].split(':')
+            v, j = [], []
+            for level in levels:
+                v.append(int32(level.split(',')[0]))
+                j.append(int32(level.split(',')[1]))
+
+            ini = numpy.repeat(numpy.vstack((v, j)), len(v), axis=1)
+            fin = numpy.tile([v, j], len(v))
+
+            cr = zeros((int(len(v)), int(len(j)), int(len(v)), int(len(j))),
+                       'f8')
+            for initial, line in enumerate(lines):
+                if len(line.strip()) > 0:
+                    data = numpy.float64(line.replace('D', 'E').strip().split())
+                    for final, (vp, jp) in enumerate(zip(v, j)):
+                        cr[v[initial], j[initial], vp, jp] = data[final]
+
+                    print data[0]
+
+            return ini, fin, tkin, cr
+
+    reader = Reader(fname)
+
+    T_values = reader.tkin
+
+    # read the data from the original ascii file
+    # data_read = loadtxt(fname, unpack=True, skiprows=10)
+    # (v, j, vp, jp), cr = int32(data_read[0:4]), data_read[4:]
+
+    ini = reader.ini[0]
+    fin = reader.fin[0]
+
+    v, j = ini[0, :], ini[1, :]
+    vp, jp = fin[0, :], fin[1, :]
+
+    n_transitions_per_T_value = v.size
+
+    # declare the array where the data will be stored in a tensor
+    nv, nj, nvp, njp = v.max()+1, j.max()+1, vp.max()+1, jp.max()+1
+    nv_max, nj_max = max(nv, nvp), max(nj, njp)
+    data = zeros((T_values.size, nv_max, nj_max, nv_max, nj_max), 'f8')
+
+    # declare the array where the data will be stored in a matrix
+    cr = numpy.zeros((T_values.size, n_transitions_per_T_value), 'f8')
+
+    # copy the read data into the container array
+    for i, cri in enumerate(reader.data):
+        data[i, v, j, vp, jp] = cri[v, j, vp, jp]
+        cr[i, :] = cri[v, j, vp, jp]
 
     # find the unique levels from from the transitions
     unique_levels = unique_level_pairs(hstack((unique_level_pairs(ini),
