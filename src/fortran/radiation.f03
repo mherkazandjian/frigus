@@ -1,7 +1,7 @@
 module radiation
     
     use energy_levels
-    use types_and_parameters, only: jmax, vi, ji, vf, jf,           &
+    use types_and_parameters, only: vmax, jmax, vi, ji, vf, jf,           &
                                     collisional_coeffs,             &
                                     radiative_coeffs, energy_lev,   &
                                     Trad
@@ -17,7 +17,7 @@ module radiation
     contains
 
      subroutine reading_data_radiative(e, a21)
-                 use types_and_parameters, only: jmax, nlev, nlev_lique,      &
+                 use types_and_parameters, only: vmax, jmax, nlev, nlev_lique,  &
                                                  energy_lev, ini, fin
  
                  type(radiative_coeffs) :: a21
@@ -158,6 +158,48 @@ module radiation
                   enddo
                   return
        end subroutine radiative_upwards
+       
+     subroutine reading_data_radiative_lipovka(e, a21)
+                 use types_and_parameters, only: vmax, jmax, nlev, nlev_lique,  &
+                                                 energy_lev, ini, fin
+ 
+                 type(radiative_coeffs) :: a21
+                 type(energy_lev) :: e 
+                 integer, dimension(0:jmax)  :: ivmax
+
+
+                 a21%reading = 0.d0
+                 a21%M_lique = 0.d0
+                 
+                 open(123, file='../../data/read/lipovka/hd_einstein_coeffs.dat', status = 'unknown')
+                 
+                 a21%ntransrad = 10
+
+                 allocate(a21%vir(1:a21%ntransrad), a21%jir(1:a21%ntransrad))
+                 allocate(a21%vfr(1:a21%ntransrad), a21%jfr(1:a21%ntransrad))
+                 allocate(a21%arranging(0:vmax, 0:jmax, 0:vmax, 0:jmax))
+
+                 do i = 1, 2
+                    read(123, *)
+                 enddo
+                 do i = 1, a21%ntransrad
+                    read(123, *) a21%vir(i),a21%jir(i),a21%vfr(i),a21%jfr(i), &
+                     a21%arranging(a21%vir(i),a21%jir(i),a21%vfr(i),a21%jfr(i))
+                 enddo
+
+                do ini = 1, nlev_lique
+                   do fin = 1, nlev_lique
+                            vi = e%vl_lique(ini)
+                            ji = e%jl_lique(ini)
+                            vf = e%vl_lique(fin)
+                            jf = e%jl_lique(fin)
+                      a21%M_lique(ini, fin) = a21%arranging(vi,ji,vf,jf)
+                   enddo
+                 enddo
+                return
+      end subroutine reading_data_radiative_lipovka
+       
+       
 
      real*8 function planck(ni, Trad)
     !    computes the planck function:
