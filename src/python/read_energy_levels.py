@@ -9,7 +9,7 @@ import pylab
 
 from astropy.table import QTable
 from astropy import units as u
-
+from astropy import constants
 from utils import linear_2d_index
 
 
@@ -197,7 +197,7 @@ def read_levels_lique(fname):
     energy_levels.data['v'] = v
     energy_levels.data['j'] = j
     energy_levels.data['g'] = 2*j + 1
-    energy_levels.data['E'] = energies*u.eV
+    energy_levels.data['E'] = energies * u.eV
     energy_levels.data['label'] = linear_2d_index(v, j)
 
     return energy_levels
@@ -236,7 +236,7 @@ def read_levels_lipovka(fname):
     energy_levels.data['v'] = v
     energy_levels.data['j'] = j
     energy_levels.data['g'] = 2*j + 1
-    energy_levels.data['E'] = energies*u.K
+    energy_levels.data['E'] = (energies * u.K * constants.k_B).to(u.eV)
     energy_levels.data['label'] = linear_2d_index(v, j)
 
     return energy_levels
