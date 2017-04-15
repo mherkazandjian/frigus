@@ -311,6 +311,7 @@ def read_collision_coefficients_lipovka(fname):
     # set the units of the data to be returned
     data_with_units = data * (u.cm**3 / u.second)
     cr_with_units = cr * (u.cm**3 / u.second)
+    T_values = T_values * u.K
 
     # convert the units to m^3/s
     data_with_units = data_with_units.to(u.m**3 / u.second)
