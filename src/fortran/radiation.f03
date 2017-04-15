@@ -165,7 +165,6 @@ module radiation
  
                  type(radiative_coeffs) :: a21
                  type(energy_lev) :: e 
-                 integer, dimension(0:jmax)  :: ivmax
 
 
                  a21%reading = 0.d0
@@ -173,7 +172,7 @@ module radiation
                  
                  open(123, file='../../data/read/lipovka/hd_einstein_coeffs.dat', status = 'unknown')
                  
-                 a21%ntransrad = 10
+                 a21%ntransrad = 9
 
                  allocate(a21%vir(1:a21%ntransrad), a21%jir(1:a21%ntransrad))
                  allocate(a21%vfr(1:a21%ntransrad), a21%jfr(1:a21%ntransrad))
@@ -183,7 +182,7 @@ module radiation
                     read(123, *)
                  enddo
                  do i = 1, a21%ntransrad
-                    read(123, *) a21%vir(i),a21%jir(i),a21%vfr(i),a21%jfr(i), &
+                    read(123, *) a21%vir(i),a21%jir(i),a21%vfr(i),a21%jfr(i), ac, &
                      a21%arranging(a21%vir(i),a21%jir(i),a21%vfr(i),a21%jfr(i))
                  enddo
 
@@ -194,6 +193,7 @@ module radiation
                             vf = e%vl_lique(fin)
                             jf = e%jl_lique(fin)
                       a21%M_lique(ini, fin) = a21%arranging(vi,ji,vf,jf)
+!                     print*, ini, fin, a21%M_lique(ini, fin)
                    enddo
                  enddo
                 return

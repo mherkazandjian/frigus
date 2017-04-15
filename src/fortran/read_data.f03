@@ -28,9 +28,9 @@ module read_data
 
          call reading_data_energies(energy)
 
-         call reading_data_radiative(energy, a21)
+!         call reading_data_radiative(energy, a21)
 
-!         call reading_data_radiative_lipovka(energy, a21)         
+         call reading_data_radiative_lipovka(energy, a21)         
          
          call reading_data_collisions(energy, rr, rr21, rr12)
 

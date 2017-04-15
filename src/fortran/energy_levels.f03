@@ -144,6 +144,11 @@ module energy_levels
                           e%ene_lique(i) = e%en_lique(e%vl_lique(i), e%jl_lique(i))
                           !   write(6,'(i3,2x,i2,2x,i2,2x,e10.4)') i, vl(i), jl(i), en(vl(i),jl(i))
                       enddo
+                      do ini = 1, nlev_lique
+                          do fin = 1, nlev_lique
+                              e%freq_lique(ini, fin) = (dabs(e%ene_lique(ini)-e%ene_lique(fin))/kb)/hp
+                          enddo
+                      enddo                      
                       !conversion K -->  Joule
                       e%en_lique = e%en_lique*kb
                       e%ene_lique = e%ene_lique*kb
