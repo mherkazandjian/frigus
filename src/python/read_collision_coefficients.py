@@ -135,19 +135,18 @@ def read_collision_coefficients_lipovka(fname):
     v, v' : initial and final vibrational state
     j, j' : initial and final rotational state
 
-    v  j  v' j'    k(cm3 s-1) (T) , T= 100 to 5000K by steps of 100K
-
-    0  1  0  0     0.3098E-21  0.1521E-18  0.1791E-16  0.3164E-15.....
-    0  2  0  0     0.6561E-13  0.7861E-13  0.9070E-13  0.1266E-12.....
+    the data are stored in blocks for each temperature. The colomns are the
+    initial ro-vibrational (v,j) level and the rows are the final ones (v', j')
+    http://massey.dur.ac.uk/drf/HD_H/
 
     :param string fname: The path to the ascii data.
     :return: a tuple of 3 elements.
       The first element is a 5D array that holds all the rate coefficients.
-      K[v, j, v', j', T_index] ( in m3/s)
+      K[T_index, v, j, v', j'] ( in m3/s)
 
       The second element is a 1D temperature array (T) corresponding to the
       rate coefficients in the 5D array. This array has the same size as the
-      last dimension of K (i.e K[0,0,0,0,:].size = T.size
+      last dimension of K (i.e K[:,0,0,0,0].size = T.size
 
       The third element is a tuple of 4 elements:
 
@@ -245,7 +244,8 @@ def read_collision_coefficients_lipovka(fname):
         def parse_block(self, block):
             """parse a block of data and return the temperature, the levels
             and the collision rates"""
-            lines = iter(block.split('\n'))
+            lines = iter(filter(lambda x: len(x) > 0, block.split('\n')))
+
             # get the temperature
             T = lines.next()
             assert 'K' in T
@@ -259,19 +259,19 @@ def read_collision_coefficients_lipovka(fname):
             for level in levels:
                 v.append(int32(level.split(',')[0]))
                 j.append(int32(level.split(',')[1]))
+            v, j = numpy.array(v), numpy.array(j)
 
             ini = numpy.repeat(numpy.vstack((v, j)), len(v), axis=1)
             fin = numpy.tile([v, j], len(v))
 
-            cr = zeros((int(len(v)), int(len(j)), int(len(v)), int(len(j))),
-                       'f8')
-            for initial, line in enumerate(lines):
+            cr = zeros((v.size, j.size, v.size, j.size), 'f8')
+            for final_state_ind, line in enumerate(lines):
+                vp, jp = v[final_state_ind], j[final_state_ind]
                 if len(line.strip()) > 0:
                     data = numpy.float64(line.replace('D', 'E').strip().split())
-                    for final, (vp, jp) in enumerate(zip(v, j)):
-                        cr[v[initial], j[initial], vp, jp] = data[final]
-
-                    print data[0]
+                    for initial_state_ind, datum in enumerate(data):
+                        vi, ji = v[initial_state_ind], j[initial_state_ind]
+                        cr[vi, ji, vp, jp] = datum
 
             return ini, fin, tkin, cr
 
