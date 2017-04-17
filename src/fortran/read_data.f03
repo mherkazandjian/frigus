@@ -28,17 +28,17 @@ module read_data
 
          call reading_data_energies(energy)
 
-!         call reading_data_radiative(energy, a21)
+         call reading_data_radiative(energy, a21)
 
-         call reading_data_radiative_lipovka(energy, a21)         
-         
+         !call reading_data_radiative_lipovka(energy, a21)         
+
          call reading_data_collisions(energy, rr, rr21, rr12)
 
          call radiative_downwards(energy, Trad, a21, b21, r21)
 
          call radiative_upwards(energy, Trad, b21, b12, jnu, r12)
 
-         !call tests(energy, rr, rr21, rr12, a21, b21, r21, b12, jnu, r12, coll_rad_matrix, id_temp)
+         call tests(energy, rr, rr21, rr12, a21, b21, r21, b12, jnu, r12, coll_rad_matrix, id_temp)
 
          !call writing_files(a21, b21, b12, jnu, id_temp, rr, coll_rad_matrix)
 

@@ -56,12 +56,12 @@ module testing_data
 !----------------------------------------------------------------------------------------------------      
 
     ! TEST READING ENERGY LEVELS
-    !    call reading_data(e)
-    !    do i = 0, vmax
-    !       do j = 0, jmax
-    !           write(6,'(2(i2,2x), e14.8)') i, j, e%en(i,j)
-    !       enddo
-    !    enddo
+    !    call reading_data(energy)
+        do i = 0, vmax
+           do j = 0, jmax
+               write(6,'(2(i2,2x), e14.8)') i, j, energy%en(i,j)
+           enddo
+        enddo
 
 !----------------------------------------------------------------------------------------------------      
 

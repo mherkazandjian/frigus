@@ -35,11 +35,11 @@ module collisions
                  rr%reading = 0.d0
                  rr%matrix_lique = 0.d0
 
-                 if(ilipovka_flag.eq.0) then
-                    rr%temp = [ (i, i=100,ntemp*100,100) ]
-                 else
-                    rr%temp = [ (i, i=100, 2000, 20) ]
-                 endif
+                 !if(ilipovka_flag.eq.0)
+                 !rr%temp = [ (i, i=100,ntemp*100,100) ]
+                 !if(ilipovka_flag.eq.1)
+                 rr%temp = [ (i, i=100, 2000, 20) ]
+                
                  
 
                  !do i = 1, ntemp
@@ -49,8 +49,8 @@ module collisions
                  open (19, file='../../data/read/wrathmall/Rates_H_H2_flower_new.dat', status = 'unknown')                 
                  open (20, file='../../data/read/wrathmall/Rates_H_H2_flower_new_downwards.dat', status = 'unknown')
                  open (21, file='../../data/read/Rates_H_H2.dat', status = 'unknown')                 
-                 open (22, file='../../data/read/lipovka/Rates_H_HD.dat', status = 'unknown')                 
-                 
+                 open (22, file='../../data/read/lipovka/Rates_H_HD.dat', status = 'unknown')
+                 ! open (23, in the part concerning the lipovka data
 
                 print*, 'ilique_flag in collisions file:', ilique_flag
                 print*, 'ilipovka_flag in collisions file:', ilipovka_flag
@@ -175,65 +175,79 @@ module collisions
                          enddo
                      endif
             else
-                ! reading data used by lipovka (by flower and roueff)
-                  do i = 1, 15
+                ! reading data used by lipovka (by flower and roueff) and transforming them into the format by wrathmall and lique
+                do i = 1, 15
+                   read(22,*)
+                enddo
+                do it = 1, ntemp
+                   read(22,*) a
+                   read(22,'(a80)') bc
+                   print*, a
+                   do i_final = 1, 10
+                          read(22,*) (rr%reading(0, i_initial-1, 0, i_final-1, it), i_initial= 1, 10)
+                          !print*, i_final-1, i_initial-1
+                          !print*, rr%reading(0,i_initial,0,i_final,it)
+                   enddo
+                     read(22,*)
+                     read(22,*)
                      read(22,*)
                   enddo
-                  do it = 1, ntemp
-                     read(22,*) a
-                     read(22,'(a80)') bc
-!                     print*, a
-                     do i_final = 1, 10
-                            read(22,*) (rr%reading(0, i_initial-1, 0, i_final-1, it), i_initial= 1, 10)
-!                            print*, i_final, i_initial
-!                        print*, rr%reading(0,i_initial,0,i_final,it)
-                     enddo
-                     read(22,*)
-                     read(22,*)
-                     read(22,*)
+                  ! rewriting on file in the same format by Wrathmall and Lique
+                  open (23, file='../../data/read/lipovka/Rates_H_HD_new.dat', status = 'unknown')
+                  do i_final = 1, 10
+                    do i_initial = 10-i_final+1, 10
+                       write(23, ('(4(i2, x), 96(ES23.15, x))')) 0,                                     &
+                                                          i_initial-1,                                  &
+                                                          0,                                            &
+                                                          i_final-1,                                    &
+                                                          (rr%reading(0,i_initial-1,0,i_final-1,it),    &
+                                                          it = 1, ntemp)
+                    enddo
                   enddo
-!                   do i = 1,ntrans
-!                       read(22,*) rr%vic(i),rr%jic(i),rr%vfc(i),rr%jfc(i),      &
-!                       (rr%reading(rr%vic(i),rr%jic(i),rr%vfc(i),rr%jfc(i),it), &
-!                       it=1,ntemp)
-!                       vi=rr%vic(i)
-!                       ji=rr%jic(i)
-!                       vf=rr%vfc(i)
-!                       jf=rr%jfc(i)
-!                       do l=1, nlev_lique
-!                           if(vi.eq.e%vl_lique(l)) then
-!                               if(ji.eq.e%jl_lique(l)) then
-!                                   rr%couple1c(i) = l
-!                               endif
-!                           endif
-!                           if(vf.eq.e%vl_lique(l)) then
-!                               if(jf.eq.e%jl_lique(l)) then
-!                                   rr%couple2c(i) = l
-!                               endif
-!                           endif
-!                       enddo
-!                   enddo
-!                   ! detailed balance implementation (lique)
-!                       do i=1, ntrans
-!                       vi=rr%vic(i)
-!                       ji=rr%jic(i)
-!                       vf=rr%vfc(i)
-!                       jf=rr%jfc(i)
-!                       dE = abs(e%en_lique(vi,ji)-e%en_lique(vf,jf))
-!                           do it = 1, ntemp
-!                           rr%matrix_lique(rr%couple1c(i),rr%couple2c(i),it) = &
-!                                           rr%reading(vi,ji,vf,jf,it)
-!                           rr21%matrix_lique(rr%couple1c(i),rr%couple2c(i),it) = &
-!                               rr%matrix_lique(rr%couple1c(i),rr%couple2c(i),it)
-!                           rr%matrix_lique(rr%couple2c(i),rr%couple1c(i),it) =       &
-!                               dexp(-dE/(kb*rr%temp(it))) * rr%reading(vi,ji,vf,jf,it) &
-!                               * ((2.*ji+1.))/(2.*jf+1.)
-!                           rr12%matrix_lique(rr%couple2c(i),rr%couple1c(i),it) = &
-!                               rr%matrix_lique(rr%couple2c(i),rr%couple1c(i),it)
-!                           enddo
-!                       enddo
-            endif
-
+                  rewind(23)
+                  ! finished with the restyled datafile
+                   do i = 1,ntrans
+                       read(23,*) rr%vic(i),rr%jic(i),rr%vfc(i),rr%jfc(i),      &
+                       (rr%reading(rr%vic(i),rr%jic(i),rr%vfc(i),rr%jfc(i),it), &
+                       it=1,ntemp)
+                       vi=rr%vic(i)
+                       ji=rr%jic(i)
+                       vf=rr%vfc(i)
+                       jf=rr%jfc(i)
+                       print*, vi, ji, vf, jf
+                       do l=1, nlev_lique
+                           if(vi.eq.e%vl_lique(l)) then
+                               if(ji.eq.e%jl_lique(l)) then
+                                   rr%couple1c(i) = l
+                               endif
+                           endif
+                           if(vf.eq.e%vl_lique(l)) then
+                               if(jf.eq.e%jl_lique(l)) then
+                                   rr%couple2c(i) = l
+                               endif
+                           endif
+                       enddo
+                   enddo
+                   ! detailed balance implementation (lique)
+                       do i=1, ntrans
+                       vi=rr%vic(i)
+                       ji=rr%jic(i)
+                       vf=rr%vfc(i)
+                       jf=rr%jfc(i)
+                       dE = abs(e%en_lique(vi,ji)-e%en_lique(vf,jf))
+                           do it = 1, ntemp
+                           rr%matrix_lique(rr%couple1c(i),rr%couple2c(i),it) = &
+                                           rr%reading(vi,ji,vf,jf,it)
+                           rr21%matrix_lique(rr%couple1c(i),rr%couple2c(i),it) = &
+                               rr%matrix_lique(rr%couple1c(i),rr%couple2c(i),it)
+                           rr%matrix_lique(rr%couple2c(i),rr%couple1c(i),it) =       &
+                               dexp(-dE/(kb*rr%temp(it))) * rr%reading(vi,ji,vf,jf,it) &
+                               * ((2.*ji+1.))/(2.*jf+1.)
+                           rr12%matrix_lique(rr%couple2c(i),rr%couple1c(i),it) = &
+                               rr%matrix_lique(rr%couple2c(i),rr%couple1c(i),it)
+                           enddo
+                       enddo
+           endif
                  !units conversion: cm3 s-1 -> m3 s-1
                  rr%matrix_lique = rr%matrix_lique*1.d-6
                  rr21%matrix_lique = rr21%matrix_lique*1.d-6                                  

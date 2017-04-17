@@ -146,7 +146,7 @@ module energy_levels
                       enddo
                       do ini = 1, nlev_lique
                           do fin = 1, nlev_lique
-                              e%freq_lique(ini, fin) = (dabs(e%ene_lique(ini)-e%ene_lique(fin))/kb)/hp
+                              e%freq_lique(ini, fin) = (dabs(e%ene_lique(ini)-e%ene_lique(fin))*kb)/hp
                           enddo
                       enddo                      
                       !conversion K -->  Joule
@@ -156,10 +156,7 @@ module energy_levels
                       !e%ene = -e%ene   ! to revert the actual way the energies are given
                                        ! Emax @ (v=0,j=0) --> Emin @ (v=0,j=0)
              endif
-             
-    
-             
-                    
+
                      do i=1,nlev                     
                         write(13,'(3(i3,2x))') i, e%vl(i), e%jl(i)
                      enddo
@@ -169,10 +166,10 @@ module energy_levels
                         write(14,'(3(i3,2x),e14.7)') i, e%vl_lique(i), e%jl_lique(i), e%ene_lique(i)/q
                      enddo
                      
-                     write(15,'(a5, 2x, 4(a2,3x))') 'label', 'v' , 'j', 'vp' , 'jp'
+                     write(15,'(2(a7, 3x), 4(a2,6x))') 'lab_ini', 'lab_fin', 'v' , 'j', 'vp' , 'jp'
                      do i=1,nlev_lique
                         do j=1,nlev_lique                     
-                            write(15,'(6(i3,2x),e14.7)') i, j,                            &
+                            write(15,'(2(i3,8x),4(i3, 4x),e14.7)') i, j,                            &
                                                             e%vl_lique(i), e%jl_lique(i), &
                                                             e%vl_lique(j), e%jl_lique(j), & 
                                                             e%freq_lique(i,j)

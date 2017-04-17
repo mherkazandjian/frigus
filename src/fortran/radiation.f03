@@ -174,6 +174,7 @@ module radiation
                  
                  a21%ntransrad = 9
 
+                 allocate(a21%couple1r(1:a21%ntransrad), a21%couple2r(1:a21%ntransrad))
                  allocate(a21%vir(1:a21%ntransrad), a21%jir(1:a21%ntransrad))
                  allocate(a21%vfr(1:a21%ntransrad), a21%jfr(1:a21%ntransrad))
                  allocate(a21%arranging(0:vmax, 0:jmax, 0:vmax, 0:jmax))
