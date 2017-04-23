@@ -19,7 +19,7 @@ import population
 
 class DataSetRawBase(object):
     """
-
+    Abstract class for storing raw data of species. 
     """
     def __init__(self):
         """
