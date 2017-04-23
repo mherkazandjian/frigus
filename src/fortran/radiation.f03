@@ -178,6 +178,7 @@ module radiation
                  allocate(a21%vir(1:a21%ntransrad), a21%jir(1:a21%ntransrad))
                  allocate(a21%vfr(1:a21%ntransrad), a21%jfr(1:a21%ntransrad))
                  allocate(a21%arranging(0:vmax, 0:jmax, 0:vmax, 0:jmax))
+                 a21%arranging = 0.d0
 
                  do i = 1, 2
                     read(123, *)
