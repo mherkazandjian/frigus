@@ -46,7 +46,7 @@ if True:
 if False:
 
     # density of the colliding species, in m^3
-    nc_H = 0.0 * u.meter ** -3
+    nc_H = 1e6 * u.meter ** -3
     T_kin = 100.0 * u.Kelvin
     T_rad = 0.0 * u.Kelvin
 

@@ -194,13 +194,13 @@ module collisions
                   enddo
                   ! rewriting on file in the same format by Wrathmall and Lique
                   open (23, file='../../data/read/lipovka/Rates_H_HD_new.dat', status = 'unknown')
-                  do i_final = 1, 10
-                    do i_initial = 10-i_final+1, 10
+                  do i_initial = 0, 9
+                    do i_final = 0, 9
                        write(23, ('(4(i2, x), 96(ES23.15, x))')) 0,                                     &
-                                                          i_initial-1,                                  &
+                                                          i_initial,                                  &
                                                           0,                                            &
-                                                          i_final-1,                                    &
-                                                          (rr%reading(0,i_initial-1,0,i_final-1,it),    &
+                                                          i_final,                                    &
+                                                          (rr%reading(0,i_initial,0,i_final,it),    &
                                                           it = 1, ntemp)
                     enddo
                   enddo
@@ -214,7 +214,7 @@ module collisions
                        ji=rr%jic(i)
                        vf=rr%vfc(i)
                        jf=rr%jfc(i)
-                       print*, vi, ji, vf, jf
+                       !print*, vi, ji, vf, jf
                        do l=1, nlev_lique
                            if(vi.eq.e%vl_lique(l)) then
                                if(ji.eq.e%jl_lique(l)) then
@@ -250,7 +250,7 @@ module collisions
            endif
                  !units conversion: cm3 s-1 -> m3 s-1
                  rr%matrix_lique = rr%matrix_lique*1.d-6
-                 rr21%matrix_lique = rr21%matrix_lique*1.d-6                                  
+                 rr21%matrix_lique = rr21%matrix_lique*1.d-6
                  rr12%matrix_lique = rr12%matrix_lique*1.d-6
 
 
