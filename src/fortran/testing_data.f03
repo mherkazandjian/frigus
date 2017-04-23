@@ -56,21 +56,24 @@ module testing_data
 !----------------------------------------------------------------------------------------------------      
 
     ! TEST READING ENERGY LEVELS
-    !    call reading_data(energy)
-        do i = 0, vmax
-           do j = 0, jmax
-               write(6,'(2(i2,2x), e14.8)') i, j, energy%en(i,j)
-           enddo
-        enddo
+    !!   call reading_data(energy)
+!         do i = 0, vmax
+!            do j = 0, jmax
+    !    do i = 1, nlev_lique
+    !       !do j = 1, nlev_lique
+    !           !write(6,'(2(i2,2x), e14.8)') i, j, energy%en(i,j)
+    !           write(6,'((i2,2x), e14.8)') i, energy%ene_lique(i)
+    !       !enddo
+    !    enddo
 
 !----------------------------------------------------------------------------------------------------      
 
     ! TEST READING RADIATIVE COEFFICIENTS
-    !    call reading_data_radiative(a21)
+    !!    call reading_data_radiative(a21)
     !    print*, a21%ntransrad
-    !    do ini = 1, nlev
-    !        do fin = 1, nlev
-    !           write(6,'(2(i3, 2x), e14.5)') ini, fin, a21%M(ini, fin)
+    !    do ini = 1, nlev_lique
+    !        do fin = 1, nlev_lique
+    !           write(6,'(2(i3, 2x), es7.1)') ini, fin, a21%M_lique(ini, fin)
     !        enddo
     !    enddo
 
@@ -109,37 +112,37 @@ module testing_data
 
     ! TEST COLLISIONAL COEFFICIENTS
     ! test 1: checks for comparison with the Python code
-     diagonal_rr21 = 0.d0
-     diagonal_rr12 = 0.d0    
-     do i = 1, ntrans
-        do itt = 1, ntemp
-            if(rr%couple1c(i).ge.rr%couple2c(i))  then
-                diagonal_rr21 = diagonal_rr21 + rr21%matrix_lique(rr%couple1c(i),rr%couple2c(i),itt)
-            else
-                diagonal_rr12 = diagonal_rr12 + rr12%matrix_lique(rr%couple2c(i),rr%couple1c(i),itt)
-            endif
-        enddo
-    enddo
-    print*, 'rr21', sum(rr21%matrix_lique), diagonal_rr21, 'max', maxval(rr21%matrix_lique)
-    print*, 'rr12', sum(rr12%matrix_lique), diagonal_rr12, 'max', maxval(rr12%matrix_lique)
-    print*, 'sum_collisional: ', sum(rr%matrix_lique),                        &
-            'sum(rr21+rr12):',sum(rr21%matrix_lique + rr12%matrix_lique)
-    print*, 'max_collisional: ', maxval(rr%matrix_lique)
-    print*, 'min_collisional: ', minval(rr%matrix_lique)    
+    ! diagonal_rr21 = 0.d0
+    ! diagonal_rr12 = 0.d0    
+    ! do i = 1, ntrans
+    !    do itt = 1, ntemp
+    !        if(rr%couple1c(i).ge.rr%couple2c(i))  then
+    !            diagonal_rr21 = diagonal_rr21 + rr21%matrix_lique(rr%couple1c(i),rr%couple2c(i),itt)
+    !        else
+    !            diagonal_rr12 = diagonal_rr12 + rr12%matrix_lique(rr%couple2c(i),rr%couple1c(i),itt)
+    !        endif
+    !    enddo
+    !enddo
+    !print*, 'rr21', sum(rr21%matrix_lique), diagonal_rr21, 'max', maxval(rr21%matrix_lique)
+    !print*, 'rr12', sum(rr12%matrix_lique), diagonal_rr12, 'max', maxval(rr12%matrix_lique)
+    !print*, 'sum_collisional: ', sum(rr%matrix_lique),                        &
+    !        'sum(rr21+rr12):',sum(rr21%matrix_lique + rr12%matrix_lique)
+    !print*, 'max_collisional: ', maxval(rr%matrix_lique)
+    !print*, 'min_collisional: ', minval(rr%matrix_lique)    
     
     ! test 2: checks with the read values from the input file + detailed balance
-    ! do i = 1, ntrans
-    !    do it = 1, ntemp    
-    !          write(6, '(6(i3,2x), 4(e14.5))') rr%couple1c(i),rr%couple2c(i),   &
-    !                                    rr%vic(i),rr%jic(i),rr%vfc(i),rr%jfc(i),&
-    !                                    rr%temp(it),                            &
-    !                     rr%matrix_lique(rr%couple1c(i),rr%couple2c(i),it)*1.d6,      &
-    !                     rr%matrix_lique(rr%couple2c(i),rr%couple1c(i),it)*1.d6,      &
-    !                          (rr%matrix_lique(rr%couple1c(i),rr%couple2c(i),it)-     &
-    !                      rr%matrix_lique(rr%couple2c(i),rr%couple1c(i),it))*1.d6/    &
-    !                      (rr%matrix_lique(rr%couple1c(i),rr%couple2c(i),it)*1.d6)
-    !    enddo
-    !enddo    
+     do i = 1, ntrans
+        do it = 1, 1!ntemp    
+              write(6, '(6(i3,2x), 4(e14.5))') rr%couple1c(i),rr%couple2c(i),   &
+                                        rr%vic(i),rr%jic(i),rr%vfc(i),rr%jfc(i),&
+                                        rr%temp(it),                            &
+                         rr%matrix_lique(rr%couple1c(i),rr%couple2c(i),it)*1.d6,      &
+                         rr%matrix_lique(rr%couple2c(i),rr%couple1c(i),it)*1.d6,      &
+                              (rr%matrix_lique(rr%couple1c(i),rr%couple2c(i),it)-     &
+                          rr%matrix_lique(rr%couple2c(i),rr%couple1c(i),it))*1.d6/    &
+                          (rr%matrix_lique(rr%couple1c(i),rr%couple2c(i),it)*1.d6)
+        enddo
+    enddo    
 
     ! test 3: check for collisional coefficients and corresponding temperature
     !     do i = 1, ntrans
@@ -155,35 +158,35 @@ module testing_data
 
     ! TEST RADIATIVE TRANSITIONS COEFFICIENTS
     ! test 1: checks for comparison with the Python code
-    diagonal_a21 = 0.d0
-    diagonal_b21 = 0.d0
-    diagonal_r21 = 0.d0
-    diagonal_b12 = 0.d0
-    diagonal_r12 = 0.d0
-    diagonal_jnu = 0.d0    
-      do ini = 1, nlev_lique
-         do fin = 1, nlev_lique
-            if(ini.ge.fin)  then
-                diagonal_a21 = diagonal_a21 + a21%M_lique(ini, fin)   
-                diagonal_b21 = diagonal_b21 + b21%M_lique(ini, fin)   
-                diagonal_r21 = diagonal_r21 + r21%M_lique(ini, fin)
-            else
-                diagonal_b12 = diagonal_b12 + b12%M_lique(ini, fin)
-                diagonal_r12 = diagonal_r12 + r12%M_lique(ini, fin)
-            endif
-           
-            diagonal_jnu = diagonal_jnu + jnu%M_lique(ini, fin)
-         enddo
-      enddo
-      print*, 'a21', sum(a21%M_lique), diagonal_a21
-      write(6, '(a13,e14.7)') 'max frequency', maxval(energy%freq_lique)
-      print*, 'sum b21:', sum(b21%M_lique), diagonal_b21, 'max b21:', maxval(b21%M_lique)
-      print*, 'sum b12:', sum(b12%M_lique), diagonal_b12, 'max b12:', maxval(b12%M_lique)
-      print*, 'sum b21+b12:', sum(b21%M_lique + b12%M_lique), 'max b:', maxval(b21%M_lique + b12%M_lique)
-      print*, 'sum jnu', sum(jnu%M_lique), diagonal_jnu, 'max', maxval(jnu%M_lique)
-      print*, 'sum r21', sum(r21%M_lique), diagonal_r21, 'max', maxval(r21%M_lique)
-      print*, 'sum r12', sum(r12%M_lique), diagonal_r12, 'max', maxval(r12%M_lique)
-      print*, 'sum r21+r12', sum(r21%M_lique+r12%M_lique), 'max', maxval(r21%M_lique+r12%M_lique)
+    !diagonal_a21 = 0.d0
+    !diagonal_b21 = 0.d0
+    !diagonal_r21 = 0.d0
+    !diagonal_b12 = 0.d0
+    !diagonal_r12 = 0.d0
+    !diagonal_jnu = 0.d0    
+    !  do ini = 1, nlev_lique
+    !     do fin = 1, nlev_lique
+    !        if(ini.ge.fin)  then
+    !            diagonal_a21 = diagonal_a21 + a21%M_lique(ini, fin)   
+    !            diagonal_b21 = diagonal_b21 + b21%M_lique(ini, fin)   
+    !            diagonal_r21 = diagonal_r21 + r21%M_lique(ini, fin)
+    !        else
+    !            diagonal_b12 = diagonal_b12 + b12%M_lique(ini, fin)
+    !            diagonal_r12 = diagonal_r12 + r12%M_lique(ini, fin)
+    !        endif
+    !       
+    !        diagonal_jnu = diagonal_jnu + jnu%M_lique(ini, fin)
+    !     enddo
+    !  enddo
+    !  print*, 'a21', sum(a21%M_lique), diagonal_a21
+    !  write(6, '(a13,e14.7)') 'max frequency', maxval(energy%freq_lique)
+    !  print*, 'sum b21:', sum(b21%M_lique), diagonal_b21, 'max b21:', maxval(b21%M_lique)
+    !  print*, 'sum b12:', sum(b12%M_lique), diagonal_b12, 'max b12:', maxval(b12%M_lique)
+    !  print*, 'sum b21+b12:', sum(b21%M_lique + b12%M_lique), 'max b:', maxval(b21%M_lique + b12%M_lique)
+    !  print*, 'sum jnu', sum(jnu%M_lique), diagonal_jnu, 'max', maxval(jnu%M_lique)
+    !  print*, 'sum r21', sum(r21%M_lique), diagonal_r21, 'max', maxval(r21%M_lique)
+    !  print*, 'sum r12', sum(r12%M_lique), diagonal_r12, 'max', maxval(r12%M_lique)
+    !  print*, 'sum r21+r12', sum(r21%M_lique+r12%M_lique), 'max', maxval(r21%M_lique+r12%M_lique)
     
     ! test 2: to check the read data and filled matrices
     !  do ini = 1, nlev_lique
@@ -205,26 +208,26 @@ module testing_data
 
     ! TEST MATRIX LINEAR SYSTEM
     ! test 1: checks for the off-diagonal terms of M
-    diagonal_M = 0.d0
-    diagonal_O = 0.d0
-    diagonal_D = 0.d0
-      do ini = 1, nlev_lique
-         do fin = 1, nlev_lique
-                diagonal_O = diagonal_O + coll_rad_matrix%O(ini, fin)
-                diagonal_D = diagonal_D + coll_rad_matrix%D(ini, fin)                
-                diagonal_M = diagonal_M + coll_rad_matrix%M(ini, fin)                
-         enddo
-      enddo
-     print*, 'sum O: ', sum(coll_rad_matrix%O), diagonal_O, 'max: ', maxval(coll_rad_matrix%O)
-     print*, 'sum D: ', sum(coll_rad_matrix%D), diagonal_D, 'max: ', maxval(coll_rad_matrix%D)
-     print*, 'min D: ', minval(coll_rad_matrix%D)
-     write(6, '(a7, 2(e14.7, 2x), 2(a5, (e14.7, 2x)), 2(a11, e14.7, 2x) )')                    &
-              'sum M: ', sum(coll_rad_matrix%M), diagonal_M,             &
-              'max: ', maxval(coll_rad_matrix%M),                        &
-              'min: ', minval(coll_rad_matrix%M),                        &
-              'sum O + D: ', sum(coll_rad_matrix%O+coll_rad_matrix%D),   &
-              'max O + D: ', maxval(coll_rad_matrix%M)
-              
+    !diagonal_M = 0.d0
+    !diagonal_O = 0.d0
+    !diagonal_D = 0.d0
+    !  do ini = 1, nlev_lique
+    !     do fin = 1, nlev_lique
+    !            diagonal_O = diagonal_O + coll_rad_matrix%O(ini, fin)
+    !            diagonal_D = diagonal_D + coll_rad_matrix%D(ini, fin)                
+    !            diagonal_M = diagonal_M + coll_rad_matrix%M(ini, fin)                
+    !     enddo
+    !  enddo
+    ! print*, 'sum O: ', sum(coll_rad_matrix%O), diagonal_O, 'max: ', maxval(coll_rad_matrix%O)
+    ! print*, 'sum D: ', sum(coll_rad_matrix%D), diagonal_D, 'max: ', maxval(coll_rad_matrix%D)
+    ! print*, 'min D: ', minval(coll_rad_matrix%D)
+    ! write(6, '(a7, 2(e14.7, 2x), 2(a5, (e14.7, 2x)), 2(a11, e14.7, 2x) )')                    &
+    !          'sum M: ', sum(coll_rad_matrix%M), diagonal_M,             &
+    !          'max: ', maxval(coll_rad_matrix%M),                        &
+    !          'min: ', minval(coll_rad_matrix%M),                        &
+    !          'sum O + D: ', sum(coll_rad_matrix%O+coll_rad_matrix%D),   &
+    !          'max O + D: ', maxval(coll_rad_matrix%M)
+    !          
     
     
     
