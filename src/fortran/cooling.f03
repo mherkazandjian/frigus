@@ -81,7 +81,7 @@ program cooling
                                      +12.066770*log10((rr%temp(id_temp)/1000.))**7)
              endif            
             
-            ln_hd = dlog10(nc(idensity)*1.d-6)
+            ln_hd = dlog10(nc(idensity)*1.d-6) ! the fit by lipovka is valid for densities in cm-3
             lt_kin = dlog10(rr%temp(id_temp))
             
             lipovka(id_temp) =                                          &
