@@ -327,8 +327,7 @@ def reduce_collisional_coefficients_slow(cr_info_nnz, energy_levels):
     # check that the upper triangular matrices for all the temperatures
     # including the diagonal are zero since this is the K_dex matrix (see doc)
     #
-    for i in range(n_T):
-        assert numpy.triu(K_dex_reduced[..., i], k=0).sum() == 0.0
+    assert numpy.triu(numpy.moveaxis(K_dex_reduced, -1, 0)).sum() == 0.0
 
     # DEBUG
     # K_dex_reduced[K_dex_reduced > 0.0] = numpy.log10(
