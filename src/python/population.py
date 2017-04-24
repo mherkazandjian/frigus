@@ -303,7 +303,7 @@ def reduce_collisional_coefficients_slow(cr_info_nnz, energy_levels):
     labels_ini = linear_2d_index(v_nnz, j_nnz, n_i=levels.v_max_allowed)
     labels_fin = linear_2d_index(vp_nnz, jp_nnz, n_i=levels.v_max_allowed)
 
-    K_ex_reduced = zeros((n_levels, n_levels, n_T), 'f8') * cr_nnz.unit
+    K_dex_reduced = zeros((n_levels, n_levels, n_T), 'f8') * cr_nnz.unit
 
     for i, cr_i in enumerate(cr_nnz.T):
 
@@ -319,19 +319,25 @@ def reduce_collisional_coefficients_slow(cr_info_nnz, energy_levels):
         ind_fin = where(labels == labels_fin[i])[0]
 
         if ind_ini.size != 0 or ind_fin.size != 0:
-            K_ex_reduced[ind_ini, ind_fin, :] = cr_i
+            K_dex_reduced[ind_ini, ind_fin, :] = cr_i
         else:
             continue
 
+    #
+    # check that the upper triangular matrices for all the temperatures
+    # including the diagonal are zero since this is the K_dex matrix (see doc)
+    #
+    for i in range(n_T):
+        assert numpy.triu(K_dex_reduced[..., i], k=0).sum() == 0.0
 
     # DEBUG
-    # K_ex_reduced[K_ex_reduced > 0.0] = numpy.log10(
-    #     K_ex_reduced[K_ex_reduced > 0.0])
-    # pylab.imshow(K_ex_reduced[:, :, 0], interpolation='none')
+    # K_dex_reduced[K_dex_reduced > 0.0] = numpy.log10(
+    #     K_dex_reduced[K_dex_reduced > 0.0])
+    # pylab.imshow(K_dex_reduced[:, :, 0], interpolation='none')
     # pylab.colorbar()
     # pylab.show()
 
-    return K_ex_reduced
+    return K_dex_reduced
 
 
 def reduce_collisional_coefficients(cr, energy_levels):
