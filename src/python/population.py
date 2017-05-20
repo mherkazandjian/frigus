@@ -582,49 +582,57 @@ def fit_glover(T):
 def fit_lipovka(T, n_hd):
     """
     fit of the cooling rate of HD as a function of temperature (in K) in units
-    of erg x s^-1
+    of erg / s.
 
-    .. todo:: add ref
+       HD revised cooling function - Lipovka, Nunez, Avila Reese 2005 
 
-    :param T: .. todo:: add doc
-    :return: .. todo:: add doc
+    :param T: The temperature range
+    :param n_hd: The density of HD
+    :return: The cooling function in erg / s for the inpute T values
+
+    .. see-also:: test_plot_fit_lipovka.py
     """
+    #
+    # make sure the intput temperatures and density value are within the
+    # validity range of the fit
+    #
+    assert T.min() >= 100.0 * u.K
+    assert T.max() <= 2000.0 * u.K
+    assert n_hd.min() >= 1.0 * u.cm**-3
+    assert n_hd.max() <= 1e8 * u.cm**-3
+
     lt_kin = numpy.log10(T.value)
     ln_hd = numpy.log10(n_hd.cgs.value)
 
-    if numpy.log10(100.0) <= lt_kin and lt_kin <= numpy.log10(20000.0):
-        retval = 10.**(- 42.57688 * lt_kin ** 0 * ln_hd ** 0
-                       + 0.92433 * lt_kin ** 0 * ln_hd ** 1
-                       + 0.54962 * lt_kin ** 0 * ln_hd ** 2
-                       - 0.07676 * lt_kin ** 0 * ln_hd ** 3
-                       + 0.00275 * lt_kin ** 0 * ln_hd ** 4
+    retval = 10.**(- 42.57688 * lt_kin ** 0 * ln_hd ** 0
+                   + 0.92433 * lt_kin ** 0 * ln_hd ** 1
+                   + 0.54962 * lt_kin ** 0 * ln_hd ** 2
+                   - 0.07676 * lt_kin ** 0 * ln_hd ** 3
+                   + 0.00275 * lt_kin ** 0 * ln_hd ** 4
 
-                       + 21.93385 * lt_kin ** 1 * ln_hd ** 0
-                       + 0.77952 * lt_kin ** 1 * ln_hd ** 1
-                       - 1.06447 * lt_kin ** 1 * ln_hd ** 2
-                       + 0.11864 * lt_kin ** 1 * ln_hd ** 3
-                       - 0.00366 * lt_kin ** 1 * ln_hd ** 4
+                   + 21.93385 * lt_kin ** 1 * ln_hd ** 0
+                   + 0.77952 * lt_kin ** 1 * ln_hd ** 1
+                   - 1.06447 * lt_kin ** 1 * ln_hd ** 2
+                   + 0.11864 * lt_kin ** 1 * ln_hd ** 3
+                   - 0.00366 * lt_kin ** 1 * ln_hd ** 4
 
-                       - 10.19097 * lt_kin ** 2 * ln_hd ** 0
-                       - 0.54263 * lt_kin ** 2 * ln_hd ** 1
-                       + 0.62343 * lt_kin ** 2 * ln_hd ** 2
-                       - 0.07366 * lt_kin ** 2 * ln_hd ** 3
-                       + 0.002514 * lt_kin ** 2 * ln_hd ** 4
+                   - 10.19097 * lt_kin ** 2 * ln_hd ** 0
+                   - 0.54263 * lt_kin ** 2 * ln_hd ** 1
+                   + 0.62343 * lt_kin ** 2 * ln_hd ** 2
+                   - 0.07366 * lt_kin ** 2 * ln_hd ** 3
+                   + 0.002514 * lt_kin ** 2 * ln_hd ** 4
 
-                       + 2.19906 * lt_kin ** 3 * ln_hd ** 0
-                       + 0.11711 * lt_kin ** 3 * ln_hd ** 1
-                       - 0.13768 * lt_kin ** 3 * ln_hd ** 2
-                       + 0.01759 * lt_kin ** 3 * ln_hd ** 3
-                       - 0.000666317 * lt_kin ** 3 * ln_hd ** 4
+                   + 2.19906 * lt_kin ** 3 * ln_hd ** 0
+                   + 0.11711 * lt_kin ** 3 * ln_hd ** 1
+                   - 0.13768 * lt_kin ** 3 * ln_hd ** 2
+                   + 0.01759 * lt_kin ** 3 * ln_hd ** 3
+                   - 0.000666317 * lt_kin ** 3 * ln_hd ** 4
 
-                       - 0.17334 * lt_kin ** 4 * ln_hd ** 0
-                       - 0.00835 * lt_kin ** 4 * ln_hd ** 1
-                       + 0.0106 * lt_kin ** 4 * ln_hd ** 2
-                       - 0.001482 * lt_kin ** 4 * ln_hd ** 3
-                       + 0.000061926 * lt_kin ** 4 * ln_hd ** 4)
-    else:
-        msg = """temperature value {} is out of bound""".format(T)
-        raise ValueError(msg)
+                   - 0.17334 * lt_kin ** 4 * ln_hd ** 0
+                   - 0.00835 * lt_kin ** 4 * ln_hd ** 1
+                   + 0.0106 * lt_kin ** 4 * ln_hd ** 2
+                   - 0.001482 * lt_kin ** 4 * ln_hd ** 3
+                   + 0.000061926 * lt_kin ** 4 * ln_hd ** 4)
 
     return retval * u.erg * u.s**-1
 
