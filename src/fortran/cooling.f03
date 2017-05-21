@@ -27,14 +27,14 @@ program cooling
 
 
      do idensity = 1, ndensity
-        !write(*,'(a5, ES23.15)') 'nc = ', nc(idensity)
+        write(*,'(a5, ES23.15)') 'nc = ', nc(idensity)
         rr%matrix_lique = rr%matrix_lique * nc(idensity)
         rr21%matrix_lique = rr21%matrix_lique * nc(idensity)
         rr12%matrix_lique = rr12%matrix_lique * nc(idensity)
 
         do id_temp = 1, ntemp 
             call lev_pop(energy, a21, b21, r21, b12, jnu, r12, rr, rr21, rr12, id_temp, nc(idensity), coll_rad_matrix, x)
-            !write(6, '(a17, ES23.15)') 'gas temperature: ', rr%temp(id_temp)
+            write(6, '(a17, ES23.15)') 'gas temperature: ', rr%temp(id_temp)
             cooling_rate(id_temp) = 0.d0
             glover(id_temp) = 0.d0
             lipovka(id_temp) = 0.d0

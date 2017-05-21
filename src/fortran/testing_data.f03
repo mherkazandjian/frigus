@@ -27,14 +27,15 @@ module testing_data
         open(35, file = '/home/carla/Dropbox/us/cooling_function/carla/D_matrix.txt', status = 'unknown')        
         open(36, file = '/home/carla/Dropbox/us/cooling_function/carla/M_matrix.txt', status = 'unknown')        
         
+
         do j = 1, nlev_lique
-           write(30, '(58(ES25.15E3, 1x))') (a21%M_lique(i, j), i = 1, nlev_lique)
-           write(31, '(58(ES25.15E3, 1x))') (b21%M_lique(i, j)+b12%M_lique(i, j), i = 1, nlev_lique)
-           write(32, '(58(ES25.15E3, 1x))') (jnu%M_lique(i, j), i = 1, nlev_lique)
+           write(30, '(58(ES10.3E3, 1x))') (a21%M_lique(i, j), i = 1, nlev_lique)
+           write(31, '(58(ES10.3E3, 1x))') (b21%M_lique(i, j)+b12%M_lique(i, j), i = 1, nlev_lique)
+           write(32, '(58(ES10.3E3, 1x))') (jnu%M_lique(i, j), i = 1, nlev_lique)
            write(33, '(58(ES10.3E3, 1x))') (rr%matrix_lique(i, j, id_temp_test), i = 1, nlev_lique)
-           write(34, '(58(ES25.15E3, 1x))') (coll_rad_matrix%O(i, j), i = 1, nlev_lique)
-           write(35, '(58(ES25.15E3, 1x))') (coll_rad_matrix%D(i, j), i = 1, nlev_lique)
-           write(36, '(58(ES25.15E3, 1x))') (coll_rad_matrix%M(i, j), i = 1, nlev_lique)
+           write(34, '(58(ES10.3E3, 1x))') (coll_rad_matrix%O(i, j), i = 1, nlev_lique)
+           write(35, '(58(ES10.3E3, 1x))') (coll_rad_matrix%D(i, j), i = 1, nlev_lique)
+           write(36, '(58(ES10.3E3, 1x))') (coll_rad_matrix%M(i, j), i = 1, nlev_lique)
         enddo
         
         return
