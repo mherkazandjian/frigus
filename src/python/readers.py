@@ -296,9 +296,9 @@ class DataSetHDLipovka(DataSetBase):
         K_dex_matrix = population.reduce_collisional_coefficients_slow(
             self.raw_data.collision_rates_info_nnz,
             self.energy_levels,
-            set_inelastic_coefficient_to_zero=True,
+            # set_inelastic_coefficient_to_zero=True,
             set_excitation_coefficients_to_zero=True,
-            reduced_data_is_upper_to_lower_only=True,
+            reduced_data_is_upper_to_lower_only=False,
         )
 
         # compute the interpolator that produces K_dex at a certain temperature

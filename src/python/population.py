@@ -189,15 +189,17 @@ def compute_delta_energy_matrix(levels):
 
 
 def compute_degeneracy_matrix(levels):
-    """Given the energy levels, returns the degeneracy matrix R that is
-     strictly upper triangular that is documented in the notebook.
+    """
+    Given the energy levels, returns the degeneracy matrix R that is strictly
+    upper triangular that is documented in the notebook.
+
     :param levels:  .. todo:: add doc
-    :return: square matrix of shape n x n.
+    :return: square strictly upper triangular matrix of shape n x n.
     """
     n = len(levels.data)
     degeneracies_as_column = levels.data['g'].reshape(1, n)
 
-    G = numpy.repeat(degeneracies_as_column, n, axis=0).T
+    G = numpy.array(numpy.repeat(degeneracies_as_column, n, axis=0).T)
 
     # a strict upper triangular matrix
     one_U_nn = numpy.tril(numpy.ones((n, n), 'f8'), -1).T
@@ -512,11 +514,15 @@ def population_density_at_steady_state(data_set,
                                        collider_density,
                                        debug=False):
     """
+    Compute the population density at steady state by solving the linear
+     system. 
 
-    :param data_set:
-    :param T_kin:
-    :param T_rad:
-    :param collider_density:
+    :param readers.DataSet data_set: The data of the species
+    :param T_kin: The kinetic temperature at which the steady state computation
+     will be done.
+    :param T_rad: The radiation temperature at which the steady state computation
+     will be done.
+    :param collider_density: The density of the collider species.
     :return: The equilibrium population density
     """
 
@@ -525,16 +531,18 @@ def population_density_at_steady_state(data_set,
     K_dex_matrix_interpolator = data_set.K_dex_matrix_interpolator
 
     # compute the stimulated emission and absorption coefficients matrix
-    B_J_nu_matrix = compute_B_J_nu_matrix_from_A_matrix(energy_levels,
-                                                        A_matrix,
-                                                        T_rad,
-                                                        debug=debug)
+    B_J_nu_matrix = compute_B_J_nu_matrix_from_A_matrix(
+        energy_levels,
+        A_matrix,
+        T_rad,
+        debug=debug)
 
     # get the K matrix for a certain temperature in the tabulated range
-    K_matrix = compute_K_matrix_from_K_dex_matrix(energy_levels,
-                                                  K_dex_matrix_interpolator,
-                                                  T_kin,
-                                                  debug=debug)
+    K_matrix = compute_K_matrix_from_K_dex_matrix(
+        energy_levels,
+        K_dex_matrix_interpolator,
+        T_kin,
+        debug=debug)
 
     # compute the M matrix that can be used to compute the equilibrium state of
     # the levels (see notebook)
