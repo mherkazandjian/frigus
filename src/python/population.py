@@ -648,16 +648,20 @@ def fit_lipovka(T, n_hd):
 
        HD revised cooling function - Lipovka, Nunez, Avila Reese 2005 
 
-    :param T: The temperature range
-    :param n_hd: The density of HD
-    :return: The cooling function in erg / s for the inpute T values
+    :param u.quantity.Quantity T: The temperature range as an astropy quantity
+    :param u.quantity.Quantity n_hd: The density of HD
+    :return: u.quantity.Quantity: The cooling function in erg / s for the
+     inpute T values
 
     .. see-also:: test_plot_fit_lipovka.py
     """
     #
     # make sure the intput temperatures and density value are within the
-    # validity range of the fit
+    # validity range of the fit and are of the correct types
     #
+    assert isinstance(T, u.quantity.Quantity)
+    assert isinstance(n_hd, u.quantity.Quantity)
+
     assert T.min() >= 100.0 * u.K
     assert T.max() <= 2000.0 * u.K
     assert n_hd.min() >= 1.0 * u.cm**-3
