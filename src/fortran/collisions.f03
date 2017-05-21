@@ -24,7 +24,7 @@ module collisions
                                                  vi, ji, vf, jf,        &
                                                  kb, nc, id_temp, ilique_flag, &
                                                  ilipovka_flag
-                 integer :: ndownwards
+                 integer :: ndownwards, ndownwards_lipovka
                  type(collisional_coeffs) :: rr, rr21, rr12       ! reaction rate
                  type(energy_lev) :: e
                  integer :: i_final, i_initial
@@ -159,7 +159,7 @@ module collisions
                          vi=rr%vic(i)
                          ji=rr%jic(i)
                          vf=rr%vfc(i)
-                        jf=rr%jfc(i)
+                         jf=rr%jfc(i)
                          dE = abs(e%en_lique(vi,ji)-e%en_lique(vf,jf))
                              do it = 1, ntemp
                              rr%matrix_lique(rr%couple1c(i),rr%couple2c(i),it) = &
@@ -194,19 +194,23 @@ module collisions
                   enddo
                   ! rewriting on file in the same format by Wrathmall and Lique
                   open (23, file='../../data/read/lipovka/Rates_H_HD_new.dat', status = 'unknown')
+                  ndownwards_lipovka = 0
                   do i_initial = 0, 9
                     do i_final = 0, 9
+                     if(e%en_lique(0,i_initial)-e%en_lique(0,i_final).gt. 0.d0) then
+                     ndownwards_lipovka = ndownwards_lipovka + 1
                        write(23, ('(4(i2, x), 96(ES23.15, x))')) 0,                                     &
                                                           i_initial,                                  &
                                                           0,                                            &
                                                           i_final,                                    &
                                                           (rr%reading(0,i_initial,0,i_final,it),    &
                                                           it = 1, ntemp)
+                     endif
                     enddo
                   enddo
                   rewind(23)
                   ! finished with the restyled datafile
-                   do i = 1,ntrans
+                   do i = 1, ndownwards_lipovka
                        read(23,*) rr%vic(i),rr%jic(i),rr%vfc(i),rr%jfc(i),      &
                        (rr%reading(rr%vic(i),rr%jic(i),rr%vfc(i),rr%jfc(i),it), &
                        it=1,ntemp)
@@ -215,7 +219,7 @@ module collisions
                        vf=rr%vfc(i)
                        jf=rr%jfc(i)
                        !print*, vi, ji, vf, jf
-                       do l=1, nlev_lique
+                       do l = 1, nlev_lique
                            if(vi.eq.e%vl_lique(l)) then
                                if(ji.eq.e%jl_lique(l)) then
                                    rr%couple1c(i) = l
@@ -229,30 +233,34 @@ module collisions
                        enddo
                    enddo
                    ! detailed balance implementation (lique)
-                       do i=1, ntrans
-                       vi=rr%vic(i)
-                       ji=rr%jic(i)
-                       vf=rr%vfc(i)
-                       jf=rr%jfc(i)
-                       dE = abs(e%en_lique(vi,ji)-e%en_lique(vf,jf))
-                           do it = 1, ntemp
-                           rr%matrix_lique(rr%couple1c(i),rr%couple2c(i),it) = &
-                                           rr%reading(vi,ji,vf,jf,it)
-                           rr21%matrix_lique(rr%couple1c(i),rr%couple2c(i),it) = &
-                               rr%matrix_lique(rr%couple1c(i),rr%couple2c(i),it)
-                           rr%matrix_lique(rr%couple2c(i),rr%couple1c(i),it) =       &
-                               dexp(-dE/(kb*rr%temp(it))) * rr%reading(vi,ji,vf,jf,it) &
-                               * ((2.*ji+1.))/(2.*jf+1.)
-                           rr12%matrix_lique(rr%couple2c(i),rr%couple1c(i),it) = &
-                               rr%matrix_lique(rr%couple2c(i),rr%couple1c(i),it)
-                           enddo
-                       enddo
+                         do i= 1, ndownwards_lipovka
+                         vi=rr%vic(i)
+                         ji=rr%jic(i)
+                         vf=rr%vfc(i)
+                         jf=rr%jfc(i)
+                         dE = abs(e%en_lique(vi,ji)-e%en_lique(vf,jf))
+                             do it = 1, ntemp
+                             rr%matrix_lique(rr%couple1c(i),rr%couple2c(i),it) = &
+                                             rr%reading(vi,ji,vf,jf,it)
+                             rr21%matrix_lique(rr%couple1c(i),rr%couple2c(i),it) = &
+                                 rr%matrix_lique(rr%couple1c(i),rr%couple2c(i),it)
+                             rr%matrix_lique(rr%couple2c(i),rr%couple1c(i),it) =       &
+                                 dexp(-dE/(kb*rr%temp(it))) * rr%reading(vi,ji,vf,jf,it) &
+                                 * ((2.*ji+1.))/(2.*jf+1.)
+                             rr12%matrix_lique(rr%couple2c(i),rr%couple1c(i),it) = &
+                                 rr%matrix_lique(rr%couple2c(i),rr%couple1c(i),it)
+                             enddo
+                         enddo
            endif
                  !units conversion: cm3 s-1 -> m3 s-1
                  rr%matrix_lique = rr%matrix_lique*1.d-6
                  rr21%matrix_lique = rr21%matrix_lique*1.d-6
                  rr12%matrix_lique = rr12%matrix_lique*1.d-6
 
+     do j = 1, nlev_lique
+        write(6, '(58(ES23.15, 1x))') (rr%matrix_lique(i, j, 1), i = 1, nlev_lique)
+     enddo
+                 
 
       end subroutine reading_data_collisions
 

@@ -31,7 +31,7 @@ module testing_data
            write(30, '(58(ES25.15E3, 1x))') (a21%M_lique(i, j), i = 1, nlev_lique)
            write(31, '(58(ES25.15E3, 1x))') (b21%M_lique(i, j)+b12%M_lique(i, j), i = 1, nlev_lique)
            write(32, '(58(ES25.15E3, 1x))') (jnu%M_lique(i, j), i = 1, nlev_lique)
-           write(33, '(58(ES25.15E3, 1x))') (rr%matrix_lique(i, j, id_temp_test), i = 1, nlev_lique)
+           write(33, '(58(ES10.3E3, 1x))') (rr%matrix_lique(i, j, id_temp_test), i = 1, nlev_lique)
            write(34, '(58(ES25.15E3, 1x))') (coll_rad_matrix%O(i, j), i = 1, nlev_lique)
            write(35, '(58(ES25.15E3, 1x))') (coll_rad_matrix%D(i, j), i = 1, nlev_lique)
            write(36, '(58(ES25.15E3, 1x))') (coll_rad_matrix%M(i, j), i = 1, nlev_lique)
@@ -100,14 +100,14 @@ module testing_data
     !        enddo
     !    enddo
     !  enddo
-      !do i = 1, a21%ntransrad
-      !   write(6,'(4(i2,2x),e14.5)') a21%vir(i), a21%jir(j), &
-      !                               a21%vfr(l), a21%jfr(m), &
-      !                 a21%M(a21%couple1r(i),a21%couple2r(i))
-      !enddo      
-      !print*, 'SUM(a21%M)', SUM(a21%M)
-      !print*, 'max(a21%M)', maxval(a21%M)
-      
+     !do i = 1, 9 !a21%ntransrad
+     !   write(6,'(4(i2,2x),e14.5)') a21%vir(i), a21%jir(j), &
+     !                               a21%vfr(l), a21%jfr(m), &
+     !                 a21%M(a21%couple1r(i),a21%couple2r(i))
+     !enddo      
+     !print*, 'SUM(a21%M)', SUM(a21%M_lique)
+     !print*, 'max(a21%M)', maxval(a21%M_lique)
+     
 !----------------------------------------------------------------------------------------------------      
 
     ! TEST COLLISIONAL COEFFICIENTS
@@ -115,7 +115,7 @@ module testing_data
     ! diagonal_rr21 = 0.d0
     ! diagonal_rr12 = 0.d0    
     ! do i = 1, ntrans
-    !    do itt = 1, ntemp
+    !    do itt = 1, 1!ntemp
     !        if(rr%couple1c(i).ge.rr%couple2c(i))  then
     !            diagonal_rr21 = diagonal_rr21 + rr21%matrix_lique(rr%couple1c(i),rr%couple2c(i),itt)
     !        else
@@ -123,6 +123,7 @@ module testing_data
     !        endif
     !    enddo
     !enddo
+    !!print*, 'kinetic temperature:', rr%temp(itt)
     !print*, 'rr21', sum(rr21%matrix_lique), diagonal_rr21, 'max', maxval(rr21%matrix_lique)
     !print*, 'rr12', sum(rr12%matrix_lique), diagonal_rr12, 'max', maxval(rr12%matrix_lique)
     !print*, 'sum_collisional: ', sum(rr%matrix_lique),                        &
@@ -131,18 +132,18 @@ module testing_data
     !print*, 'min_collisional: ', minval(rr%matrix_lique)    
     
     ! test 2: checks with the read values from the input file + detailed balance
-     do i = 1, ntrans
-        do it = 1, 1!ntemp    
-              write(6, '(6(i3,2x), 4(e14.5))') rr%couple1c(i),rr%couple2c(i),   &
-                                        rr%vic(i),rr%jic(i),rr%vfc(i),rr%jfc(i),&
-                                        rr%temp(it),                            &
-                         rr%matrix_lique(rr%couple1c(i),rr%couple2c(i),it)*1.d6,      &
-                         rr%matrix_lique(rr%couple2c(i),rr%couple1c(i),it)*1.d6,      &
-                              (rr%matrix_lique(rr%couple1c(i),rr%couple2c(i),it)-     &
-                          rr%matrix_lique(rr%couple2c(i),rr%couple1c(i),it))*1.d6/    &
-                          (rr%matrix_lique(rr%couple1c(i),rr%couple2c(i),it)*1.d6)
-        enddo
-    enddo    
+    ! do i = 1, ntrans
+    !    do it = 1, 1!ntemp    
+    !          write(6, '(6(i3,2x), 4(e14.5))') rr%couple1c(i),rr%couple2c(i),   &
+    !                                    rr%vic(i),rr%jic(i),rr%vfc(i),rr%jfc(i),&
+    !                                    rr%temp(it),                            &
+    !                     rr%matrix_lique(rr%couple1c(i),rr%couple2c(i),it)*1.d6,      &
+    !                     rr%matrix_lique(rr%couple2c(i),rr%couple1c(i),it)*1.d6,      &
+    !                          (rr%matrix_lique(rr%couple1c(i),rr%couple2c(i),it)-     &
+    !                      rr%matrix_lique(rr%couple2c(i),rr%couple1c(i),it))*1.d6/    &
+    !                      (rr%matrix_lique(rr%couple1c(i),rr%couple2c(i),it)*1.d6)
+    !    enddo
+    !enddo    
 
     ! test 3: check for collisional coefficients and corresponding temperature
     !     do i = 1, ntrans

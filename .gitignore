@@ -51,3 +51,7 @@ src/fortran/cooling_nc=1\.0E\+14
 src/fortran/cooling_nc=1\.0E\+13
 
 .ipynb_checkpoints
+
+src/fortran/carla_matrix_M
+
+src/fortran/cooling_function_lipovka\.dat

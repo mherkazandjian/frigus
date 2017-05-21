@@ -23,6 +23,8 @@ program cooling
      character*19 :: filename
 
      call get_data(Trad, id_temp_test, energy, a21, b21, r21, b12, jnu, r12, rr, rr21, rr12)
+     
+
 
      do idensity = 1, ndensity
         !write(*,'(a5, ES23.15)') 'nc = ', nc(idensity)
@@ -31,7 +33,7 @@ program cooling
         rr12%matrix_lique = rr12%matrix_lique * nc(idensity)
 
         do id_temp = 1, ntemp 
-            call lev_pop(energy, a21, b21, r21, b12, jnu, r12, rr, rr21, rr12, id_temp, nc(idensity), coll_rad_matrix, x)    
+            call lev_pop(energy, a21, b21, r21, b12, jnu, r12, rr, rr21, rr12, id_temp, nc(idensity), coll_rad_matrix, x)
             !write(6, '(a17, ES23.15)') 'gas temperature: ', rr%temp(id_temp)
             cooling_rate(id_temp) = 0.d0
             glover(id_temp) = 0.d0
@@ -42,9 +44,6 @@ program cooling
                          cooling_rate(id_temp) = cooling_rate(id_temp) + a21%M_lique(i, j)                 &
                                              * abs(energy%ene_lique(i)-energy%ene_lique(j))    &
                                              * x%pop(i)
-!                         cooling_rate(id_temp) = cooling_rate(id_temp) + rr21%matrix_lique(i, j, id_temp)  &
-!                                             * abs(energy%ene_lique(i)-energy%ene_lique(j))    &
-!                                             * x%pop(i)
                     endif
                 enddo
             enddo
@@ -114,8 +113,9 @@ program cooling
             glover(id_temp) = glover(id_temp)*1.d-7
             lipovka(id_temp) = lipovka(id_temp)*1.d-7
 
-            call tests(energy, rr, rr21, rr12, a21, b21, r21, b12, jnu, r12, coll_rad_matrix, id_temp)
-            !call writing_files(a21, b21, b12, jnu, id_temp, rr, coll_rad_matrix)
+            call tests(energy, rr, rr21, rr12, a21, b21, r21, b12, jnu, r12, coll_rad_matrix, id_temp_test)
+
+
              write(char1, '(ES7.1)') nc(idensity)
              filename = 'cooling_nc=' // char1
              open(50, file = filename, status = 'unknown')

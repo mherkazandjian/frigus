@@ -40,7 +40,7 @@ module read_data
 
          call tests(energy, rr, rr21, rr12, a21, b21, r21, b12, jnu, r12, coll_rad_matrix, id_temp)
 
-         !call writing_files(a21, b21, b12, jnu, id_temp, rr, coll_rad_matrix)
+         call writing_files(a21, b21, b12, jnu, id_temp, rr, coll_rad_matrix)
 
         return
      end subroutine get_data
