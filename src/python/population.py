@@ -483,8 +483,8 @@ def solveEquilibrium(M_matrix, debug=False):
     # for i in arange(sz):
     #     A[i, :] = A[i, :] / A[i, i]
 
-    for i in arange(sz):
-        A[i, :] /= (numpy.linalg.norm(A[i, :], 2)*numpy.linalg.norm(A[:, i], 2))
+    # for i in arange(sz):
+    #     A[i, :] /= (numpy.linalg.norm(A[i, :], 2)*numpy.linalg.norm(A[:, i], 2))
 
     numpy.savetxt(
         os.path.expanduser(
@@ -567,6 +567,8 @@ def population_density_at_steady_state(data_set,
 
     # solve the equilibrium population densities
     x_equilibrium = solveEquilibrium(M_matrix.si.value, debug=debug)
+
+    assert numpy.fabs(1.0 - numpy.fabs(x_equilibrium.sum())) <= 1e-3
 
     return x_equilibrium
 
@@ -664,8 +666,8 @@ def fit_lipovka(T, n_hd):
 
     assert T.min() >= 100.0 * u.K
     assert T.max() <= 2000.0 * u.K
-    assert n_hd.min() >= 1.0 * u.cm**-3
-    assert n_hd.max() <= 1e8 * u.cm**-3
+    assert n_hd.min() >= 1e6 * u.m**-3
+    assert n_hd.max() <= 1e14 * u.m**-3
 
     lt_kin = numpy.log10(T.value)
     ln_hd = numpy.log10(n_hd.cgs.value)
