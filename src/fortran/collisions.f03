@@ -197,7 +197,7 @@ module collisions
                   ndownwards_lipovka = 0
                   do i_initial = 0, 9
                     do i_final = 0, 9
-                     if(e%en_lique(0,i_initial)-e%en_lique(0,i_final).gt. 0.d0) then
+                     if(e%en_lique(0,i_initial)-e%en_lique(0,i_final).ge. 0.d0) then
                      ndownwards_lipovka = ndownwards_lipovka + 1
                        write(23, ('(4(i2, x), 96(ES23.15, x))')) 0,                                     &
                                                           i_initial,                                  &
