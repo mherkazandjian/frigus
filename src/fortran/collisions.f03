@@ -257,10 +257,6 @@ module collisions
                  rr21%matrix_lique = rr21%matrix_lique*1.d-6
                  rr12%matrix_lique = rr12%matrix_lique*1.d-6
 
-     do j = 1, nlev_lique
-        write(6, '(58(ES23.15, 1x))') (rr%matrix_lique(i, j, 1), i = 1, nlev_lique)
-     enddo
-                 
 
       end subroutine reading_data_collisions
 
