@@ -23,7 +23,7 @@ species_data = DataLoader().load('H2_lique')
 
 # Calculate the population density and the cooling rate per particle
 # for one value of kinetic temperature and gas density of H
-if True:
+if False:
 
     # density of the colliding species, in m^3
     nc_H = 1e6 * u.meter ** -3
@@ -43,7 +43,7 @@ if True:
 
 # utils.load_ascii_matrix_data()
 
-if False:
+if True:
 
     # density of the colliding species, in m^3
     nc_H = 1e6 * u.meter ** -3
