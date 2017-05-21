@@ -1,0 +1,2232 @@
+%!PS-Adobe-2.0 EPSF-2.0
+%%Title: comparison_with_lipovka_tab.eps
+%%Creator: gnuplot 5.0 patchlevel 3
+%%CreationDate: Sun May 21 22:51:25 2017
+%%DocumentFonts: (atend)
+%%BoundingBox: 50 50 410 302
+%%EndComments
+%%BeginProlog
+/gnudict 256 dict def
+gnudict begin
+%
+% The following true/false flags may be edited by hand if desired.
+% The unit line width and grayscale image gamma correction may also be changed.
+%
+/Color true def
+/Blacktext false def
+/Solid false def
+/Dashlength 1 def
+/Landscape false def
+/Level1 false def
+/Level3 false def
+/Rounded false def
+/ClipToBoundingBox false def
+/SuppressPDFMark false def
+/TransparentPatterns false def
+/gnulinewidth 5.000 def
+/userlinewidth gnulinewidth def
+/Gamma 1.0 def
+/BackgroundColor {-1.000 -1.000 -1.000} def
+%
+/vshift -66 def
+/dl1 {
+  10.0 Dashlength userlinewidth gnulinewidth div mul mul mul
+  Rounded { currentlinewidth 0.75 mul sub dup 0 le { pop 0.01 } if } if
+} def
+/dl2 {
+  10.0 Dashlength userlinewidth gnulinewidth div mul mul mul
+  Rounded { currentlinewidth 0.75 mul add } if
+} def
+/hpt_ 31.5 def
+/vpt_ 31.5 def
+/hpt hpt_ def
+/vpt vpt_ def
+/doclip {
+  ClipToBoundingBox {
+    newpath 50 50 moveto 410 50 lineto 410 302 lineto 50 302 lineto closepath
+    clip
+  } if
+} def
+%
+% Gnuplot Prolog Version 5.1 (Oct 2015)
+%
+%/SuppressPDFMark true def
+%
+/M {moveto} bind def
+/L {lineto} bind def
+/R {rmoveto} bind def
+/V {rlineto} bind def
+/N {newpath moveto} bind def
+/Z {closepath} bind def
+/C {setrgbcolor} bind def
+/f {rlineto fill} bind def
+/g {setgray} bind def
+/Gshow {show} def   % May be redefined later in the file to support UTF-8
+/vpt2 vpt 2 mul def
+/hpt2 hpt 2 mul def
+/Lshow {currentpoint stroke M 0 vshift R 
+	Blacktext {gsave 0 setgray textshow grestore} {textshow} ifelse} def
+/Rshow {currentpoint stroke M dup stringwidth pop neg vshift R
+	Blacktext {gsave 0 setgray textshow grestore} {textshow} ifelse} def
+/Cshow {currentpoint stroke M dup stringwidth pop -2 div vshift R 
+	Blacktext {gsave 0 setgray textshow grestore} {textshow} ifelse} def
+/UP {dup vpt_ mul /vpt exch def hpt_ mul /hpt exch def
+  /hpt2 hpt 2 mul def /vpt2 vpt 2 mul def} def
+/DL {Color {setrgbcolor Solid {pop []} if 0 setdash}
+ {pop pop pop 0 setgray Solid {pop []} if 0 setdash} ifelse} def
+/BL {stroke userlinewidth 2 mul setlinewidth
+	Rounded {1 setlinejoin 1 setlinecap} if} def
+/AL {stroke userlinewidth 2 div setlinewidth
+	Rounded {1 setlinejoin 1 setlinecap} if} def
+/UL {dup gnulinewidth mul /userlinewidth exch def
+	dup 1 lt {pop 1} if 10 mul /udl exch def} def
+/PL {stroke userlinewidth setlinewidth
+	Rounded {1 setlinejoin 1 setlinecap} if} def
+3.8 setmiterlimit
+% Classic Line colors (version 5.0)
+/LCw {1 1 1} def
+/LCb {0 0 0} def
+/LCa {0 0 0} def
+/LC0 {1 0 0} def
+/LC1 {0 1 0} def
+/LC2 {0 0 1} def
+/LC3 {1 0 1} def
+/LC4 {0 1 1} def
+/LC5 {1 1 0} def
+/LC6 {0 0 0} def
+/LC7 {1 0.3 0} def
+/LC8 {0.5 0.5 0.5} def
+% Default dash patterns (version 5.0)
+/LTB {BL [] LCb DL} def
+/LTw {PL [] 1 setgray} def
+/LTb {PL [] LCb DL} def
+/LTa {AL [1 udl mul 2 udl mul] 0 setdash LCa setrgbcolor} def
+/LT0 {PL [] LC0 DL} def
+/LT1 {PL [2 dl1 3 dl2] LC1 DL} def
+/LT2 {PL [1 dl1 1.5 dl2] LC2 DL} def
+/LT3 {PL [6 dl1 2 dl2 1 dl1 2 dl2] LC3 DL} def
+/LT4 {PL [1 dl1 2 dl2 6 dl1 2 dl2 1 dl1 2 dl2] LC4 DL} def
+/LT5 {PL [4 dl1 2 dl2] LC5 DL} def
+/LT6 {PL [1.5 dl1 1.5 dl2 1.5 dl1 1.5 dl2 1.5 dl1 6 dl2] LC6 DL} def
+/LT7 {PL [3 dl1 3 dl2 1 dl1 3 dl2] LC7 DL} def
+/LT8 {PL [2 dl1 2 dl2 2 dl1 6 dl2] LC8 DL} def
+/SL {[] 0 setdash} def
+/Pnt {stroke [] 0 setdash gsave 1 setlinecap M 0 0 V stroke grestore} def
+/Dia {stroke [] 0 setdash 2 copy vpt add M
+  hpt neg vpt neg V hpt vpt neg V
+  hpt vpt V hpt neg vpt V closepath stroke
+  Pnt} def
+/Pls {stroke [] 0 setdash vpt sub M 0 vpt2 V
+  currentpoint stroke M
+  hpt neg vpt neg R hpt2 0 V stroke
+ } def
+/Box {stroke [] 0 setdash 2 copy exch hpt sub exch vpt add M
+  0 vpt2 neg V hpt2 0 V 0 vpt2 V
+  hpt2 neg 0 V closepath stroke
+  Pnt} def
+/Crs {stroke [] 0 setdash exch hpt sub exch vpt add M
+  hpt2 vpt2 neg V currentpoint stroke M
+  hpt2 neg 0 R hpt2 vpt2 V stroke} def
+/TriU {stroke [] 0 setdash 2 copy vpt 1.12 mul add M
+  hpt neg vpt -1.62 mul V
+  hpt 2 mul 0 V
+  hpt neg vpt 1.62 mul V closepath stroke
+  Pnt} def
+/Star {2 copy Pls Crs} def
+/BoxF {stroke [] 0 setdash exch hpt sub exch vpt add M
+  0 vpt2 neg V hpt2 0 V 0 vpt2 V
+  hpt2 neg 0 V closepath fill} def
+/TriUF {stroke [] 0 setdash vpt 1.12 mul add M
+  hpt neg vpt -1.62 mul V
+  hpt 2 mul 0 V
+  hpt neg vpt 1.62 mul V closepath fill} def
+/TriD {stroke [] 0 setdash 2 copy vpt 1.12 mul sub M
+  hpt neg vpt 1.62 mul V
+  hpt 2 mul 0 V
+  hpt neg vpt -1.62 mul V closepath stroke
+  Pnt} def
+/TriDF {stroke [] 0 setdash vpt 1.12 mul sub M
+  hpt neg vpt 1.62 mul V
+  hpt 2 mul 0 V
+  hpt neg vpt -1.62 mul V closepath fill} def
+/DiaF {stroke [] 0 setdash vpt add M
+  hpt neg vpt neg V hpt vpt neg V
+  hpt vpt V hpt neg vpt V closepath fill} def
+/Pent {stroke [] 0 setdash 2 copy gsave
+  translate 0 hpt M 4 {72 rotate 0 hpt L} repeat
+  closepath stroke grestore Pnt} def
+/PentF {stroke [] 0 setdash gsave
+  translate 0 hpt M 4 {72 rotate 0 hpt L} repeat
+  closepath fill grestore} def
+/Circle {stroke [] 0 setdash 2 copy
+  hpt 0 360 arc stroke Pnt} def
+/CircleF {stroke [] 0 setdash hpt 0 360 arc fill} def
+/C0 {BL [] 0 setdash 2 copy moveto vpt 90 450 arc} bind def
+/C1 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 0 90 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/C2 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 90 180 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/C3 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 0 180 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/C4 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 180 270 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/C5 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 0 90 arc
+	2 copy moveto
+	2 copy vpt 180 270 arc closepath fill
+	vpt 0 360 arc} bind def
+/C6 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 90 270 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/C7 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 0 270 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/C8 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 270 360 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/C9 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 270 450 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/C10 {BL [] 0 setdash 2 copy 2 copy moveto vpt 270 360 arc closepath fill
+	2 copy moveto
+	2 copy vpt 90 180 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/C11 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 0 180 arc closepath fill
+	2 copy moveto
+	2 copy vpt 270 360 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/C12 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 180 360 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/C13 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 0 90 arc closepath fill
+	2 copy moveto
+	2 copy vpt 180 360 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/C14 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 90 360 arc closepath fill
+	vpt 0 360 arc} bind def
+/C15 {BL [] 0 setdash 2 copy vpt 0 360 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/Rec {newpath 4 2 roll moveto 1 index 0 rlineto 0 exch rlineto
+	neg 0 rlineto closepath} bind def
+/Square {dup Rec} bind def
+/Bsquare {vpt sub exch vpt sub exch vpt2 Square} bind def
+/S0 {BL [] 0 setdash 2 copy moveto 0 vpt rlineto BL Bsquare} bind def
+/S1 {BL [] 0 setdash 2 copy vpt Square fill Bsquare} bind def
+/S2 {BL [] 0 setdash 2 copy exch vpt sub exch vpt Square fill Bsquare} bind def
+/S3 {BL [] 0 setdash 2 copy exch vpt sub exch vpt2 vpt Rec fill Bsquare} bind def
+/S4 {BL [] 0 setdash 2 copy exch vpt sub exch vpt sub vpt Square fill Bsquare} bind def
+/S5 {BL [] 0 setdash 2 copy 2 copy vpt Square fill
+	exch vpt sub exch vpt sub vpt Square fill Bsquare} bind def
+/S6 {BL [] 0 setdash 2 copy exch vpt sub exch vpt sub vpt vpt2 Rec fill Bsquare} bind def
+/S7 {BL [] 0 setdash 2 copy exch vpt sub exch vpt sub vpt vpt2 Rec fill
+	2 copy vpt Square fill Bsquare} bind def
+/S8 {BL [] 0 setdash 2 copy vpt sub vpt Square fill Bsquare} bind def
+/S9 {BL [] 0 setdash 2 copy vpt sub vpt vpt2 Rec fill Bsquare} bind def
+/S10 {BL [] 0 setdash 2 copy vpt sub vpt Square fill 2 copy exch vpt sub exch vpt Square fill
+	Bsquare} bind def
+/S11 {BL [] 0 setdash 2 copy vpt sub vpt Square fill 2 copy exch vpt sub exch vpt2 vpt Rec fill
+	Bsquare} bind def
+/S12 {BL [] 0 setdash 2 copy exch vpt sub exch vpt sub vpt2 vpt Rec fill Bsquare} bind def
+/S13 {BL [] 0 setdash 2 copy exch vpt sub exch vpt sub vpt2 vpt Rec fill
+	2 copy vpt Square fill Bsquare} bind def
+/S14 {BL [] 0 setdash 2 copy exch vpt sub exch vpt sub vpt2 vpt Rec fill
+	2 copy exch vpt sub exch vpt Square fill Bsquare} bind def
+/S15 {BL [] 0 setdash 2 copy Bsquare fill Bsquare} bind def
+/D0 {gsave translate 45 rotate 0 0 S0 stroke grestore} bind def
+/D1 {gsave translate 45 rotate 0 0 S1 stroke grestore} bind def
+/D2 {gsave translate 45 rotate 0 0 S2 stroke grestore} bind def
+/D3 {gsave translate 45 rotate 0 0 S3 stroke grestore} bind def
+/D4 {gsave translate 45 rotate 0 0 S4 stroke grestore} bind def
+/D5 {gsave translate 45 rotate 0 0 S5 stroke grestore} bind def
+/D6 {gsave translate 45 rotate 0 0 S6 stroke grestore} bind def
+/D7 {gsave translate 45 rotate 0 0 S7 stroke grestore} bind def
+/D8 {gsave translate 45 rotate 0 0 S8 stroke grestore} bind def
+/D9 {gsave translate 45 rotate 0 0 S9 stroke grestore} bind def
+/D10 {gsave translate 45 rotate 0 0 S10 stroke grestore} bind def
+/D11 {gsave translate 45 rotate 0 0 S11 stroke grestore} bind def
+/D12 {gsave translate 45 rotate 0 0 S12 stroke grestore} bind def
+/D13 {gsave translate 45 rotate 0 0 S13 stroke grestore} bind def
+/D14 {gsave translate 45 rotate 0 0 S14 stroke grestore} bind def
+/D15 {gsave translate 45 rotate 0 0 S15 stroke grestore} bind def
+/DiaE {stroke [] 0 setdash vpt add M
+  hpt neg vpt neg V hpt vpt neg V
+  hpt vpt V hpt neg vpt V closepath stroke} def
+/BoxE {stroke [] 0 setdash exch hpt sub exch vpt add M
+  0 vpt2 neg V hpt2 0 V 0 vpt2 V
+  hpt2 neg 0 V closepath stroke} def
+/TriUE {stroke [] 0 setdash vpt 1.12 mul add M
+  hpt neg vpt -1.62 mul V
+  hpt 2 mul 0 V
+  hpt neg vpt 1.62 mul V closepath stroke} def
+/TriDE {stroke [] 0 setdash vpt 1.12 mul sub M
+  hpt neg vpt 1.62 mul V
+  hpt 2 mul 0 V
+  hpt neg vpt -1.62 mul V closepath stroke} def
+/PentE {stroke [] 0 setdash gsave
+  translate 0 hpt M 4 {72 rotate 0 hpt L} repeat
+  closepath stroke grestore} def
+/CircE {stroke [] 0 setdash 
+  hpt 0 360 arc stroke} def
+/Opaque {gsave closepath 1 setgray fill grestore 0 setgray closepath} def
+/DiaW {stroke [] 0 setdash vpt add M
+  hpt neg vpt neg V hpt vpt neg V
+  hpt vpt V hpt neg vpt V Opaque stroke} def
+/BoxW {stroke [] 0 setdash exch hpt sub exch vpt add M
+  0 vpt2 neg V hpt2 0 V 0 vpt2 V
+  hpt2 neg 0 V Opaque stroke} def
+/TriUW {stroke [] 0 setdash vpt 1.12 mul add M
+  hpt neg vpt -1.62 mul V
+  hpt 2 mul 0 V
+  hpt neg vpt 1.62 mul V Opaque stroke} def
+/TriDW {stroke [] 0 setdash vpt 1.12 mul sub M
+  hpt neg vpt 1.62 mul V
+  hpt 2 mul 0 V
+  hpt neg vpt -1.62 mul V Opaque stroke} def
+/PentW {stroke [] 0 setdash gsave
+  translate 0 hpt M 4 {72 rotate 0 hpt L} repeat
+  Opaque stroke grestore} def
+/CircW {stroke [] 0 setdash 
+  hpt 0 360 arc Opaque stroke} def
+/BoxFill {gsave Rec 1 setgray fill grestore} def
+/Density {
+  /Fillden exch def
+  currentrgbcolor
+  /ColB exch def /ColG exch def /ColR exch def
+  /ColR ColR Fillden mul Fillden sub 1 add def
+  /ColG ColG Fillden mul Fillden sub 1 add def
+  /ColB ColB Fillden mul Fillden sub 1 add def
+  ColR ColG ColB setrgbcolor} def
+/BoxColFill {gsave Rec PolyFill} def
+/PolyFill {gsave Density fill grestore grestore} def
+/h {rlineto rlineto rlineto gsave closepath fill grestore} bind def
+%
+% PostScript Level 1 Pattern Fill routine for rectangles
+% Usage: x y w h s a XX PatternFill
+%	x,y = lower left corner of box to be filled
+%	w,h = width and height of box
+%	  a = angle in degrees between lines and x-axis
+%	 XX = 0/1 for no/yes cross-hatch
+%
+/PatternFill {gsave /PFa [ 9 2 roll ] def
+  PFa 0 get PFa 2 get 2 div add PFa 1 get PFa 3 get 2 div add translate
+  PFa 2 get -2 div PFa 3 get -2 div PFa 2 get PFa 3 get Rec
+  TransparentPatterns {} {gsave 1 setgray fill grestore} ifelse
+  clip
+  currentlinewidth 0.5 mul setlinewidth
+  /PFs PFa 2 get dup mul PFa 3 get dup mul add sqrt def
+  0 0 M PFa 5 get rotate PFs -2 div dup translate
+  0 1 PFs PFa 4 get div 1 add floor cvi
+	{PFa 4 get mul 0 M 0 PFs V} for
+  0 PFa 6 get ne {
+	0 1 PFs PFa 4 get div 1 add floor cvi
+	{PFa 4 get mul 0 2 1 roll M PFs 0 V} for
+ } if
+  stroke grestore} def
+%
+/languagelevel where
+ {pop languagelevel} {1} ifelse
+dup 2 lt
+	{/InterpretLevel1 true def
+	 /InterpretLevel3 false def}
+	{/InterpretLevel1 Level1 def
+	 2 gt
+	    {/InterpretLevel3 Level3 def}
+	    {/InterpretLevel3 false def}
+	 ifelse }
+ ifelse
+%
+% PostScript level 2 pattern fill definitions
+%
+/Level2PatternFill {
+/Tile8x8 {/PaintType 2 /PatternType 1 /TilingType 1 /BBox [0 0 8 8] /XStep 8 /YStep 8}
+	bind def
+/KeepColor {currentrgbcolor [/Pattern /DeviceRGB] setcolorspace} bind def
+<< Tile8x8
+ /PaintProc {0.5 setlinewidth pop 0 0 M 8 8 L 0 8 M 8 0 L stroke} 
+>> matrix makepattern
+/Pat1 exch def
+<< Tile8x8
+ /PaintProc {0.5 setlinewidth pop 0 0 M 8 8 L 0 8 M 8 0 L stroke
+	0 4 M 4 8 L 8 4 L 4 0 L 0 4 L stroke}
+>> matrix makepattern
+/Pat2 exch def
+<< Tile8x8
+ /PaintProc {0.5 setlinewidth pop 0 0 M 0 8 L
+	8 8 L 8 0 L 0 0 L fill}
+>> matrix makepattern
+/Pat3 exch def
+<< Tile8x8
+ /PaintProc {0.5 setlinewidth pop -4 8 M 8 -4 L
+	0 12 M 12 0 L stroke}
+>> matrix makepattern
+/Pat4 exch def
+<< Tile8x8
+ /PaintProc {0.5 setlinewidth pop -4 0 M 8 12 L
+	0 -4 M 12 8 L stroke}
+>> matrix makepattern
+/Pat5 exch def
+<< Tile8x8
+ /PaintProc {0.5 setlinewidth pop -2 8 M 4 -4 L
+	0 12 M 8 -4 L 4 12 M 10 0 L stroke}
+>> matrix makepattern
+/Pat6 exch def
+<< Tile8x8
+ /PaintProc {0.5 setlinewidth pop -2 0 M 4 12 L
+	0 -4 M 8 12 L 4 -4 M 10 8 L stroke}
+>> matrix makepattern
+/Pat7 exch def
+<< Tile8x8
+ /PaintProc {0.5 setlinewidth pop 8 -2 M -4 4 L
+	12 0 M -4 8 L 12 4 M 0 10 L stroke}
+>> matrix makepattern
+/Pat8 exch def
+<< Tile8x8
+ /PaintProc {0.5 setlinewidth pop 0 -2 M 12 4 L
+	-4 0 M 12 8 L -4 4 M 8 10 L stroke}
+>> matrix makepattern
+/Pat9 exch def
+/Pattern1 {PatternBgnd KeepColor Pat1 setpattern} bind def
+/Pattern2 {PatternBgnd KeepColor Pat2 setpattern} bind def
+/Pattern3 {PatternBgnd KeepColor Pat3 setpattern} bind def
+/Pattern4 {PatternBgnd KeepColor Landscape {Pat5} {Pat4} ifelse setpattern} bind def
+/Pattern5 {PatternBgnd KeepColor Landscape {Pat4} {Pat5} ifelse setpattern} bind def
+/Pattern6 {PatternBgnd KeepColor Landscape {Pat9} {Pat6} ifelse setpattern} bind def
+/Pattern7 {PatternBgnd KeepColor Landscape {Pat8} {Pat7} ifelse setpattern} bind def
+} def
+%
+%
+%End of PostScript Level 2 code
+%
+/PatternBgnd {
+  TransparentPatterns {} {gsave 1 setgray fill grestore} ifelse
+} def
+%
+% Substitute for Level 2 pattern fill codes with
+% grayscale if Level 2 support is not selected.
+%
+/Level1PatternFill {
+/Pattern1 {0.250 Density} bind def
+/Pattern2 {0.500 Density} bind def
+/Pattern3 {0.750 Density} bind def
+/Pattern4 {0.125 Density} bind def
+/Pattern5 {0.375 Density} bind def
+/Pattern6 {0.625 Density} bind def
+/Pattern7 {0.875 Density} bind def
+} def
+%
+% Now test for support of Level 2 code
+%
+Level1 {Level1PatternFill} {Level2PatternFill} ifelse
+%
+/Symbol-Oblique /Symbol findfont [1 0 .167 1 0 0] makefont
+dup length dict begin {1 index /FID eq {pop pop} {def} ifelse} forall
+currentdict end definefont pop
+%
+/MFshow {
+   { dup 5 get 3 ge
+     { 5 get 3 eq {gsave} {grestore} ifelse }
+     {dup dup 0 get findfont exch 1 get scalefont setfont
+     [ currentpoint ] exch dup 2 get 0 exch R dup 5 get 2 ne {dup dup 6
+     get exch 4 get {textshow} {stringwidth pop 0 R} ifelse }if dup 5 get 0 eq
+     {dup 3 get {2 get neg 0 exch R pop} {pop aload pop M} ifelse} {dup 5
+     get 1 eq {dup 2 get exch dup 3 get exch 6 get stringwidth pop -2 div
+     dup 0 R} {dup 6 get stringwidth pop -2 div 0 R 6 get
+     textshow 2 index {aload pop M neg 3 -1 roll neg R pop pop} {pop pop pop
+     pop aload pop M} ifelse }ifelse }ifelse }
+     ifelse }
+   forall} def
+/Gswidth {dup type /stringtype eq {stringwidth} {pop (n) stringwidth} ifelse} def
+/MFwidth {0 exch { dup 5 get 3 ge { 5 get 3 eq { 0 } { pop } ifelse }
+ {dup 3 get{dup dup 0 get findfont exch 1 get scalefont setfont
+     6 get Gswidth pop add} {pop} ifelse} ifelse} forall} def
+/MLshow { currentpoint stroke M
+  0 exch R
+  Blacktext {gsave 0 setgray MFshow grestore} {MFshow} ifelse } bind def
+/MRshow { currentpoint stroke M
+  exch dup MFwidth neg 3 -1 roll R
+  Blacktext {gsave 0 setgray MFshow grestore} {MFshow} ifelse } bind def
+/MCshow { currentpoint stroke M
+  exch dup MFwidth -2 div 3 -1 roll R
+  Blacktext {gsave 0 setgray MFshow grestore} {MFshow} ifelse } bind def
+/XYsave    { [( ) 1 2 true false 3 ()] } bind def
+/XYrestore { [( ) 1 2 true false 4 ()] } bind def
+Level1 SuppressPDFMark or 
+{} {
+/SDict 10 dict def
+systemdict /pdfmark known not {
+  userdict /pdfmark systemdict /cleartomark get put
+} if
+SDict begin [
+  /Title (comparison_with_lipovka_tab.eps)
+  /Subject (gnuplot plot)
+  /Creator (gnuplot 5.0 patchlevel 3)
+  /Author (carla)
+%  /Producer (gnuplot)
+%  /Keywords ()
+  /CreationDate (Sun May 21 22:51:25 2017)
+  /DOCINFO pdfmark
+end
+} ifelse
+%
+% Support for boxed text - Ethan A Merritt May 2005
+%
+/InitTextBox { userdict /TBy2 3 -1 roll put userdict /TBx2 3 -1 roll put
+           userdict /TBy1 3 -1 roll put userdict /TBx1 3 -1 roll put
+	   /Boxing true def } def
+/ExtendTextBox { Boxing
+    { gsave dup false charpath pathbbox
+      dup TBy2 gt {userdict /TBy2 3 -1 roll put} {pop} ifelse
+      dup TBx2 gt {userdict /TBx2 3 -1 roll put} {pop} ifelse
+      dup TBy1 lt {userdict /TBy1 3 -1 roll put} {pop} ifelse
+      dup TBx1 lt {userdict /TBx1 3 -1 roll put} {pop} ifelse
+      grestore } if } def
+/PopTextBox { newpath TBx1 TBxmargin sub TBy1 TBymargin sub M
+               TBx1 TBxmargin sub TBy2 TBymargin add L
+	       TBx2 TBxmargin add TBy2 TBymargin add L
+	       TBx2 TBxmargin add TBy1 TBymargin sub L closepath } def
+/DrawTextBox { PopTextBox stroke /Boxing false def} def
+/FillTextBox { gsave PopTextBox 1 1 1 setrgbcolor fill grestore /Boxing false def} def
+0 0 0 0 InitTextBox
+/TBxmargin 20 def
+/TBymargin 20 def
+/Boxing false def
+/textshow { ExtendTextBox Gshow } def
+%
+% redundant definitions for compatibility with prologue.ps older than 5.0.2
+/LTB {BL [] LCb DL} def
+/LTb {PL [] LCb DL} def
+end
+%%EndProlog
+%%Page: 1 1
+gnudict begin
+gsave
+doclip
+50 50 translate
+0.050 0.050 scale
+0 setgray
+newpath
+(Helvetica) findfont 200 scalefont setfont
+BackgroundColor 0 lt 3 1 roll 0 lt exch 0 lt or or not {BackgroundColor C 1.000 0 0 7200.00 5040.00 BoxColFill} if
+1.000 UL
+LTb
+LCb setrgbcolor
+980 840 M
+63 0 V
+5796 0 R
+-63 0 V
+stroke
+860 840 M
+[ [(Helvetica) 200.0 0.0 true true 0 (10)]
+[(Helvetica) 160.0 100.0 true true 0 (-32)]
+] -86.7 MRshow
+1.000 UL
+LTb
+LCb setrgbcolor
+980 972 M
+31 0 V
+5828 0 R
+-31 0 V
+980 1147 M
+31 0 V
+5828 0 R
+-31 0 V
+980 1237 M
+31 0 V
+5828 0 R
+-31 0 V
+980 1280 M
+63 0 V
+5796 0 R
+-63 0 V
+stroke
+860 1280 M
+[ [(Helvetica) 200.0 0.0 true true 0 (10)]
+[(Helvetica) 160.0 100.0 true true 0 (-31)]
+] -86.7 MRshow
+1.000 UL
+LTb
+LCb setrgbcolor
+980 1412 M
+31 0 V
+5828 0 R
+-31 0 V
+980 1587 M
+31 0 V
+5828 0 R
+-31 0 V
+980 1677 M
+31 0 V
+5828 0 R
+-31 0 V
+980 1720 M
+63 0 V
+5796 0 R
+-63 0 V
+stroke
+860 1720 M
+[ [(Helvetica) 200.0 0.0 true true 0 (10)]
+[(Helvetica) 160.0 100.0 true true 0 (-30)]
+] -86.7 MRshow
+1.000 UL
+LTb
+LCb setrgbcolor
+980 1852 M
+31 0 V
+5828 0 R
+-31 0 V
+980 2027 M
+31 0 V
+5828 0 R
+-31 0 V
+980 2117 M
+31 0 V
+5828 0 R
+-31 0 V
+980 2160 M
+63 0 V
+5796 0 R
+-63 0 V
+stroke
+860 2160 M
+[ [(Helvetica) 200.0 0.0 true true 0 (10)]
+[(Helvetica) 160.0 100.0 true true 0 (-29)]
+] -86.7 MRshow
+1.000 UL
+LTb
+LCb setrgbcolor
+980 2292 M
+31 0 V
+5828 0 R
+-31 0 V
+980 2467 M
+31 0 V
+5828 0 R
+-31 0 V
+980 2557 M
+31 0 V
+5828 0 R
+-31 0 V
+980 2600 M
+63 0 V
+5796 0 R
+-63 0 V
+stroke
+860 2600 M
+[ [(Helvetica) 200.0 0.0 true true 0 (10)]
+[(Helvetica) 160.0 100.0 true true 0 (-28)]
+] -86.7 MRshow
+1.000 UL
+LTb
+LCb setrgbcolor
+980 2732 M
+31 0 V
+5828 0 R
+-31 0 V
+980 2907 M
+31 0 V
+5828 0 R
+-31 0 V
+980 2997 M
+31 0 V
+5828 0 R
+-31 0 V
+980 3039 M
+63 0 V
+5796 0 R
+-63 0 V
+stroke
+860 3039 M
+[ [(Helvetica) 200.0 0.0 true true 0 (10)]
+[(Helvetica) 160.0 100.0 true true 0 (-27)]
+] -86.7 MRshow
+1.000 UL
+LTb
+LCb setrgbcolor
+980 3172 M
+31 0 V
+5828 0 R
+-31 0 V
+980 3347 M
+31 0 V
+5828 0 R
+-31 0 V
+980 3437 M
+31 0 V
+5828 0 R
+-31 0 V
+980 3479 M
+63 0 V
+5796 0 R
+-63 0 V
+stroke
+860 3479 M
+[ [(Helvetica) 200.0 0.0 true true 0 (10)]
+[(Helvetica) 160.0 100.0 true true 0 (-26)]
+] -86.7 MRshow
+1.000 UL
+LTb
+LCb setrgbcolor
+980 3612 M
+31 0 V
+5828 0 R
+-31 0 V
+980 3787 M
+31 0 V
+5828 0 R
+-31 0 V
+980 3877 M
+31 0 V
+5828 0 R
+-31 0 V
+980 3919 M
+63 0 V
+5796 0 R
+-63 0 V
+stroke
+860 3919 M
+[ [(Helvetica) 200.0 0.0 true true 0 (10)]
+[(Helvetica) 160.0 100.0 true true 0 (-25)]
+] -86.7 MRshow
+1.000 UL
+LTb
+LCb setrgbcolor
+980 4052 M
+31 0 V
+5828 0 R
+-31 0 V
+980 4227 M
+31 0 V
+5828 0 R
+-31 0 V
+980 4316 M
+31 0 V
+5828 0 R
+-31 0 V
+980 4359 M
+63 0 V
+5796 0 R
+-63 0 V
+stroke
+860 4359 M
+[ [(Helvetica) 200.0 0.0 true true 0 (10)]
+[(Helvetica) 160.0 100.0 true true 0 (-24)]
+] -86.7 MRshow
+1.000 UL
+LTb
+LCb setrgbcolor
+980 4492 M
+31 0 V
+5828 0 R
+-31 0 V
+980 4667 M
+31 0 V
+5828 0 R
+-31 0 V
+980 4756 M
+31 0 V
+5828 0 R
+-31 0 V
+980 4799 M
+63 0 V
+5796 0 R
+-63 0 V
+stroke
+860 4799 M
+[ [(Helvetica) 200.0 0.0 true true 0 (10)]
+[(Helvetica) 160.0 100.0 true true 0 (-23)]
+] -86.7 MRshow
+1.000 UL
+LTb
+LCb setrgbcolor
+980 840 M
+0 63 V
+0 3896 R
+0 -63 V
+stroke
+980 640 M
+[ [(Helvetica) 200.0 0.0 true true 0 ( 10)]
+] -66.7 MCshow
+1.000 UL
+LTb
+LCb setrgbcolor
+1421 840 M
+0 31 V
+0 3928 R
+0 -31 V
+1679 840 M
+0 31 V
+0 3928 R
+0 -31 V
+1862 840 M
+0 31 V
+0 3928 R
+0 -31 V
+2004 840 M
+0 31 V
+0 3928 R
+0 -31 V
+2120 840 M
+0 31 V
+0 3928 R
+0 -31 V
+2218 840 M
+0 31 V
+0 3928 R
+0 -31 V
+2303 840 M
+0 31 V
+0 3928 R
+0 -31 V
+2378 840 M
+0 31 V
+0 3928 R
+0 -31 V
+2445 840 M
+0 63 V
+0 3896 R
+0 -63 V
+stroke
+2445 640 M
+[ [(Helvetica) 200.0 0.0 true true 0 ( 100)]
+] -66.7 MCshow
+1.000 UL
+LTb
+LCb setrgbcolor
+2886 840 M
+0 31 V
+0 3928 R
+0 -31 V
+3144 840 M
+0 31 V
+0 3928 R
+0 -31 V
+3327 840 M
+0 31 V
+0 3928 R
+0 -31 V
+3469 840 M
+0 31 V
+0 3928 R
+0 -31 V
+3585 840 M
+0 31 V
+0 3928 R
+0 -31 V
+3683 840 M
+0 31 V
+0 3928 R
+0 -31 V
+3768 840 M
+0 31 V
+0 3928 R
+0 -31 V
+3842 840 M
+0 31 V
+0 3928 R
+0 -31 V
+3910 840 M
+0 63 V
+0 3896 R
+0 -63 V
+stroke
+3910 640 M
+[ [(Helvetica) 200.0 0.0 true true 0 ( 1000)]
+] -66.7 MCshow
+1.000 UL
+LTb
+LCb setrgbcolor
+4350 840 M
+0 31 V
+0 3928 R
+0 -31 V
+4608 840 M
+0 31 V
+0 3928 R
+0 -31 V
+4791 840 M
+0 31 V
+0 3928 R
+0 -31 V
+4933 840 M
+0 31 V
+0 3928 R
+0 -31 V
+5049 840 M
+0 31 V
+0 3928 R
+0 -31 V
+5147 840 M
+0 31 V
+0 3928 R
+0 -31 V
+5232 840 M
+0 31 V
+0 3928 R
+0 -31 V
+5307 840 M
+0 31 V
+0 3928 R
+0 -31 V
+5374 840 M
+0 63 V
+0 3896 R
+0 -63 V
+stroke
+5374 640 M
+[ [(Helvetica) 200.0 0.0 true true 0 ( 10000)]
+] -66.7 MCshow
+1.000 UL
+LTb
+LCb setrgbcolor
+5815 840 M
+0 31 V
+0 3928 R
+0 -31 V
+6073 840 M
+0 31 V
+0 3928 R
+0 -31 V
+6256 840 M
+0 31 V
+0 3928 R
+0 -31 V
+6398 840 M
+0 31 V
+0 3928 R
+0 -31 V
+6514 840 M
+0 31 V
+0 3928 R
+0 -31 V
+6612 840 M
+0 31 V
+0 3928 R
+0 -31 V
+6697 840 M
+0 31 V
+0 3928 R
+0 -31 V
+6772 840 M
+0 31 V
+0 3928 R
+0 -31 V
+6839 840 M
+0 63 V
+0 3896 R
+0 -63 V
+stroke
+6839 640 M
+[ [(Helvetica) 200.0 0.0 true true 0 ( 100000)]
+] -66.7 MCshow
+1.000 UL
+LTb
+LCb setrgbcolor
+1.000 UL
+LTB
+LCb setrgbcolor
+980 4799 N
+980 840 L
+5859 0 V
+0 3959 V
+-5859 0 V
+Z stroke
+1.000 UP
+1.000 UL
+LTb
+LCb setrgbcolor
+LCb setrgbcolor
+160 2819 M
+currentpoint gsave translate -270 rotate 0 0 moveto
+[ [(Helvetica) 200.0 0.0 true true 0 (cooling function)]
+] -66.7 MCshow
+grestore
+LTb
+LCb setrgbcolor
+3909 340 M
+[ [(Helvetica) 200.0 0.0 true true 0 (T)]
+[(Helvetica) 160.0 -60.0 true true 0 (g)]
+] -46.7 MCshow
+LTb
+% Begin plot #1
+1.000 UP
+1.000 UL
+LTb
+0.58 0.00 0.83 C LCb setrgbcolor
+5936 2003 M
+[ [(Helvetica) 200.0 0.0 true true 0 (lipovka data n)]
+[(Helvetica) 160.0 -60.0 true true 0 (H)]
+[(Helvetica) 200.0 0.0 true true 0 ( = 10)]
+[(Helvetica) 160.0 100.0 true true 0 (7)]
+[(Helvetica) 200.0 0.0 true true 0 ( m-3)]
+] -66.7 MRshow
+1.000 UP
+1.000 UL
+LTb
+0.58 0.00 0.83 C 1859 995 Pls
+1903 1040 Pls
+1947 1082 Pls
+1991 1123 Pls
+2035 1160 Pls
+2079 1197 Pls
+2123 1231 Pls
+2166 1263 Pls
+2210 1294 Pls
+2254 1324 Pls
+2298 1353 Pls
+2342 1380 Pls
+2386 1406 Pls
+2430 1432 Pls
+2474 1456 Pls
+2518 1480 Pls
+2562 1504 Pls
+2606 1526 Pls
+2650 1548 Pls
+2694 1570 Pls
+2738 1592 Pls
+2782 1613 Pls
+2826 1633 Pls
+2870 1654 Pls
+2913 1674 Pls
+2957 1694 Pls
+3001 1714 Pls
+3045 1734 Pls
+3089 1754 Pls
+3133 1774 Pls
+3177 1793 Pls
+3221 1812 Pls
+3265 1831 Pls
+3309 1851 Pls
+3353 1869 Pls
+3397 1888 Pls
+3441 1907 Pls
+3485 1925 Pls
+3529 1943 Pls
+3573 1961 Pls
+3617 1978 Pls
+3660 1996 Pls
+3704 2013 Pls
+3748 2029 Pls
+3792 2046 Pls
+3836 2062 Pls
+3880 2078 Pls
+3924 2094 Pls
+3968 2109 Pls
+4012 2125 Pls
+4056 2140 Pls
+4100 2156 Pls
+4144 2172 Pls
+4188 2188 Pls
+4232 2205 Pls
+4276 2222 Pls
+4320 2240 Pls
+4364 2259 Pls
+4408 2279 Pls
+4451 2300 Pls
+4495 2321 Pls
+4539 2344 Pls
+4583 2368 Pls
+4627 2392 Pls
+4671 2417 Pls
+4715 2443 Pls
+4759 2469 Pls
+4803 2495 Pls
+4847 2521 Pls
+4891 2547 Pls
+4935 2572 Pls
+4979 2598 Pls
+5023 2622 Pls
+5067 2646 Pls
+5111 2670 Pls
+5155 2692 Pls
+5198 2714 Pls
+5242 2736 Pls
+5286 2756 Pls
+5330 2776 Pls
+5374 2795 Pls
+5418 2813 Pls
+5462 2830 Pls
+5506 2847 Pls
+5550 2863 Pls
+5594 2879 Pls
+5638 2894 Pls
+5682 2908 Pls
+5726 2922 Pls
+5770 2935 Pls
+5814 2948 Pls
+6327 2003 Pls
+% End plot #1
+% Begin plot #2
+1.000 UP
+1.000 UL
+LTb
+0.00 0.62 0.45 C 2445 1433 Crs
+2561 1499 Crs
+2659 1552 Crs
+2744 1595 Crs
+2819 1638 Crs
+2886 1670 Crs
+2946 1697 Crs
+3002 1722 Crs
+3053 1743 Crs
+3100 1764 Crs
+3144 1783 Crs
+3185 1800 Crs
+3223 1817 Crs
+3260 1832 Crs
+3294 1846 Crs
+3327 1860 Crs
+3358 1873 Crs
+3387 1885 Crs
+3416 1897 Crs
+3443 1908 Crs
+3469 1919 Crs
+3494 1926 Crs
+3518 1937 Crs
+3541 1946 Crs
+3563 1956 Crs
+3585 1962 Crs
+3605 1971 Crs
+3626 1979 Crs
+3645 1986 Crs
+3664 1993 Crs
+3683 2001 Crs
+3701 2007 Crs
+3718 2015 Crs
+3735 2020 Crs
+3751 2027 Crs
+3768 2032 Crs
+3783 2039 Crs
+3799 2044 Crs
+3814 2050 Crs
+3828 2055 Crs
+3842 2060 Crs
+3856 2066 Crs
+3870 2070 Crs
+3884 2075 Crs
+3897 2080 Crs
+3909 2083 Crs
+3922 2091 Crs
+3934 2096 Crs
+3947 2098 Crs
+3958 2102 Crs
+3970 2108 Crs
+3982 2110 Crs
+3993 2112 Crs
+4004 2115 Crs
+4015 2120 Crs
+4025 2132 Crs
+4036 2134 Crs
+4046 2135 Crs
+4057 2141 Crs
+4067 2143 Crs
+4076 2145 Crs
+4086 2147 Crs
+4096 2148 Crs
+4105 2154 Crs
+4114 2163 Crs
+4124 2165 Crs
+4133 2166 Crs
+4141 2172 Crs
+4150 2174 Crs
+4159 2175 Crs
+4167 2177 Crs
+4176 2179 Crs
+4184 2184 Crs
+4192 2185 Crs
+4200 2187 Crs
+4208 2196 Crs
+4216 2198 Crs
+4224 2202 Crs
+4232 2204 Crs
+4240 2205 Crs
+4247 2206 Crs
+4254 2209 Crs
+4262 2212 Crs
+4269 2214 Crs
+4276 2217 Crs
+4283 2218 Crs
+4290 2219 Crs
+4297 2226 Crs
+4304 2231 Crs
+4311 2232 Crs
+4318 2233 Crs
+4324 2236 Crs
+4331 2237 Crs
+4338 2240 Crs
+4344 2243 Crs
+4350 2244 Crs
+% End plot #2
+% Begin plot #3
+1.000 UP
+1.000 UL
+LTb
+0.34 0.71 0.91 C LCb setrgbcolor
+5936 1803 M
+[ [(Helvetica) 200.0 0.0 true true 0 (lipovka data n)]
+[(Helvetica) 160.0 -60.0 true true 0 (H)]
+[(Helvetica) 200.0 0.0 true true 0 ( = 10)]
+[(Helvetica) 160.0 100.0 true true 0 (8)]
+[(Helvetica) 200.0 0.0 true true 0 ( m-3)]
+] -66.7 MRshow
+1.000 UP
+1.000 UL
+LTb
+0.34 0.71 0.91 C 1859 1431 Star
+1903 1476 Star
+1947 1518 Star
+1991 1558 Star
+2035 1596 Star
+2079 1631 Star
+2123 1665 Star
+2166 1698 Star
+2210 1728 Star
+2254 1758 Star
+2298 1786 Star
+2342 1813 Star
+2386 1839 Star
+2430 1864 Star
+2474 1888 Star
+2518 1912 Star
+2562 1935 Star
+2606 1957 Star
+2650 1979 Star
+2694 2000 Star
+2738 2021 Star
+2782 2042 Star
+2826 2062 Star
+2870 2082 Star
+2913 2102 Star
+2957 2122 Star
+3001 2142 Star
+3045 2162 Star
+3089 2181 Star
+3133 2200 Star
+3177 2220 Star
+3221 2239 Star
+3265 2258 Star
+3309 2277 Star
+3353 2296 Star
+3397 2314 Star
+3441 2333 Star
+3485 2351 Star
+3529 2369 Star
+3573 2387 Star
+3617 2405 Star
+3660 2422 Star
+3704 2439 Star
+3748 2456 Star
+3792 2473 Star
+3836 2489 Star
+3880 2505 Star
+3924 2521 Star
+3968 2537 Star
+4012 2552 Star
+4056 2568 Star
+4100 2584 Star
+4144 2600 Star
+4188 2616 Star
+4232 2632 Star
+4276 2649 Star
+4320 2667 Star
+4364 2686 Star
+4408 2705 Star
+4451 2726 Star
+4495 2747 Star
+4539 2769 Star
+4583 2792 Star
+4627 2816 Star
+4671 2840 Star
+4715 2865 Star
+4759 2890 Star
+4803 2915 Star
+4847 2940 Star
+4891 2965 Star
+4935 2990 Star
+4979 3014 Star
+5023 3038 Star
+5067 3061 Star
+5111 3084 Star
+5155 3106 Star
+5198 3127 Star
+5242 3148 Star
+5286 3168 Star
+5330 3187 Star
+5374 3205 Star
+5418 3223 Star
+5462 3240 Star
+5506 3256 Star
+5550 3272 Star
+5594 3287 Star
+5638 3301 Star
+5682 3315 Star
+5726 3329 Star
+5770 3341 Star
+5814 3354 Star
+6327 1803 Star
+% End plot #3
+% Begin plot #4
+1.000 UP
+1.000 UL
+LTb
+0.90 0.62 0.00 C 2445 1866 Box
+2561 1931 Box
+2659 1982 Box
+2744 2025 Box
+2819 2067 Box
+2886 2098 Box
+2946 2125 Box
+3002 2149 Box
+3053 2171 Box
+3100 2191 Box
+3144 2210 Box
+3185 2227 Box
+3223 2243 Box
+3260 2259 Box
+3294 2273 Box
+3327 2286 Box
+3358 2299 Box
+3387 2311 Box
+3416 2323 Box
+3443 2334 Box
+3469 2344 Box
+3494 2352 Box
+3518 2362 Box
+3541 2371 Box
+3563 2381 Box
+3585 2388 Box
+3605 2396 Box
+3626 2404 Box
+3645 2411 Box
+3664 2419 Box
+3683 2427 Box
+3701 2433 Box
+3718 2440 Box
+3735 2446 Box
+3751 2453 Box
+3768 2458 Box
+3783 2464 Box
+3799 2469 Box
+3814 2474 Box
+3828 2479 Box
+3842 2488 Box
+3856 2493 Box
+3870 2496 Box
+3884 2501 Box
+3897 2505 Box
+3909 2508 Box
+3922 2519 Box
+3934 2522 Box
+3947 2524 Box
+3958 2528 Box
+3970 2534 Box
+3982 2536 Box
+3993 2542 Box
+4004 2544 Box
+4015 2549 Box
+4025 2557 Box
+4036 2559 Box
+4046 2561 Box
+4057 2566 Box
+4067 2571 Box
+4076 2573 Box
+4086 2576 Box
+4096 2577 Box
+4105 2582 Box
+4114 2589 Box
+4124 2590 Box
+4133 2592 Box
+4141 2600 Box
+4150 2602 Box
+4159 2603 Box
+4167 2605 Box
+4176 2608 Box
+4184 2611 Box
+4192 2613 Box
+4200 2616 Box
+4208 2623 Box
+4216 2625 Box
+4224 2629 Box
+4232 2631 Box
+4240 2633 Box
+4247 2634 Box
+4254 2637 Box
+4262 2640 Box
+4269 2641 Box
+4276 2647 Box
+4283 2648 Box
+4290 2650 Box
+4297 2653 Box
+4304 2658 Box
+4311 2660 Box
+4318 2661 Box
+4324 2664 Box
+4331 2665 Box
+4338 2668 Box
+4344 2672 Box
+4350 2674 Box
+% End plot #4
+% Begin plot #5
+1.000 UP
+1.000 UL
+LTb
+0.94 0.89 0.26 C LCb setrgbcolor
+5936 1603 M
+[ [(Helvetica) 200.0 0.0 true true 0 (lipovka data n)]
+[(Helvetica) 160.0 -60.0 true true 0 (H)]
+[(Helvetica) 200.0 0.0 true true 0 ( = 10)]
+[(Helvetica) 160.0 100.0 true true 0 (9)]
+[(Helvetica) 200.0 0.0 true true 0 ( m-3)]
+] -66.7 MRshow
+1.000 UP
+1.000 UL
+LTb
+0.94 0.89 0.26 C 1859 1835 BoxF
+1903 1879 BoxF
+1947 1920 BoxF
+1991 1958 BoxF
+2035 1994 BoxF
+2079 2028 BoxF
+2123 2060 BoxF
+2166 2090 BoxF
+2210 2119 BoxF
+2254 2146 BoxF
+2298 2172 BoxF
+2342 2197 BoxF
+2386 2221 BoxF
+2430 2244 BoxF
+2474 2266 BoxF
+2518 2288 BoxF
+2562 2310 BoxF
+2606 2331 BoxF
+2650 2352 BoxF
+2694 2373 BoxF
+2738 2393 BoxF
+2782 2414 BoxF
+2826 2435 BoxF
+2870 2456 BoxF
+2913 2476 BoxF
+2957 2497 BoxF
+3001 2518 BoxF
+3045 2539 BoxF
+3089 2560 BoxF
+3133 2581 BoxF
+3177 2602 BoxF
+3221 2623 BoxF
+3265 2644 BoxF
+3309 2664 BoxF
+3353 2685 BoxF
+3397 2705 BoxF
+3441 2725 BoxF
+3485 2745 BoxF
+3529 2765 BoxF
+3573 2784 BoxF
+3617 2803 BoxF
+3660 2822 BoxF
+3704 2840 BoxF
+3748 2858 BoxF
+3792 2875 BoxF
+3836 2893 BoxF
+3880 2910 BoxF
+3924 2927 BoxF
+3968 2943 BoxF
+4012 2960 BoxF
+4056 2976 BoxF
+4100 2993 BoxF
+4144 3009 BoxF
+4188 3026 BoxF
+4232 3043 BoxF
+4276 3061 BoxF
+4320 3079 BoxF
+4364 3098 BoxF
+4408 3118 BoxF
+4451 3139 BoxF
+4495 3160 BoxF
+4539 3183 BoxF
+4583 3206 BoxF
+4627 3229 BoxF
+4671 3253 BoxF
+4715 3278 BoxF
+4759 3303 BoxF
+4803 3328 BoxF
+4847 3353 BoxF
+4891 3378 BoxF
+4935 3402 BoxF
+4979 3426 BoxF
+5023 3450 BoxF
+5067 3473 BoxF
+5111 3496 BoxF
+5155 3517 BoxF
+5198 3538 BoxF
+5242 3559 BoxF
+5286 3578 BoxF
+5330 3597 BoxF
+5374 3616 BoxF
+5418 3633 BoxF
+5462 3650 BoxF
+5506 3666 BoxF
+5550 3681 BoxF
+5594 3696 BoxF
+5638 3710 BoxF
+5682 3724 BoxF
+5726 3737 BoxF
+5770 3750 BoxF
+5814 3762 BoxF
+6327 1603 BoxF
+% End plot #5
+% Begin plot #6
+1.000 UP
+1.000 UL
+LTb
+0.00 0.45 0.70 C 2445 2249 Circle
+2561 2310 Circle
+2659 2360 Circle
+2744 2401 Circle
+2819 2441 Circle
+2886 2472 Circle
+2946 2501 Circle
+3002 2526 Circle
+3053 2550 Circle
+3100 2571 Circle
+3144 2592 Circle
+3185 2610 Circle
+3223 2627 Circle
+3260 2644 Circle
+3294 2659 Circle
+3327 2672 Circle
+3358 2687 Circle
+3387 2699 Circle
+3416 2712 Circle
+3443 2725 Circle
+3469 2735 Circle
+3494 2745 Circle
+3518 2756 Circle
+3541 2765 Circle
+3563 2775 Circle
+3585 2783 Circle
+3605 2792 Circle
+3626 2801 Circle
+3645 2809 Circle
+3664 2816 Circle
+3683 2824 Circle
+3701 2831 Circle
+3718 2839 Circle
+3735 2845 Circle
+3751 2852 Circle
+3768 2859 Circle
+3783 2864 Circle
+3799 2870 Circle
+3814 2874 Circle
+3828 2880 Circle
+3842 2892 Circle
+3856 2896 Circle
+3870 2898 Circle
+3884 2904 Circle
+3897 2909 Circle
+3909 2912 Circle
+3922 2924 Circle
+3934 2926 Circle
+3947 2929 Circle
+3958 2933 Circle
+3970 2939 Circle
+3982 2941 Circle
+3993 2951 Circle
+4004 2953 Circle
+4015 2956 Circle
+4025 2961 Circle
+4036 2965 Circle
+4046 2967 Circle
+4057 2972 Circle
+4067 2979 Circle
+4076 2982 Circle
+4086 2985 Circle
+4096 2987 Circle
+4105 2992 Circle
+4114 2996 Circle
+4124 2998 Circle
+4133 3000 Circle
+4141 3008 Circle
+4150 3010 Circle
+4159 3012 Circle
+4167 3014 Circle
+4176 3020 Circle
+4184 3022 Circle
+4192 3024 Circle
+4200 3027 Circle
+4208 3032 Circle
+4216 3034 Circle
+4224 3038 Circle
+4232 3040 Circle
+4240 3044 Circle
+4247 3046 Circle
+4254 3049 Circle
+4262 3051 Circle
+4269 3053 Circle
+4276 3059 Circle
+4283 3060 Circle
+4290 3062 Circle
+4297 3064 Circle
+4304 3069 Circle
+4311 3072 Circle
+4318 3073 Circle
+4324 3076 Circle
+4331 3077 Circle
+4338 3080 Circle
+4344 3083 Circle
+4350 3086 Circle
+% End plot #6
+% Begin plot #7
+1.000 UP
+1.000 UL
+LTb
+0.90 0.12 0.06 C LCb setrgbcolor
+5936 1403 M
+[ [(Helvetica) 200.0 0.0 true true 0 (lipovka data n)]
+[(Helvetica) 160.0 -60.0 true true 0 (H)]
+[(Helvetica) 200.0 0.0 true true 0 ( = 10)]
+[(Helvetica) 160.0 100.0 true true 0 (10)]
+[(Helvetica) 200.0 0.0 true true 0 ( m-3)]
+] -66.7 MRshow
+1.000 UP
+1.000 UL
+LTb
+0.90 0.12 0.06 C 1859 2087 CircleF
+1903 2127 CircleF
+1947 2164 CircleF
+1991 2199 CircleF
+2035 2232 CircleF
+2079 2263 CircleF
+2123 2292 CircleF
+2166 2321 CircleF
+2210 2349 CircleF
+2254 2376 CircleF
+2298 2403 CircleF
+2342 2431 CircleF
+2386 2458 CircleF
+2430 2485 CircleF
+2474 2512 CircleF
+2518 2540 CircleF
+2562 2567 CircleF
+2606 2594 CircleF
+2650 2622 CircleF
+2694 2649 CircleF
+2738 2675 CircleF
+2782 2702 CircleF
+2826 2728 CircleF
+2870 2754 CircleF
+2913 2780 CircleF
+2957 2805 CircleF
+3001 2830 CircleF
+3045 2854 CircleF
+3089 2879 CircleF
+3133 2903 CircleF
+3177 2927 CircleF
+3221 2950 CircleF
+3265 2973 CircleF
+3309 2996 CircleF
+3353 3019 CircleF
+3397 3041 CircleF
+3441 3063 CircleF
+3485 3085 CircleF
+3529 3107 CircleF
+3573 3128 CircleF
+3617 3149 CircleF
+3660 3169 CircleF
+3704 3189 CircleF
+3748 3209 CircleF
+3792 3229 CircleF
+3836 3248 CircleF
+3880 3267 CircleF
+3924 3286 CircleF
+3968 3304 CircleF
+4012 3323 CircleF
+4056 3341 CircleF
+4100 3359 CircleF
+4144 3378 CircleF
+4188 3396 CircleF
+4232 3415 CircleF
+4276 3435 CircleF
+4320 3455 CircleF
+4364 3475 CircleF
+4408 3497 CircleF
+4451 3519 CircleF
+4495 3543 CircleF
+4539 3567 CircleF
+4583 3591 CircleF
+4627 3617 CircleF
+4671 3642 CircleF
+4715 3668 CircleF
+4759 3694 CircleF
+4803 3721 CircleF
+4847 3746 CircleF
+4891 3772 CircleF
+4935 3797 CircleF
+4979 3822 CircleF
+5023 3845 CircleF
+5067 3869 CircleF
+5111 3891 CircleF
+5155 3913 CircleF
+5198 3934 CircleF
+5242 3954 CircleF
+5286 3973 CircleF
+5330 3992 CircleF
+5374 4010 CircleF
+5418 4027 CircleF
+5462 4043 CircleF
+5506 4059 CircleF
+5550 4074 CircleF
+5594 4088 CircleF
+5638 4102 CircleF
+5682 4116 CircleF
+5726 4128 CircleF
+5770 4141 CircleF
+5814 4152 CircleF
+6327 1403 CircleF
+% End plot #7
+% Begin plot #8
+1.000 UP
+1.000 UL
+LTb
+0.00 0.00 0.00 C 2445 2502 TriU
+2561 2575 TriU
+2659 2638 TriU
+2744 2688 TriU
+2819 2735 TriU
+2886 2772 TriU
+2946 2808 TriU
+3002 2837 TriU
+3053 2866 TriU
+3100 2890 TriU
+3144 2914 TriU
+3185 2934 TriU
+3223 2954 TriU
+3260 2973 TriU
+3294 2990 TriU
+3327 3005 TriU
+3358 3022 TriU
+3387 3035 TriU
+3416 3050 TriU
+3443 3063 TriU
+3469 3075 TriU
+3494 3087 TriU
+3518 3098 TriU
+3541 3109 TriU
+3563 3119 TriU
+3585 3129 TriU
+3605 3139 TriU
+3626 3148 TriU
+3645 3157 TriU
+3664 3165 TriU
+3683 3174 TriU
+3701 3182 TriU
+3718 3190 TriU
+3735 3197 TriU
+3751 3204 TriU
+3768 3212 TriU
+3783 3217 TriU
+3799 3225 TriU
+3814 3229 TriU
+3828 3238 TriU
+3842 3246 TriU
+3856 3252 TriU
+3870 3256 TriU
+3884 3262 TriU
+3897 3269 TriU
+3909 3272 TriU
+3922 3279 TriU
+3934 3286 TriU
+3947 3289 TriU
+3958 3294 TriU
+3970 3300 TriU
+3982 3303 TriU
+3993 3310 TriU
+4004 3316 TriU
+4015 3318 TriU
+4025 3323 TriU
+4036 3328 TriU
+4046 3331 TriU
+4057 3337 TriU
+4067 3342 TriU
+4076 3346 TriU
+4086 3350 TriU
+4096 3352 TriU
+4105 3356 TriU
+4114 3361 TriU
+4124 3364 TriU
+4133 3369 TriU
+4141 3373 TriU
+4150 3376 TriU
+4159 3378 TriU
+4167 3381 TriU
+4176 3386 TriU
+4184 3389 TriU
+4192 3394 TriU
+4200 3398 TriU
+4208 3400 TriU
+4216 3403 TriU
+4224 3406 TriU
+4232 3408 TriU
+4240 3413 TriU
+4247 3416 TriU
+4254 3420 TriU
+4262 3422 TriU
+4269 3425 TriU
+4276 3428 TriU
+4283 3430 TriU
+4290 3432 TriU
+4297 3436 TriU
+4304 3440 TriU
+4311 3444 TriU
+4318 3445 TriU
+4324 3448 TriU
+4331 3450 TriU
+4338 3452 TriU
+4344 3455 TriU
+4350 3457 TriU
+% End plot #8
+% Begin plot #9
+1.000 UP
+1.000 UL
+LTb
+0.58 0.00 0.83 C LCb setrgbcolor
+5936 1203 M
+[ [(Helvetica) 200.0 0.0 true true 0 (lipovka data n)]
+[(Helvetica) 160.0 -60.0 true true 0 (H)]
+[(Helvetica) 200.0 0.0 true true 0 ( = 10)]
+[(Helvetica) 160.0 100.0 true true 0 (11)]
+[(Helvetica) 200.0 0.0 true true 0 ( m-3)]
+] -66.7 MRshow
+1.000 UP
+1.000 UL
+LTb
+0.58 0.00 0.83 C 1859 2152 TriUF
+1903 2192 TriUF
+1947 2230 TriUF
+1991 2267 TriUF
+2035 2303 TriUF
+2079 2339 TriUF
+2123 2374 TriUF
+2166 2409 TriUF
+2210 2445 TriUF
+2254 2480 TriUF
+2298 2516 TriUF
+2342 2551 TriUF
+2386 2586 TriUF
+2430 2621 TriUF
+2474 2656 TriUF
+2518 2689 TriUF
+2562 2723 TriUF
+2606 2755 TriUF
+2650 2787 TriUF
+2694 2819 TriUF
+2738 2850 TriUF
+2782 2881 TriUF
+2826 2911 TriUF
+2870 2941 TriUF
+2913 2970 TriUF
+2957 2999 TriUF
+3001 3028 TriUF
+3045 3056 TriUF
+3089 3084 TriUF
+3133 3111 TriUF
+3177 3139 TriUF
+3221 3165 TriUF
+3265 3192 TriUF
+3309 3218 TriUF
+3353 3245 TriUF
+3397 3270 TriUF
+3441 3296 TriUF
+3485 3321 TriUF
+3529 3346 TriUF
+3573 3371 TriUF
+3617 3395 TriUF
+3660 3419 TriUF
+3704 3443 TriUF
+3748 3466 TriUF
+3792 3489 TriUF
+3836 3511 TriUF
+3880 3533 TriUF
+3924 3555 TriUF
+3968 3577 TriUF
+4012 3599 TriUF
+4056 3621 TriUF
+4100 3643 TriUF
+4144 3665 TriUF
+4188 3688 TriUF
+4232 3712 TriUF
+4276 3736 TriUF
+4320 3761 TriUF
+4364 3787 TriUF
+4408 3814 TriUF
+4451 3842 TriUF
+4495 3871 TriUF
+4539 3900 TriUF
+4583 3929 TriUF
+4627 3959 TriUF
+4671 3988 TriUF
+4715 4018 TriUF
+4759 4047 TriUF
+4803 4075 TriUF
+4847 4103 TriUF
+4891 4130 TriUF
+4935 4156 TriUF
+4979 4182 TriUF
+5023 4206 TriUF
+5067 4230 TriUF
+5111 4252 TriUF
+5155 4274 TriUF
+5198 4295 TriUF
+5242 4314 TriUF
+5286 4333 TriUF
+5330 4351 TriUF
+5374 4368 TriUF
+5418 4384 TriUF
+5462 4399 TriUF
+5506 4413 TriUF
+5550 4427 TriUF
+5594 4440 TriUF
+5638 4452 TriUF
+5682 4463 TriUF
+5726 4474 TriUF
+5770 4485 TriUF
+5814 4495 TriUF
+6327 1203 TriUF
+% End plot #9
+% Begin plot #10
+1.000 UP
+1.000 UL
+LTb
+0.00 0.62 0.45 C 2445 2637 TriD
+2561 2726 TriD
+2659 2799 TriD
+2744 2858 TriD
+2819 2911 TriD
+2886 2955 TriD
+2946 2996 TriD
+3002 3031 TriD
+3053 3064 TriD
+3100 3093 TriD
+3144 3120 TriD
+3185 3145 TriD
+3223 3169 TriD
+3260 3190 TriD
+3294 3211 TriD
+3327 3229 TriD
+3358 3248 TriD
+3387 3264 TriD
+3416 3280 TriD
+3443 3296 TriD
+3469 3310 TriD
+3494 3324 TriD
+3518 3337 TriD
+3541 3350 TriD
+3563 3362 TriD
+3585 3374 TriD
+3605 3385 TriD
+3626 3396 TriD
+3645 3406 TriD
+3664 3416 TriD
+3683 3426 TriD
+3701 3435 TriD
+3718 3444 TriD
+3735 3453 TriD
+3751 3462 TriD
+3768 3470 TriD
+3783 3478 TriD
+3799 3486 TriD
+3814 3493 TriD
+3828 3501 TriD
+3842 3508 TriD
+3856 3516 TriD
+3870 3522 TriD
+3884 3529 TriD
+3897 3535 TriD
+3909 3541 TriD
+3922 3547 TriD
+3934 3555 TriD
+3947 3560 TriD
+3958 3566 TriD
+3970 3571 TriD
+3982 3575 TriD
+3993 3583 TriD
+4004 3589 TriD
+4015 3594 TriD
+4025 3599 TriD
+4036 3603 TriD
+4046 3607 TriD
+4057 3613 TriD
+4067 3619 TriD
+4076 3623 TriD
+4086 3628 TriD
+4096 3632 TriD
+4105 3636 TriD
+4114 3639 TriD
+4124 3644 TriD
+4133 3650 TriD
+4141 3654 TriD
+4150 3658 TriD
+4159 3661 TriD
+4167 3665 TriD
+4176 3669 TriD
+4184 3673 TriD
+4192 3677 TriD
+4200 3682 TriD
+4208 3685 TriD
+4216 3688 TriD
+4224 3691 TriD
+4232 3694 TriD
+4240 3698 TriD
+4247 3702 TriD
+4254 3706 TriD
+4262 3709 TriD
+4269 3712 TriD
+4276 3715 TriD
+4283 3717 TriD
+4290 3720 TriD
+4297 3723 TriD
+4304 3727 TriD
+4311 3731 TriD
+4318 3734 TriD
+4324 3736 TriD
+4331 3739 TriD
+4338 3741 TriD
+4344 3744 TriD
+4350 3746 TriD
+% End plot #10
+% Begin plot #11
+1.000 UP
+1.000 UL
+LTb
+0.34 0.71 0.91 C LCb setrgbcolor
+5936 1003 M
+[ [(Helvetica) 200.0 0.0 true true 0 (lipovka data n)]
+[(Helvetica) 160.0 -60.0 true true 0 (H)]
+[(Helvetica) 200.0 0.0 true true 0 ( = 10)]
+[(Helvetica) 160.0 100.0 true true 0 (14)]
+[(Helvetica) 200.0 0.0 true true 0 ( m-3)]
+] -66.7 MRshow
+1.000 UP
+1.000 UL
+LTb
+0.34 0.71 0.91 C 1859 2163 TriDF
+1903 2204 TriDF
+1947 2243 TriDF
+1991 2282 TriDF
+2035 2320 TriDF
+2079 2358 TriDF
+2123 2396 TriDF
+2166 2434 TriDF
+2210 2473 TriDF
+2254 2511 TriDF
+2298 2550 TriDF
+2342 2588 TriDF
+2386 2626 TriDF
+2430 2663 TriDF
+2474 2700 TriDF
+2518 2737 TriDF
+2562 2773 TriDF
+2606 2809 TriDF
+2650 2844 TriDF
+2694 2879 TriDF
+2738 2914 TriDF
+2782 2948 TriDF
+2826 2982 TriDF
+2870 3015 TriDF
+2913 3048 TriDF
+2957 3081 TriDF
+3001 3113 TriDF
+3045 3146 TriDF
+3089 3177 TriDF
+3133 3209 TriDF
+3177 3240 TriDF
+3221 3272 TriDF
+3265 3302 TriDF
+3309 3333 TriDF
+3353 3363 TriDF
+3397 3393 TriDF
+3441 3423 TriDF
+3485 3453 TriDF
+3529 3482 TriDF
+3573 3511 TriDF
+3617 3540 TriDF
+3660 3568 TriDF
+3704 3597 TriDF
+3748 3626 TriDF
+3792 3656 TriDF
+3836 3686 TriDF
+3880 3718 TriDF
+3924 3751 TriDF
+3968 3785 TriDF
+4012 3821 TriDF
+4056 3858 TriDF
+4100 3895 TriDF
+4144 3934 TriDF
+4188 3972 TriDF
+4232 4010 TriDF
+4276 4048 TriDF
+4320 4086 TriDF
+4364 4123 TriDF
+4408 4159 TriDF
+4451 4194 TriDF
+4495 4229 TriDF
+4539 4262 TriDF
+4583 4294 TriDF
+4627 4325 TriDF
+4671 4355 TriDF
+4715 4384 TriDF
+4759 4411 TriDF
+4803 4437 TriDF
+4847 4462 TriDF
+4891 4485 TriDF
+4935 4507 TriDF
+4979 4528 TriDF
+5023 4547 TriDF
+5067 4565 TriDF
+5111 4581 TriDF
+5155 4597 TriDF
+5198 4611 TriDF
+5242 4624 TriDF
+5286 4637 TriDF
+5330 4648 TriDF
+5374 4659 TriDF
+5418 4668 TriDF
+5462 4677 TriDF
+5506 4686 TriDF
+5550 4693 TriDF
+5594 4700 TriDF
+5638 4707 TriDF
+5682 4713 TriDF
+5726 4718 TriDF
+5770 4723 TriDF
+5814 4728 TriDF
+6327 1003 TriDF
+% End plot #11
+% Begin plot #12
+1.000 UP
+1.000 UL
+LTb
+0.90 0.62 0.00 C 2445 2676 Dia
+2561 2773 Dia
+2659 2852 Dia
+2744 2919 Dia
+2819 2977 Dia
+2886 3028 Dia
+2946 3074 Dia
+3002 3115 Dia
+3053 3153 Dia
+3100 3187 Dia
+3144 3219 Dia
+3185 3248 Dia
+3223 3275 Dia
+3260 3301 Dia
+3294 3325 Dia
+3327 3348 Dia
+3358 3369 Dia
+3387 3390 Dia
+3416 3409 Dia
+3443 3427 Dia
+3469 3445 Dia
+3494 3462 Dia
+3518 3478 Dia
+3541 3493 Dia
+3563 3508 Dia
+3585 3523 Dia
+3605 3536 Dia
+3626 3549 Dia
+3645 3562 Dia
+3664 3574 Dia
+3683 3586 Dia
+3701 3597 Dia
+3718 3608 Dia
+3735 3619 Dia
+3751 3629 Dia
+3768 3639 Dia
+3783 3649 Dia
+3799 3658 Dia
+3814 3667 Dia
+3828 3675 Dia
+3842 3684 Dia
+3856 3692 Dia
+3870 3700 Dia
+3884 3707 Dia
+3897 3715 Dia
+3909 3722 Dia
+3922 3729 Dia
+3934 3735 Dia
+3947 3742 Dia
+3958 3748 Dia
+3970 3754 Dia
+3982 3760 Dia
+3993 3766 Dia
+4004 3772 Dia
+4015 3777 Dia
+4025 3782 Dia
+4036 3787 Dia
+4046 3792 Dia
+4057 3797 Dia
+4067 3802 Dia
+4076 3806 Dia
+4086 3811 Dia
+4096 3815 Dia
+4105 3819 Dia
+4114 3824 Dia
+4124 3828 Dia
+4133 3831 Dia
+4141 3835 Dia
+4150 3839 Dia
+4159 3842 Dia
+4167 3846 Dia
+4176 3849 Dia
+4184 3853 Dia
+4192 3856 Dia
+4200 3859 Dia
+4208 3862 Dia
+4216 3865 Dia
+4224 3868 Dia
+4232 3871 Dia
+4240 3874 Dia
+4247 3876 Dia
+4254 3879 Dia
+4262 3882 Dia
+4269 3884 Dia
+4276 3887 Dia
+4283 3889 Dia
+4290 3892 Dia
+4297 3894 Dia
+4304 3896 Dia
+4311 3898 Dia
+4318 3901 Dia
+4324 3903 Dia
+4331 3905 Dia
+4338 3907 Dia
+4344 3909 Dia
+4350 3911 Dia
+% End plot #12
+2.000 UL
+LTb
+LCb setrgbcolor
+1.000 UL
+LTB
+LCb setrgbcolor
+980 4799 N
+980 840 L
+5859 0 V
+0 3959 V
+-5859 0 V
+Z stroke
+1.000 UP
+1.000 UL
+LTb
+LCb setrgbcolor
+stroke
+grestore
+end
+showpage
+%%Trailer
+%%DocumentFonts: Helvetica
