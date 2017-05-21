@@ -35,7 +35,8 @@ def unique_level_pairs(vj):
 
 
 def read_collision_coefficients_lique_and_wrathmall(fname):
-    """parse the collisional data by François. These are the coefficient rates
+    """
+    Parse the collisional data by François. These are the coefficient rates
     K_ij where i > j (so these fill the lower triangular K matrix).
 
     Supplementary Information for manuscript:
@@ -127,8 +128,9 @@ def read_collision_coefficients_lique_and_wrathmall(fname):
 
 
 def read_collision_coefficients_lipovka(fname):
-    """parse the collisional data used by lipovka. These are the coefficient
-     rates K_ij where i > j (so these fill the lower triangular K matrix).
+    """
+    Parse the collisional data used by lipovka. These are the coefficient
+    rates K_ij where i > j (so these fill the lower triangular K matrix).
 
     The table contains the HD-H collisional rate coefficients
 
@@ -222,7 +224,9 @@ def read_collision_coefficients_lipovka(fname):
             self.tkin = tkin
 
         def parse_data(self, raw_data):
-            """parses the read data into blocks, one block for each temperature"""
+            """
+            Parses the read data into blocks, one block for each temperature
+            """
 
             # split the raw data into blocks
             blocks = raw_data.split('T =')[1:]

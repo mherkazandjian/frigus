@@ -49,3 +49,5 @@ src/fortran/cooling_nc=1\.0E\+12
 src/fortran/cooling_nc=1\.0E\+14
 
 src/fortran/cooling_nc=1\.0E\+13
+
+.ipynb_checkpoints
