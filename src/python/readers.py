@@ -45,7 +45,6 @@ class DataSetRawBase(object):
         """The non zero info of the collision rates"""
 
 
-
 class DataSetBase(object):
     """
     An abstract class than can be sub-classed to populate the data attributes.
@@ -161,8 +160,10 @@ class DataSetH2Lique(DataSetBase):
         # getting the collisional de-excitation matrix (K_dex) (for all
         # tabulated values)  [n_level, n_level, n_T_kin_values]
         K_dex_matrix = population.reduce_collisional_coefficients_slow(
-                             self.raw_data.collision_rates_info_nnz,
-                             self.energy_levels)
+            self.raw_data.collision_rates_info_nnz,
+            self.energy_levels,
+            reduced_data_is_upper_to_lower_only=True
+        )
 
         # compute the interpolator that produces K_dex at a certain temperature
         K_dex_matrix_interpolator = population.compute_K_dex_matrix_interpolator(
@@ -293,8 +294,12 @@ class DataSetHDLipovka(DataSetBase):
         # getting the collisional de-excitation matrix (K_dex) (for all
         # tabulated values)  [n_level, n_level, n_T_kin_values]
         K_dex_matrix = population.reduce_collisional_coefficients_slow(
-                             self.raw_data.collision_rates_info_nnz,
-                             self.energy_levels)
+            self.raw_data.collision_rates_info_nnz,
+            self.energy_levels,
+            set_inelastic_coefficient_to_zero=True,
+            set_excitation_coefficients_to_zero=True,
+            reduced_data_is_upper_to_lower_only=True,
+        )
 
         # compute the interpolator that produces K_dex at a certain temperature
         K_dex_matrix_interpolator = population.compute_K_dex_matrix_interpolator(

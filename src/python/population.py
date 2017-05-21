@@ -16,8 +16,6 @@ from astropy.constants import h as h_planck
 from astropy.constants import k_B as kb
 from astropy.analytic_functions import blackbody_nu as B_nu
 
-import pdb
-
 from utils import linear_2d_index, find_matching_indices
 
 
@@ -120,7 +118,8 @@ def reduce_einstein_coefficients_slow(A_info_nnz, energy_levels):
 
 
 def reduce_einstein_coefficients(A, energy_levels):
-    """Given the array A that is indexed using four indices A[v, j, v', j']
+    """
+    Given the array A that is indexed using four indices A[v, j, v', j']
     returns an array A_reduced that is indexed with two indices A_reduced[i, f]
     where i and f are the initial and final levels respectively.
 
@@ -213,8 +212,10 @@ def compute_B_J_nu_matrix_from_A_matrix(energy_levels,
                                         A_matrix,
                                         T_rad,
                                         debug=False):
-    """given the energy levels, returns the stimulated emission and absorption
+    """
+    Given the energy levels, returns the stimulated emission and absorption
     coefficients matrix.
+
     https://en.wikipedia.org/wiki/Einstein_coefficients
     http://www.ifa.hawaii.edu/users/kud/teaching_12/3_Radiative_transfer.pdf
 
@@ -282,12 +283,62 @@ def compute_B_J_nu_matrix_from_A_matrix(energy_levels,
     return B_J_nu_matrix
 
 
-def reduce_collisional_coefficients_slow(cr_info_nnz, energy_levels):
+def reduce_collisional_coefficients_slow(
+        cr_info_nnz,
+        energy_levels,
+        set_inelastic_coefficient_to_zero=False,
+        set_excitation_coefficients_to_zero=False,
+        reduced_data_is_upper_to_lower_only=True):
     """
+    Given the data that is available for the collisional transitions as a
+    function of initial and final v,j -> v',j' levels and for different values
+    of temperature, returns an array of the data reduced as a matrix for each
+    temperature value and mapped by the energy level labels instead of v and j.
 
-    :param cr_info_nnz: .. todo:: add doc
-    :param energy_levels: .. todo:: add doc
-    :return: .. todo:: add doc
+    :param tuple cr_info_nnz: The information of the collisional data of the
+     levels for which data is available. This parameter is usually returned
+     by a read of raw collisional data e.g
+     read_collision_coefficients_lique_and_wrathmall.
+
+     The tuple has four elements:
+
+         - (v,j): The first element is a 2D array of shape (2, n_transitions)
+           that are the v and j of the initial level of the transitions (ini).
+           The columns of this array (v, j = ini) are the initial v and j of
+           the transitions for a certain T section. i.e. the number of non-zero
+           elements in K for a certain temperature is equal to the number of
+           elements in the v or j columns.
+           v.size = j.size = where(K[..., 0] > 0)[0].size
+
+         - (v',j') The second element is the same of the first element but for
+          the final level of the transitions (v', j' = fin)
+
+         - unique_nnz: The third element is a 2D array of shape
+          (2, n_unique_transitions) that are the unique levels involved in all
+          the transitions.
+
+         - cr_nnz: The last element is an array of shape (T.size, n_transitions)
+           which are the collisional coefficient rates with non-zero values
+           for each value of temperature in the T array.
+
+    :param EnergyLevelsMolecular energy_levels: The energy levels object whose
+     evergy levels map to the collisional nnz data.
+    :param bool set_inelastic_coefficient_to_zero: If True, then all the
+     elements along the diagonal of the matrix for all the temperatures are set
+     to zero. i.e the collision coefficient for the in-elastic collisions
+     would be ignored.
+    :param bool set_excitation_coefficients_to_zero: If True, then all the
+     elements in the upper triangular part of the matrix for all the
+     temperatures are set to zero. i.e the lower to upper transitions
+     (excitation) are ignored. 
+    :param bool reduced_data_is_upper_to_lower_only: If True, then it is assumed
+     that the computed reduced matrix has only upper to lower
+     (i.e de-excitation) coefficients. If there is any non-zero value along the
+     diagonal (i.e in-elastic coefficients) or any non zero value in the upper
+     triangular part (i.e excitation coeffients), then an exception is raised.
+    :return: The reduced matrices of the collisional coefficients. One matrix
+     for each temperature value. The shape of the matrix is
+      (n_levels, n_levels, n_temperature_values)
     """
     # check_self_transitions_in_Einstien_nnz_data(A_info_nnz)
 
@@ -297,11 +348,12 @@ def reduce_collisional_coefficients_slow(cr_info_nnz, energy_levels):
 
     (v_nnz, j_nnz), (vp_nnz, jp_nnz), unique_nnz, cr_nnz = cr_info_nnz
 
-    n_T = cr_nnz.shape[0]
-
     # get the unique label for the (v,j) pairs
     labels_ini = linear_2d_index(v_nnz, j_nnz, n_i=levels.v_max_allowed)
     labels_fin = linear_2d_index(vp_nnz, jp_nnz, n_i=levels.v_max_allowed)
+
+    # number of temperature value for which collisional data is available
+    n_T = cr_nnz.shape[0]
 
     K_dex_reduced = zeros((n_levels, n_levels, n_T), 'f8') * cr_nnz.unit
 
@@ -324,10 +376,20 @@ def reduce_collisional_coefficients_slow(cr_info_nnz, energy_levels):
             continue
 
     #
-    # check that the upper triangular matrices for all the temperatures
-    # including the diagonal are zero since this is the K_dex matrix (see doc)
+    # optionally zero out data above the diagonals
     #
-    assert numpy.triu(numpy.moveaxis(K_dex_reduced, -1, 0)).sum() == 0.0
+    if set_inelastic_coefficient_to_zero:
+        i_diag, j_diag = numpy.diag_indices(n_levels)
+        K_dex_reduced[i_diag, j_diag, :] = 0.0
+    if set_excitation_coefficients_to_zero:
+        i_upper, j_upper = numpy.triu_indices(n_levels, 1)
+        K_dex_reduced[i_upper, j_upper, :] = 0.0
+
+    if reduced_data_is_upper_to_lower_only:
+        # check that the upper triangular matrices for all the temperatures
+        # including the diagonal are zero since this is the K_dex matrix
+        # (see doc)
+        assert numpy.triu(numpy.moveaxis(K_dex_reduced, -1, 0)).sum() == 0.0
 
     # DEBUG
     # K_dex_reduced[K_dex_reduced > 0.0] = numpy.log10(
