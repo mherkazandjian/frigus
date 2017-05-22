@@ -57,3 +57,7 @@ src/fortran/carla_matrix_M
 src/fortran/cooling_function_lipovka\.dat
 
 .cache
+
+.coverage
+
+htmlcov
