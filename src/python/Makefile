@@ -2,4 +2,4 @@ clean:
 	rm -fvr *.pyc
 
 test:
-	py.test -v tests
+	py.test -v --cov --cov-report=html tests
