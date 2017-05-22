@@ -6,7 +6,7 @@ import py.test
 from population import fit_lipovka, fit_glover, fit_lipovka_low_density
 
 
-def test_that_lipovka_cooling_function_fit_is_computed_correctly_at_low_densities():
+def test_that_lipovka_cooling_function_fit_is_computed_correctly():
 
     n_hd = 1e6 * u.m**-3
     T = numpy.linspace(100.0, 2000.0, 100) * u.K
@@ -21,7 +21,7 @@ def test_that_lipovka_cooling_function_fit_is_computed_correctly_at_low_densitie
         atol=0.0)
 
 
-def test_that_lipovka_cooling_function_fit_is_computed_correctly_at_high_denisties():
+def test_that_lipovka_cooling_function_fit_is_computed_correctly_at_low_densities():
 
     py.test.skip('not implemented')
 
