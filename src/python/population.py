@@ -462,12 +462,15 @@ def compute_K_matrix_from_K_dex_matrix(energy_levels,
 
 
 def solveEquilibrium(M_matrix, debug=False):
-    """solve for the equilibrium population densities. .. todo:: add doc
+    """
+    Solve for the equilibrium population densities given the right hand side of
+    the linear system of the rate equations dx/dt as a matrix dx/dt = A.x
+    where M_matrix = A in the case of this function. The first row of the A
+    is replaces by the conservation equation.
 
-    i.e solving A.x = b
-    where M_matrix = A
-    :param M_matrix: .. todo:: add doc
-    :return: .. todo:: add doc
+    :param matrix_like M_matrix: The right hand side matrix of the rate
+    equation as an n x n matrix.
+    :return: The population densities as a column vector. 
     """
 
     sz = M_matrix.shape[0]
@@ -482,11 +485,9 @@ def solveEquilibrium(M_matrix, debug=False):
     # before solving, we will divide each row by the diagonal
     A, b = M_matrix, dxdt
 
+    # scale the rows by normalizing w.r.t the diagonal element
     for i in arange(sz):
         A[i, :] = A[i, :] / A[i, i]
-
-    # for i in arange(sz):
-    #     A[i, :] /= (numpy.linalg.norm(A[i, :], 2)*numpy.linalg.norm(A[:, i], 2))
 
     numpy.savetxt(
         os.path.expanduser(
