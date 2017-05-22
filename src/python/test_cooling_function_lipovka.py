@@ -50,15 +50,13 @@ if True:
 
         print(T_kin)
 
-        pop_dens_vs_T_kin += [population_density_at_steady_state(species_data,
-                                                                 T_kin,
-                                                                 T_rad,
-                                                                 nc_H)]
-
-        lambda_vs_T_kin += [cooling_rate_at_steady_state(species_data,
-                                                         T_kin,
-                                                         T_rad,
-                                                         nc_H)]
+        lambda_vs_T_kin += [
+            cooling_rate_at_steady_state(
+                species_data,
+                T_kin,
+                T_rad,
+                nc_H)
+        ]
 
 
     lambda_vs_T_kin = u.Quantity(lambda_vs_T_kin)
