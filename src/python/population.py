@@ -633,16 +633,18 @@ def cooling_rate(population_densities, energy_levels, A_matrix):
      per unit time from the level "upper" to the level "lower". A_matrix is
      assumed to be a strictly lower triangular matrix (this is not checked,
      thus it is the responsibility of the called to assure that).
-    :return: float: The cooling rate due to all the transitions.
+    :return: scalar astropy.units.quantity.Quantity: The cooling rate due to
+     all the transitions in units of A_matrix.unit * energy_levels['E'].units. 
     """
+    energy_levels_unit = energy_levels.data['E'].unit
+    A_matrix_unit = A_matrix.unit
+
     delta_e_matrix = fabs(compute_delta_energy_matrix(energy_levels)).si.value
     A_matrix = A_matrix.si.value
 
     retval = (A_matrix * delta_e_matrix * population_densities).sum()
 
-    retval = retval * u.Joule * u.second**-1
-
-    return retval
+    return retval * energy_levels_unit * A_matrix_unit
 
 
 def fit_glover(T):
