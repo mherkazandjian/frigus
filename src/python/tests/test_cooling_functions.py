@@ -1,8 +1,6 @@
 from __future__ import print_function
-import numpy
 from numpy.testing import assert_allclose
 from astropy import units as u
-import py.test
 
 from population import cooling_rate_at_steady_state
 from readers import DataLoader
@@ -32,7 +30,8 @@ def test_that_the_lipovka_cooling_function_is_computed_correctly():
                 species_data,
                 T,
                 T_rad,
-                nc_H) for T in T_array
+                nc_H)
+            for T in T_array
         ]
     )
 
@@ -65,7 +64,8 @@ def test_that_the_lique_cooling_function_is_computed_correctly():
                 species_data,
                 T,
                 T_rad,
-                nc_H) for T in T_array
+                nc_H)
+            for T in T_array
         ]
     )
 
