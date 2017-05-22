@@ -1,7 +1,6 @@
 from __future__ import print_function
 import numpy
 from numpy.testing import assert_allclose
-from astropy import units as u
 
 from population import solveEquilibrium
 
@@ -24,8 +23,8 @@ def test_equilibrium_solver_snaity_3x3():
 
     M_matrix = numpy.array(
         [
-            [0.2, 0.2, 0.2],   # this row is not relevant since it is set to 1, 1
-            [1.0, -1.0, 1.0],   # in the solver
+            [0.2, 0.2, 0.2],   # this row is not relevant since it is set to
+            [1.0, -1.0, 1.0],  # 1, 1, 1 in the solver
             [3.0, -2.0, -9.0]
         ]
     )
