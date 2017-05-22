@@ -119,6 +119,9 @@ def reduce_einstein_coefficients_slow(A_info_nnz, energy_levels):
 
 def reduce_einstein_coefficients(A, energy_levels):
     """
+    .. todo:: rename this function to 
+     reduce_einstein_coeffients_two_quantum_numbers or a name that indicates a
+     molecule whose levels are identified by two "quantum" numbers or labels.
     Given the array A that is indexed using four indices A[v, j, v', j']
     returns an array A_reduced that is indexed with two indices A_reduced[i, f]
     where i and f are the initial and final levels respectively.
@@ -171,11 +174,16 @@ def reduce_einstein_coefficients(A, energy_levels):
 
 
 def compute_delta_energy_matrix(levels):
-    """Given the energy levels, returns the delta energy matrix
-     \Delta E = E - E^T that is documented in the notebook.
-    :param levels:  .. todo:: add doc
+    """
+    Compute the energy difference matrix (see notebook .. todo:: notebook ref)
+    
+    Given the energy levels, returns the delta energy matrix \Delta E = E - E^T
+    that is documented in the notebook.
+    :param read_energy_levels.EnergyLevelsBase levels: The energy levels
+     object or a subclass of it that has the energies defined in the attribute
+     record levels.data['E'].
     :return: square matrix of shape n x n where n is the number of energy
-     levels.
+     levels (see notebook .. todo:: notebook ref).
     """
     n = len(levels.data)
     energies_as_column = levels.data['E'].reshape(1, n)
@@ -224,10 +232,13 @@ def compute_B_J_nu_matrix_from_A_matrix(energy_levels,
     .. todo:: replace the J_nu in the name of this function and in the body
     .. todo:: to something that represents energy density like u_nu
 
-    :param energy_levels: The energy levels .. todo:: add doc
+    :param read_energy_levels.EnergyLevelsBase energy_levels: The energy levels
+     object or a subclass of it that has the energies defined in the attribute
+     record levels.data['E'] (see the documentation of
+     compute_delta_energy_matrix).
     :param A_matrix: The spontaneous emission coefficients matrix (A in the
-     ipython notebook)
-    :param T_rad: The radiation temperature
+     ipython notebook).
+    :param T_rad: The radiation temperature.
     :return: The B matrix defined in the notebook multiplied by J_nu
     """
     delta_e = compute_delta_energy_matrix(energy_levels)
@@ -608,8 +619,12 @@ def cooling_rate_at_steady_state(data_set, T_kin, T_rad, collider_density):
 def cooling_rate(population_densities, energy_levels, A_matrix):
     """compute the cooling rate due to the spontaneous transitions
 
-    :param population_densities: .. todo:: add doc
-    :param energy_levels: .. todo:: add doc
+    :param array_like population_densities: A column vector of the population
+     densities. This is a dimensionless vector of shape nx1, where n is the 
+     number of energy levels.
+    :param read_energy_levels.EnergyLevelsBase energy_levels: The energy levels
+     object or a subclass of it that has the energies defined in the attribute
+     record levels.data['E'].
     :param A_matrix: .. todo:: add doc
     :return: .. todo:: add doc
     """
