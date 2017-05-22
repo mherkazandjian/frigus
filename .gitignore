@@ -55,3 +55,5 @@ src/fortran/cooling_nc=1\.0E\+13
 src/fortran/carla_matrix_M
 
 src/fortran/cooling_function_lipovka\.dat
+
+.cache
