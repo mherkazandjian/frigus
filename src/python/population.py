@@ -617,7 +617,8 @@ def cooling_rate_at_steady_state(data_set, T_kin, T_rad, collider_density):
 
 
 def cooling_rate(population_densities, energy_levels, A_matrix):
-    """compute the cooling rate due to the spontaneous transitions
+    """
+    Compute the cooling rate due to the spontaneous transitions.
 
     :param array_like population_densities: A column vector of the population
      densities. This is a dimensionless vector of shape nx1, where n is the 
@@ -625,8 +626,14 @@ def cooling_rate(population_densities, energy_levels, A_matrix):
     :param read_energy_levels.EnergyLevelsBase energy_levels: The energy levels
      object or a subclass of it that has the energies defined in the attribute
      record levels.data['E'].
-    :param A_matrix: .. todo:: add doc
-    :return: .. todo:: add doc
+    :param array_lik A_matrix: A square matrix that has a shape n x n where n
+     is the number of energy levels in "energy_levels". The elements of the
+     matrix are the spontaneous transition rates. An element A[upper, lower] 
+     should be read (interpreted) as: The spontaneous transition probability
+     per unit time from the level "upper" to the level "lower". A_matrix is
+     assumed to be a strictly lower triangular matrix (this is not checked,
+     thus it is the responsibility of the called to assure that).
+    :return: float: The cooling rate due to all the transitions.
     """
     delta_e_matrix = fabs(compute_delta_energy_matrix(energy_levels)).si.value
     A_matrix = A_matrix.si.value
