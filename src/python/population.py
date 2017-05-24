@@ -513,14 +513,6 @@ def solveEquilibrium(M_matrix, debug=False):
     # cond = numpy.linalg.cond(A)
     # ============ done conditioning the linear system ===============
 
-
-    numpy.savetxt(
-        os.path.expanduser(
-            os.path.join(
-                dropbox_path, 'solver_matrix.txt')),
-                A,
-            fmt='%+-1.16e')
-
     x = linalg.solve(A, b)
 
     return x
