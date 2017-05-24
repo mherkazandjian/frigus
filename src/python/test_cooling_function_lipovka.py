@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-calculate equilibrium population of species and the cooling function.
+Dalculate equilibrium population of species and the cooling function using
+the Lipovka data
 """
 from __future__ import print_function
 import matplotlib.pyplot as plt
@@ -58,7 +59,6 @@ if True:
                 T_rad,
                 nc_H)
         ]
-
 
     lambda_vs_T_kin = u.Quantity(lambda_vs_T_kin)
 

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-calculate equilibrium population of species and the cooling function.
+Calculate equilibrium population of species and the cooling function using the
+Lique data.
 """
 from __future__ import print_function
 import matplotlib.pyplot as plt
