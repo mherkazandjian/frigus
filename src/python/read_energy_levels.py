@@ -20,15 +20,17 @@ class EnergyLevelsSpeciesBase(object):
     def __init__(self, n_levels=None, energy_unit=None, level_names=None,
                  *args, **kwargs):
         """
-        constructor
+        Constructor
         """
         self.data = None
-        """the astropy table that holds the levels data"""
+        """
+        the astropy table that holds the levels data
+        """
 
 
     def set_labels(self):
         """
-        set the field self.data['label']. This method modifies
+        Set the field self.data['label']. This method modifies
         self.data['label'].
         """
         pass
@@ -41,7 +43,7 @@ class EnergyLevelsOnDegreeOfFreedom(EnergyLevelsSpeciesBase):
     def __init__(self, n_levels=None, energy_unit=None, level_name='j',
                  *args, **kwargs):
         """
-
+        constructor
         """
         super(EnergyLevelsOnDegreeOfFreedom, self).__init__(*args, **kwargs)
 
