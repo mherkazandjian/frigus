@@ -19,9 +19,6 @@ from astropy.analytic_functions import blackbody_nu as B_nu
 from utils import linear_2d_index, find_matching_indices
 
 
-dropbox_path = '~/dropbox/Dropbox/us/cooling_function/mher-1e6-100'
-
-
 def find_v_max_j_max_from_data(A_einstein_nnz, cr_coefficients_nnz):
     """
     :param A_einstein_nnz: .. todo:: add doc
@@ -263,35 +260,7 @@ def compute_B_J_nu_matrix_from_A_matrix(energy_levels,
     B_J_nu_matrix = B_matrix * J_nu_matrix
 
     if debug is True:
-        numpy.savetxt(
-            os.path.expanduser(
-                os.path.join(
-                    dropbox_path, 'A_matrix.txt'))
-            ,
-            A_matrix.si.value,
-            fmt='%+-1.16e')
-
-        numpy.savetxt(
-            os.path.expanduser(
-                os.path.join(
-                    dropbox_path, 'B_matrix.txt'))
-            ,
-            B_matrix.si.value,
-            fmt='%+-1.16e')
-
-        numpy.savetxt(
-            os.path.expanduser(
-                os.path.join(
-                    dropbox_path, 'J_nu_matrix.txt')),
-            J_nu_matrix.to(u.N / u.m**2 * u.s).value,
-            fmt='%+-1.16e')
-
-        numpy.savetxt(
-            os.path.expanduser(
-                os.path.join(
-                    dropbox_path, 'B_J_nu_matrix.txt')),
-            B_J_nu_matrix.si.value,
-            fmt='%+-1.16e')
+        pass
 
     return B_J_nu_matrix
 
@@ -462,12 +431,7 @@ def compute_K_matrix_from_K_dex_matrix(energy_levels,
     K_matrix = K_dex_T + K_ex_T
 
     if debug is True:
-        numpy.savetxt(
-            os.path.expanduser(
-                os.path.join(
-                    dropbox_path, 'K_nc_matrix.txt')),
-            K_matrix.si.value*1e14,
-            fmt='%+-1.16e')
+        pass
 
     return K_matrix
 
@@ -566,30 +530,15 @@ def population_density_at_steady_state(data_set,
     # the levels (see notebook)
     O_matrix = (A_matrix + B_J_nu_matrix + K_matrix * collider_density).T
     if debug is True:
-        numpy.savetxt(
-            os.path.expanduser(
-                os.path.join(
-                    dropbox_path, 'O_matrix.txt')),
-            O_matrix.si.value,
-            fmt='%+-1.16e')
+        pass
 
     D_matrix = -numpy.eye(O_matrix.shape[0]) * O_matrix.sum(axis=0)
     if debug is True:
-        numpy.savetxt(
-            os.path.expanduser(
-                os.path.join(
-                    dropbox_path, 'D_matrix.txt')),
-            D_matrix.si.value,
-            fmt='%+-1.16e')
+        pass
 
     M_matrix = O_matrix + D_matrix
     if debug is True:
-        numpy.savetxt(
-            os.path.expanduser(
-                os.path.join(
-                    dropbox_path, 'M_matrix.txt')),
-            M_matrix.si.value,
-            fmt='%+-1.16e')
+        pass
 
     # solve the equilibrium population densities
     x_equilibrium = solveEquilibrium(M_matrix.si.value, debug=debug)
