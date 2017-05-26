@@ -1,1 +1,4 @@
-this directory contains data
+this directory contains data (energy levels, radiative coefficients and
+collisional reaction rates). They are organized in folders according to the
+authors who computed cooling functions (wrathmall and flower for H2 - to
+compare with glover fit and lipovka data for HD).
