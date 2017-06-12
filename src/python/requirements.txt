@@ -1,0 +1,9 @@
+numpy
+scipy
+pandas
+matplotlib
+pytest
+ipython
+jupyter
+sphinx
+astropy>=1.3
