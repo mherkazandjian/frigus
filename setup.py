@@ -4,6 +4,7 @@ from __future__ import print_function
 import os
 import sys
 import imp
+import glob
 import subprocess
 
 # Python 2.6 subprocess.check_output compatibility. Thanks Greg Hewgill!
@@ -242,7 +243,8 @@ setup_dict = dict(
         'Topic :: System :: Installation/Setup',
         'Topic :: System :: Software Distribution',
     ],
-    packages=find_packages(exclude=(TESTS_DIRECTORY,)),
+    packages=['src/python/frigus'],
+    package_data={'frigus': glob.glob('src/python/frigus/*.py')},
     install_requires=[
         # your module dependencies
     ] + python_version_specific_requires,
