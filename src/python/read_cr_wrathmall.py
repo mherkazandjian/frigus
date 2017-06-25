@@ -1,18 +1,6 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Wed Jan 28 01:51:39 2015
-
-@author: carla
-"""
-
 import numpy
-from numpy import loadtxt, arange, int32, zeros, unique, void
-from numpy import ascontiguousarray, dtype, hstack
-from numpy import log10
-from scipy import interpolate
-import pylab
-from IPython.core.debugger import Tracer
-
+from numpy import int32, zeros
 
 
 class Reader(object):

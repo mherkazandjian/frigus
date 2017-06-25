@@ -1,3 +1,13 @@
+"""
+<keywords>
+test, python
+</keywords>
+<description>
+.. todo:: add documentation
+</description>
+<seealso>
+</seealso>
+"""
 from __future__ import print_function
 import os
 import numpy

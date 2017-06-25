@@ -4,8 +4,7 @@
 """
 from __future__ import print_function
 import numpy 
-from numpy import loadtxt, genfromtxt
-import pylab
+from numpy import loadtxt
 
 from astropy.table import QTable
 from astropy import units as u

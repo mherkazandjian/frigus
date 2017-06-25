@@ -2,6 +2,7 @@ from __future__ import print_function
 
 import os
 
+# .. todo:: remove this import and replace it with pyplot
 import pylab
 
 import numpy
