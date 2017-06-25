@@ -1,7 +1,7 @@
 # Informational files
 include README.rst
 include LICENSE
-# graft src/python/frigus
+graft data
 
 # Include docs and tests. It's unclear whether convention dictates
 # including built docs. However, Sphinx doesn't include built docs, so

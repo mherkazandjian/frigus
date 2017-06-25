@@ -5,6 +5,8 @@ import os
 import sys
 import imp
 import glob
+import fnmatch
+
 import subprocess
 
 # Python 2.6 subprocess.check_output compatibility. Thanks Greg Hewgill!
@@ -178,6 +180,16 @@ def _test():
     # It also runs doctest, but only on the modules in TESTS_DIRECTORY.
     return pytest.main(PYTEST_FLAGS + [TESTS_DIRECTORY])
 
+def find_all_files_in_datadir():
+
+    root_dir = 'data'
+    look_for = '*'
+
+    matches = []
+    for root, dirnames, filenames in os.walk(root_dir):
+        for filename in fnmatch.filter(filenames, look_for):
+            matches.append(os.path.join(root, filename))
+    return matches
 
 def _test_all():
     """Run lint and tests.
@@ -244,7 +256,11 @@ setup_dict = dict(
         'Topic :: System :: Software Distribution',
     ],
     packages=['frigus'],
-    package_data={'frigus': glob.glob('frigus/*.py')},
+    package_dir={'frigus': 'src/python/frigus'},
+    package_data={
+        'frigus': glob.glob('src/python/frigus/*.py'),
+    },
+    data_files=[('data', find_all_files_in_datadir())],
     install_requires=[
         # your module dependencies
     ] + python_version_specific_requires,
