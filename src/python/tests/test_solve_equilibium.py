@@ -2,7 +2,7 @@ from __future__ import print_function
 import numpy
 from numpy.testing import assert_allclose
 
-from population import solveEquilibrium
+from frigus.population import solveEquilibrium
 
 
 def test_equilibrium_solver_snaity_2x2():

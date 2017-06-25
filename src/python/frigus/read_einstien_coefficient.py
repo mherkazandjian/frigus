@@ -113,7 +113,7 @@ def read_einstein_simbotin():
     # The greatest rotational number for H2, starting from j = 0
     # (tot. rotational numbers: jmax=32). The greatest vibrational number for
     # H2, starting from v = 0 (tot. vibrational numbers: vmax=15)
-    with open('../../data/read/j2jdown', 'r') as fobj:
+    with open('../../../data/read/j2jdown', 'r') as fobj:
         lines = fobj.readlines()
     jmax = numpy.array(lines[1].split(), dtype='i').max()
     vmax = numpy.array(lines[2].split(), dtype='i').max()
@@ -122,9 +122,9 @@ def read_einstein_simbotin():
     # they are provided in the data files)
     A = zeros((vmax + 1, jmax + 1, vmax + 1, jmax + 1), 'f8')
 
-    read_j2j_x('../../data/read/j2jdown', A, delta_j=-2, skip_rows=3)
-    read_j2j_x('../../data/read/j2j',     A, delta_j=0, skip_rows=1)
-    read_j2j_x('../../data/read/j2jup',   A, delta_j=2, skip_rows=1)
+    read_j2j_x('../../../data/read/j2jdown', A, delta_j=-2, skip_rows=3)
+    read_j2j_x('../../../data/read/j2j',     A, delta_j=0, skip_rows=1)
+    read_j2j_x('../../../data/read/j2jup',   A, delta_j=2, skip_rows=1)
 
     testing.assert_approx_equal(A.sum(), 9.3724e-4, significant=4)
     testing.assert_approx_equal(A[7, 2, 4, 2], 4.133e-7, significant=4)

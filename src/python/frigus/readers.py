@@ -106,7 +106,7 @@ class DataSetH2Lique(DataSetBase):
         # read the energy levels (v, j, energy)
         #
         energy_levels = read_energy_levels.read_levels_lique(
-            '../../data/read/H2Xvjlevels_francois_mod.cs')
+            '../../../data/read/H2Xvjlevels_francois_mod.cs')
 
         # en_H2 = read_levels.read_levels("Read/H2Xvjlevels.cs")
         # print('{:3}{:3}{:10}'.format('v', 'j', 'E(eV)'))
@@ -126,7 +126,7 @@ class DataSetH2Lique(DataSetBase):
         #
         collision_rates, T_rng, collision_rates_info_nnz = \
             read_collision_coefficients_lique_and_wrathmall(
-                "../../data/read/Rates_H_H2.dat")
+                "../../../data/read/Rates_H_H2.dat")
         self.raw_data.collision_rates = collision_rates
         self.raw_data.collision_rates_T_range = T_rng
         self.raw_data.collision_rates_info_nnz = collision_rates_info_nnz
@@ -189,7 +189,7 @@ class DataSetTwoLevel_1(DataSetBase):
         # read the energy levels (v, j, energy)
         #
         energy_levels = read_energy_levels.read_levels_two_levels_test_1(
-            '../../data/two_levels_1/energy_levels.txt')
+            '../../../data/two_levels_1/energy_levels.txt')
         self.energy_levels = energy_levels
         self.raw_data.energy_levels = energy_levels
 
@@ -197,7 +197,7 @@ class DataSetTwoLevel_1(DataSetBase):
         # read the einstein coefficients
         #
         A_matrix = numpy.loadtxt(
-            '../../data/two_levels_1/A_matrix.txt')
+            '../../../data/two_levels_1/A_matrix.txt')
         A_matrix = A_matrix / u.second
         self.A_matrix = A_matrix
         self.raw_data.A = self.A_matrix / u.second

@@ -3,7 +3,7 @@ import numpy
 from numpy.testing import assert_allclose
 from astropy import units as u
 import py.test
-from population import fit_lipovka, fit_glover, fit_lipovka_low_density
+from frigus.population import fit_lipovka, fit_glover, fit_lipovka_low_density
 
 
 def test_that_lipovka_cooling_function_fit_is_computed_correctly():

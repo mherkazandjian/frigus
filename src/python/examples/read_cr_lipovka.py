@@ -33,7 +33,7 @@ species_data = DataLoader().load('HD_lipovka')
 # from __future__ import print_function
 # from read_cr_lipovka import Reader
 #
-# reader = Reader('../../data/read/lipovka/flower_roueff_data.dat')
+# reader = Reader('../../../data/read/lipovka/flower_roueff_data.dat')
 #
 # reader.read_data()
 print('done')

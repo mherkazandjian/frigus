@@ -2,8 +2,8 @@ from __future__ import print_function
 from numpy.testing import assert_allclose
 from astropy import units as u
 
-from population import cooling_rate_at_steady_state
-from readers import DataLoader
+from frigus.population import cooling_rate_at_steady_state
+from frigus.readers import DataLoader
 
 
 def test_that_the_lipovka_cooling_function_is_computed_correctly():
