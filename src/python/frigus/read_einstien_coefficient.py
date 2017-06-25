@@ -157,7 +157,7 @@ def read_einstein_coppola():
     vp_nnz, jp_nnz, vpp_nnz, jpp_nnz, A_nnz = [], [], [], [], []
 
     data = numpy.loadtxt(
-        '../../data/read/lipovka/hd_einstein_coeffs.dat',
+        '../../../data/read/lipovka/hd_einstein_coeffs.dat',
         skiprows=2)
 
     vp_nnz = data[:, 0].astype(numpy.int32)

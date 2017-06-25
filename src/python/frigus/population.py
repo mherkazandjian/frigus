@@ -1,10 +1,5 @@
 from __future__ import print_function
 
-import os
-
-# .. todo:: remove this import and replace it with pyplot
-import pylab
-
 import numpy
 from numpy import (zeros, fabs, arange, array_equal, exp, ones, log10,
                    linalg, eye, dot, where, intersect1d, setdiff1d, in1d, pi)
@@ -17,7 +12,7 @@ from astropy.constants import h as h_planck
 from astropy.constants import k_B as kb
 from astropy.analytic_functions import blackbody_nu as B_nu
 
-from utils import linear_2d_index, find_matching_indices
+from frigus.utils import linear_2d_index, find_matching_indices
 
 
 def find_v_max_j_max_from_data(A_einstein_nnz, cr_coefficients_nnz):

@@ -8,11 +8,11 @@ import matplotlib.pyplot as plt
 
 from astropy import units as u
 
-from population import (fit_lipovka,
-                        cooling_rate_at_steady_state,
-                        population_density_at_steady_state)
+from frigus.population import (fit_lipovka,
+                               cooling_rate_at_steady_state,
+                               population_density_at_steady_state)
 
-from readers import DataLoader
+from frigus.readers import DataLoader
 
 species_data = DataLoader().load('HD_lipovka')
 
@@ -69,11 +69,11 @@ if True:
 
     axs.loglog(
         T_rng.value, lambda_vs_T_kin.si.value,
-        '-o', label='cooling H2')
+        '-o', label='cooling HD')
 
     axs.loglog(
         T_rng.value, lambda_vs_T_kin_lipovka.si.value,
-        'r--', label='cooling H2 lipovka')
+        'r--', label='cooling HD lipovka')
 
     plt.legend()
     plt.show()

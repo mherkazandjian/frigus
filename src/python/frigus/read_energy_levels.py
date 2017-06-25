@@ -9,7 +9,8 @@ from numpy import loadtxt
 from astropy.table import QTable
 from astropy import units as u
 from astropy import constants
-from utils import linear_2d_index
+
+from frigus.utils import linear_2d_index
 
 
 class EnergyLevelsSpeciesBase(object):

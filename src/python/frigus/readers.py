@@ -8,13 +8,12 @@ energy levels and collision reaction rates.
 import numpy
 from astropy import units as u
 
-import read_energy_levels
-import read_einstien_coefficient
-from read_collision_coefficients import (
+from frigus import read_energy_levels, read_einstien_coefficient
+from frigus.read_collision_coefficients import (
     read_collision_coefficients_lique_and_wrathmall,
     read_collision_coefficients_lipovka)
 
-import population
+from frigus import population
 
 
 class DataSetRawBase(object):
@@ -244,7 +243,7 @@ class DataSetHDLipovka(DataSetBase):
         # read the energy levels (v, j, energy)
         #
         energy_levels = read_energy_levels.read_levels_lipovka(
-            '../../data/read/lipovka/flower_roueff_data.dat')
+            '../../../data/read/lipovka/flower_roueff_data.dat')
 
         self.raw_data.energy_levels = energy_levels
 
@@ -260,7 +259,7 @@ class DataSetHDLipovka(DataSetBase):
         #
         collision_rates, T_rng, collision_rates_info_nnz = \
             read_collision_coefficients_lipovka(
-                '../../data/read/lipovka/flower_roueff_data.dat')
+                '../../../data/read/lipovka/flower_roueff_data.dat')
 
         self.raw_data.collision_rates = collision_rates
         self.raw_data.collision_rates_T_range = T_rng
