@@ -243,8 +243,8 @@ setup_dict = dict(
         'Topic :: System :: Installation/Setup',
         'Topic :: System :: Software Distribution',
     ],
-    packages=['src/python/frigus'],
-    package_data={'frigus': glob.glob('src/python/frigus/*.py')},
+    packages=['frigus'],
+    package_data={'frigus': glob.glob('frigus/*.py')},
     install_requires=[
         # your module dependencies
     ] + python_version_specific_requires,
