@@ -3,6 +3,7 @@ scipy
 pandas
 matplotlib
 pytest
+pytest-cov
 ipython
 jupyter
 sphinx
