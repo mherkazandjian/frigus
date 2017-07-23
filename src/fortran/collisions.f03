@@ -36,9 +36,9 @@ module collisions
                  rr%matrix_lique = 0.d0
 
                  !if(ilipovka_flag.eq.0)
-                 !rr%temp = [ (i, i=100,ntemp*100,100) ]
+                 rr%temp = [ (i, i=100,ntemp*100,100) ]
                  !if(ilipovka_flag.eq.1)
-                 rr%temp = [ (i, i=100, 2000, 20) ]
+                 !rr%temp = [ (i, i=100, 2000, 20) ]
                 
                  
 

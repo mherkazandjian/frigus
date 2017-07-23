@@ -53,10 +53,10 @@ module level_population
           call dgesv(ndim, nrhs, coll_rad_matrix%M, lda, ipiv, x, ldb, info)
           !dgesvx
 
-!           do i = 1, nlev_lique
-!               write(6,'(3(i3), 2(ES26.16E3))') i, energy%vl(i), energy%jl(i), y%pop(i), x%pop(i)
-!           enddo
-!           write(6,'(a26,es24.18)') 'sum fractional abundances:', sum(x%pop)
+           do i = 1, nlev_lique
+               write(6,'(3(i3), 2(ES26.16E3))') i, energy%vl(i), energy%jl(i), y%pop(i), x%pop(i)
+           enddo
+           write(6,'(a26,es24.18)') 'sum fractional abundances:', sum(x%pop)
         return
     end subroutine solve_steady_state
 
