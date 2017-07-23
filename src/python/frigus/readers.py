@@ -170,6 +170,99 @@ class DataSetH2Lique(DataSetBase):
         self.K_dex_matrix_interpolator = K_dex_matrix_interpolator
 
 
+class DataSetH2Wrathmall(DataSetBase):
+    """
+    Data of H2 colliding with H using collisional data by Wrathmall and Flower
+
+      - energy levels of H2 (vibrational and rotational)
+      - collisional coefficients of H2 with H (K_ij)
+      - radiative coefficients (A_ij, B_ij, B_ji)
+
+    Limitations
+
+      - The smallest data set of (A, B, K) determines the number of states to
+       be inserted in the model.
+    """
+    def __init__(self):
+        """
+        constructor
+        """
+        super(DataSetH2Wrathmall, self).__init__()
+        self.read_raw_data()
+        self.reduce_raw_data()
+
+    def read_raw_data(self):
+        """read the raw H2 data"""
+
+        #
+        # read the energy levels (v, j, energy)
+        #
+        energy_levels = read_energy_levels.read_levels_lique(
+            '../../../data/read/H2Xvjlevels_francois_mod.cs')
+
+        # en_H2 = read_levels.read_levels("Read/H2Xvjlevels.cs")
+        # print('{:3}{:3}{:10}'.format('v', 'j', 'E(eV)'))
+        # for level in levels:
+        #     print('{:<3}{:<3}{:<10}'.format(level['v'], level['j'], level['E']))
+        self.raw_data.energy_levels = energy_levels
+
+        #
+        # read the einstein coefficients for the H2 transitions
+        #
+        A, A_info_nnz = read_einstien_coefficient.read_einstein_simbotin()
+        self.raw_data.A = A
+        self.raw_data.A_info_nnz = A_info_nnz
+
+        #
+        # read the collisional rates for H2 with H
+        #
+        collision_rates, T_rng, collision_rates_info_nnz = \
+            read_collision_coefficients_lique_and_wrathmall(
+                "../../../data/read/wrathmall/Rates_H_H2_flower_frigus.dat")
+        self.raw_data.collision_rates = collision_rates
+        self.raw_data.collision_rates_T_range = T_rng
+        self.raw_data.collision_rates_info_nnz = collision_rates_info_nnz
+
+    def reduce_raw_data(self):
+        """
+        use the raw data in self.raw_data to populate the A and K_dex matrices
+        """
+
+        # find the maximum v and j from the Einstein and collisional rates data
+        # sets and adjust the labels of the energy levels according to that
+        v_max_data, j_max_data = population.find_v_max_j_max_from_data(
+            self.raw_data.A_info_nnz,
+            self.raw_data.collision_rates_info_nnz)
+
+        self.energy_levels = self.raw_data.energy_levels
+        self.energy_levels.set_labels(v_max=v_max_data + 1)
+
+        #
+        # reduce the Einstein coefficients to a 2D matrix (construct the A
+        # matrix) [n_levels, n_levels]
+        # A_reduced_slow = population.reduce_einstein_coefficients_slow(
+        #                                 self.raw_data.A_info_nnz,
+        #                                 self.energy_levels)
+        A_matrix = population.reduce_einstein_coefficients(
+                          self.raw_data.A,
+                          self.energy_levels)
+        self.A_matrix = A_matrix
+
+        # getting the collisional de-excitation matrix (K_dex) (for all
+        # tabulated values)  [n_level, n_level, n_T_kin_values]
+        K_dex_matrix = population.reduce_collisional_coefficients_slow(
+            self.raw_data.collision_rates_info_nnz,
+            self.energy_levels,
+            reduced_data_is_upper_to_lower_only=True
+        )
+
+        # compute the interpolator that produces K_dex at a certain temperature
+        K_dex_matrix_interpolator = population.compute_K_dex_matrix_interpolator(
+            K_dex_matrix, self.raw_data.collision_rates_T_range)
+        self.K_dex_matrix_interpolator = K_dex_matrix_interpolator
+
+
+
 class DataSetTwoLevel_1(DataSetBase):
     """
     Data of a synthetic two level system
@@ -328,7 +421,7 @@ class DataLoader(object):
         elif name == 'HD_lipovka':
             return DataSetHDLipovka()
         elif name == 'H2_wrathmall':
-            raise NotImplementedError('''not implemented''')
+            return DataSetH2Wrathmall()
         else:
             msg = '''not data loader defined for {}'''.format(name)
             raise ValueError(msg)
