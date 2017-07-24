@@ -103,6 +103,7 @@ module collisions
                              enddo
                          enddo
                  else
+                    print*, 'ntemp=', ntemp
                      ndownwards = 0
                      do i = 1, 10
                          write(20, *)
@@ -121,7 +122,7 @@ module collisions
                          jf=rr%jfc(i)
                          if(e%en_lique(vi,ji)-e%en_lique(vf,jf).gt.0.d0) then 
                          ndownwards = ndownwards + 1
-                         write(20, '(4i3, 1x, 50(e14.4,1x))') vi, ji, vf, jf, &
+                         write(20, '(4i3, 1x, 60(e14.4,1x))') vi, ji, vf, jf, &
                          (rr%reading(rr%vic(i),rr%jic(i),rr%vfc(i),rr%jfc(i),it), &
                          it=1,ntemp)
                          endif

@@ -9,11 +9,11 @@ import numpy
 
 from astropy import units as u
 
-from population import (fit_glover,
+from frigus.population import (fit_glover,
                         cooling_rate_at_steady_state,
                         population_density_at_steady_state)
 
-from readers import DataLoader
+from frigus.readers import DataLoader
 
 species_data = DataLoader().load('H2_wrathmall')
 
