@@ -2,6 +2,12 @@
 """
 Calculate equilibrium population of species and the cooling function using the
 Lique data.
+
+The data used in calculated the cooling function are:
+
+    - reaction rates for H2+H collisions by Lique 2016
+    - Einstein coefficients for H2 by Simbotin & Dalgarno 1998
+    - energy levels provided by Lique (derived using ABC)
 """
 from __future__ import print_function
 import matplotlib.pyplot as plt
