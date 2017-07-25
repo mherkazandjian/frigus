@@ -36,9 +36,9 @@ module collisions
                  rr%matrix_lique = 0.d0
 
                  !if(ilipovka_flag.eq.0)
-                 !rr%temp = [ (i, i=100,ntemp*100,100) ]
+                 rr%temp = [ (i, i=100,ntemp*100,100) ]
                  !if(ilipovka_flag.eq.1)
-                 rr%temp = [ (i, i=100, 2000, 20) ]
+                 !rr%temp = [ (i, i=100, 2000, 20) ]
                 
                  
 
@@ -103,6 +103,7 @@ module collisions
                              enddo
                          enddo
                  else
+                    print*, 'ntemp=', ntemp
                      ndownwards = 0
                      do i = 1, 10
                          write(20, *)
@@ -121,7 +122,7 @@ module collisions
                          jf=rr%jfc(i)
                          if(e%en_lique(vi,ji)-e%en_lique(vf,jf).gt.0.d0) then 
                          ndownwards = ndownwards + 1
-                         write(20, '(4i3, 1x, 50(e14.4,1x))') vi, ji, vf, jf, &
+                         write(20, '(4i3, 1x, 60(e14.4,1x))') vi, ji, vf, jf, &
                          (rr%reading(rr%vic(i),rr%jic(i),rr%vfc(i),rr%jfc(i),it), &
                          it=1,ntemp)
                          endif

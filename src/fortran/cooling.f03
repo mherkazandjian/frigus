@@ -120,7 +120,7 @@ program cooling
              filename = 'cooling_nc=' // char1
              open(50, file = filename, status = 'unknown')
              open(51, file = 'to_be_fitted.dat', status = 'unknown')             
-             write(50,'(5(ES23.15))') Trad, rr%temp(id_temp), cooling_rate(id_temp), lipovka(id_temp)
+             write(50,'(5(ES23.15))') Trad, rr%temp(id_temp), cooling_rate(id_temp), glover(id_temp)
              write(51,'(4(ES23.15))') Trad, nc(idensity), rr%temp(id_temp), cooling_rate(id_temp)
         enddo ! loop on the kinetic temperatures
         rr%matrix_lique = rr%matrix_lique / nc(idensity)
