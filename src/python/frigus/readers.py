@@ -197,13 +197,9 @@ class DataSetH2Wrathmall(DataSetBase):
         #
         # read the energy levels (v, j, energy)
         #
-        energy_levels = read_energy_levels.read_levels_lique(
-            '../../../data/read/H2Xvjlevels_francois_mod.cs')
+        energy_levels = read_energy_levels.read_levels_wrathmall_and_flower(
+            '../../../data/read/H2Xvjlevels_flower.cs')
 
-        # en_H2 = read_levels.read_levels("Read/H2Xvjlevels.cs")
-        # print('{:3}{:3}{:10}'.format('v', 'j', 'E(eV)'))
-        # for level in levels:
-        #     print('{:<3}{:<3}{:<10}'.format(level['v'], level['j'], level['E']))
         self.raw_data.energy_levels = energy_levels
 
         #

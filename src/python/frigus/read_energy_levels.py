@@ -164,7 +164,7 @@ def read_levels(fname):
 
 def read_levels_lique(fname):
     """
-    read the energy levels from the file "H2Xvjlevels_francios_mod.cs" that is
+    read the energy levels from the file "H2Xvjlevels_francois_mod.cs" that is
     recovered from ABC. The file has (should have) the following format.
 
       ----------------------------------------------------------------------
@@ -174,14 +174,14 @@ def read_levels_lique(fname):
        93       2       0       1       0         0.28504
 
     :param fname: The paths to the ascii file containing the levels
-     information. The file should have the following format:
+     information.
     :return: numpy array array of N rows, the v and j levels and their
      corresponding energy. The elements of the array are stored in increasing
      order in the energy.
 
     .. code-block:: python
 
-        levels = read_levels('/path/to/H2Xvjlevels_francios_mod.cs')
+        levels = read_levels_lique('/path/to/H2Xvjlevels_francois_mod.cs')
 
         print('{:3}{:3}{:10}'.format('v', 'j', 'E(eV)'))
         for level in levels:
@@ -200,6 +200,52 @@ def read_levels_lique(fname):
     energy_levels.data['j'] = j
     energy_levels.data['g'] = 2*j + 1
     energy_levels.data['E'] = energies * u.eV
+    energy_levels.data['label'] = linear_2d_index(v, j)
+
+    return energy_levels
+
+
+def read_levels_wrathmall_and_flower(fname):
+    """
+    read the energy levels from the file "H2Xvjlevels_flower.cs". The file has
+    (should have) the following format.
+
+      lev no.   v           J       Energy (K)
+
+      1       0       0       0
+      2       0       2       509.85
+      3       0       4       1681.678
+
+    :param fname: The paths to the ascii file containing the levels
+     information.
+    :return: numpy array array of N rows, the v and j levels and their
+     corresponding energy. The elements of the array are stored in increasing
+     order in the energy.
+
+    .. code-block:: python
+
+        levels = read_levels_wrathmall_and_flower('/path/to/H2Xvjlevels_flower.cs')
+
+        print('{:3}{:3}{:10}'.format('v', 'j', 'E(eV)'))
+        for level in levels:
+           print('{:3}{:3}{:10}'.format(level['v'], level['j'], level['E']))
+    """
+    data_read = numpy.loadtxt(fname, skiprows=2)
+
+    # get the sorting indices list from the last column (energy)
+    inds = numpy.argsort(data_read[:, -1])
+
+    v, j, energies = data_read[inds, 1], data_read[inds, 2], data_read[inds, 3]
+
+    energy_levels = EnergyLevelsMolecule(inds.size, energy_unit=u.K)
+
+    energy_levels.data['v'] = v
+    energy_levels.data['j'] = j
+    energy_levels.data['g'] = 2*j + 1
+    energy_levels.data['E'] = (energies*u.K).to(
+        u.eV,
+        equivalencies=u.temperature_energy()
+    )
     energy_levels.data['label'] = linear_2d_index(v, j)
 
     return energy_levels
