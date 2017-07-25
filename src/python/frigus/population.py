@@ -10,7 +10,7 @@ from astropy import units as u
 from astropy.constants import c as c_light
 from astropy.constants import h as h_planck
 from astropy.constants import k_B as kb
-from astropy.analytic_functions import blackbody_nu as B_nu
+from astropy.modeling.blackbody import blackbody_nu as B_nu
 
 from frigus.utils import linear_2d_index, find_matching_indices
 
