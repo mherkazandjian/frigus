@@ -459,13 +459,8 @@ def solveEquilibrium(M_matrix, debug=False):
     # ============ condition the linear system ========================
     #
     # scale the rows by normalizing w.r.t the diagonal element
-    # for i in arange(sz):
-    #     A[i, :] = A[i, :] / A[i, i]
-
     for i in arange(sz):
-        factor = (numpy.linalg.norm(A[i, :], 2)*numpy.linalg.norm(A[:, i], 2))
-        A[i, :] /= factor
-        b[i] /= factor
+        A[i, :] = A[i, :] / A[i, i]
 
     #
     # DEBUG: examine the condition number of A
