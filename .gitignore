@@ -61,3 +61,5 @@ src/fortran/cooling_function_lipovka\.dat
 .coverage
 
 htmlcov
+
+src/fortran/to_be_fitted\.dat

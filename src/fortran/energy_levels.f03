@@ -111,7 +111,7 @@ module energy_levels
                           read(12,*) b, e%vl_lique(i), e%jl_lique(i),     &
                                      e%en_lique(e%vl_lique(i), e%jl_lique(i))
                           e%ene_lique(i) = e%en_lique(e%vl_lique(i), e%jl_lique(i))
-                          !   write(6,'(i3,2x,i2,2x,i2,2x,e10.4)') i, vl(i), jl(i), en(vl(i),jl(i))
+                          write(6,*) i, e%vl_lique(i), e%jl_lique(i), e%en_lique(e%vl_lique(i),e%jl_lique(i))
                       enddo
                       !conversion K -->  Joule
                       e%en_lique = e%en_lique*kb
