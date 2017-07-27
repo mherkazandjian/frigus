@@ -9,7 +9,7 @@
       <excludeFolder url="file://$MODULE_DIR$/src/python/.cache" />
       <excludeFolder url="file://$MODULE_DIR$/src/python/htmlcov" />
     </content>
-    <orderEntry type="jdk" jdkName="science2" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="frigus" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="TestRunnerService">
