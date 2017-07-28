@@ -7,33 +7,64 @@ module read_data
                                     population,                           &
                                     Trad, ini, fin,                       &
                                     nlev_lique, vi, vf, ji, jf,           &
-                                    id_temp, id_temp_test
+                                    id_temp, id_temp_test, ilique_flag,   &
+                                    iflower_flag, ilipovka_flag
                                     
-    use energy_levels, only: reading_data_energies
+    use energy_levels, only: reading_data_energies_stancil,               &
+                             reading_data_energies_lique,                 &
+                             reading_data_energies_flower,                &
+                             reading_data_energies_lipovka
+    
+    
     use radiation,     only: reading_data_radiative,                      &
                              radiative_downwards, radiative_upwards,      &
                              reading_data_radiative_lipovka
-    use collisions,    only: reading_data_collisions
+
+    use collisions,    only: reading_data_collisions_lique,                 &
+                             reading_data_collisions_flower,                &
+                             reading_data_collisions_lipovka
 
     use testing_data, only: tests, writing_files
 
     contains
 
-    subroutine get_data(Trad, id_temp, energy, a21, b21, r21, b12, jnu, r12, rr, rr21, rr12)
+    subroutine get_data(ilique_flag, iflower_flag, ilipovka_flag, Trad, &
+    id_temp, energy, a21, b21, r21, b12, jnu, r12, rr, rr21, rr12)
          type(energy_lev) :: energy
          type(radiative_coeffs) :: a21, b21, b12, jnu, r21, r12, rad
          type(collisional_coeffs) :: rr, rr21, rr12
          type(reaction_matrix) :: coll_rad_matrix
          real*8 :: Trad
 
-         call reading_data_energies(energy)
+         if(ilique_flag.eq.1) then
+            call reading_data_energies_lique(energy)
+         elseif(iflower_flag.eq.1) then
+            call reading_data_energies_flower(energy)
+         elseif(ilipovka_flag.eq.1) then
+            call reading_data_energies_lipovka(energy)
+         else 
+            print*, 'Error raised: no flag selected for calling energy data reader'
+         endif
 
-         !call reading_data_radiative(energy, a21)
+        if(ilique_flag.eq.1.or.iflower_flag.eq.1) then
+            call reading_data_radiative(energy, a21)
+         elseif(ilipovka_flag.eq.1) then
+            call reading_data_radiative_lipovka(energy, a21)
+         else 
+            print*,  'Error raised: no flag selected for calling radiative data reader'
+        endif
 
-         call reading_data_radiative_lipovka(energy, a21)         
 
-         call reading_data_collisions(energy, rr, rr21, rr12)
-
+         if(ilique_flag.eq.1) then
+            call reading_data_collisions_lique(energy, rr, rr21, rr12)
+         elseif(iflower_flag.eq.1) then
+            call reading_data_collisions_flower(energy, rr, rr21, rr12)
+         elseif(ilipovka_flag.eq.1) then
+            call reading_data_collisions_lipovka(energy, rr, rr21, rr12)
+         else
+            print*, 'Error raised: no flag selected for calling collisional data reader'
+         endif
+         
          call radiative_downwards(energy, Trad, a21, b21, r21)
 
          call radiative_upwards(energy, Trad, b21, b12, jnu, r12)

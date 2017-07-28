@@ -1,17 +1,17 @@
 program cooling
-     use types_and_parameters, only: energy_lev,                            &
-                                     radiative_coeffs, collisional_coeffs,  &
-                                     reaction_matrix, population,           &
-                                     ntemp, nlev_lique, Trad, nc,           &
-                                     id_temp, id_temp_test, ndensity
+     use types_and_parameters, only: energy_lev,                                     &
+                                     radiative_coeffs, collisional_coeffs,           &
+                                     reaction_matrix, population,                    &
+                                     ntemp, nlev_lique, Trad, nc,                    &
+                                     id_temp, id_temp_test, ndensity, ilique_flag,   &
+                                     iflower_flag, ilipovka_flag
 
-     use read_data, only: get_data                                     
-                                     
+     use read_data, only: get_data
+
      use level_population, only: lev_pop
-     
+
      use testing_data, only: tests, writing_files
 
-         
      type(energy_lev) :: energy
      type(radiative_coeffs) :: a21, b21, r21, b12, r12, jnu
      type(collisional_coeffs) :: rr, rr21, rr12
@@ -22,7 +22,8 @@ program cooling
      character*7 :: char1
      character*19 :: filename
 
-     call get_data(Trad, id_temp_test, energy, a21, b21, r21, b12, jnu, r12, rr, rr21, rr12)
+     call get_data(ilique_flag, iflower_flag, ilipovka_flag, Trad,&
+     id_temp_test, energy, a21, b21, r21, b12, jnu, r12, rr, rr21, rr12)
      
 
 

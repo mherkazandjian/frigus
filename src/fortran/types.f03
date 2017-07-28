@@ -38,10 +38,9 @@ module types_and_parameters
     integer, parameter :: jfmax = 23   ! 17 lique, 23 flower, 9 lipovka
     integer, parameter :: ntemp = 60   ! 50 lique, 60 flower, 96 lipovka
     integer, parameter :: ntrans = 5797 ! 1653 lique 5797 flower, tot 5832 54*54(ortho)+54*54(para), 55 lipovka
-    integer, parameter :: ilique_flag = 0   ! to switch from lique's to flower's data
-    integer, parameter :: ilipovka_flag = 0 ! to switch select the HD case; if on, the ilique_flag value 
-                                            ! is not relevant, it will continue the calculations for the 
-                                            ! HD in anycase
+    integer, parameter :: ilique_flag = 0
+    integer, parameter :: iflower_flag = 1
+    integer, parameter :: ilipovka_flag = 0
 
       
     
