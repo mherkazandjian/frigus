@@ -4,8 +4,8 @@
 frigus, time, dependent, equilibrium, steady, state, compare, check
 </keywords>
 <description>
-evolve the population density of the levels of a species using an integrator
-and compare the solution to the equilibrium solution using matrix inversion.
+  - evolve the population density of the levels of a species using an integrator
+  - compare the solution to the equilibrium solution using matrix inversion.
 </description>
 <seealso>
 </seealso>
@@ -23,9 +23,7 @@ from frigus.population import (
 )
 from frigus.readers import DataLoader
 
-#
 # load the species data
-#
 species_data = DataLoader().load('HD_lipovka')
 
 # time range and timestep
@@ -35,7 +33,7 @@ dt = 1e6
 
 # the environment parameters
 nc_H = 1e6 * u.meter ** -3
-T_kin = 100.0 * u.Kelvin
+T_kin = 1000.0 * u.Kelvin
 T_rad = 2.73 * u.Kelvin
 
 # the rates matrix (that is fixed if the environemnt params above are fixed)
@@ -43,7 +41,7 @@ T_rad = 2.73 * u.Kelvin
 M_matrix = compute_transition_rate_matrix(species_data, T_kin, T_rad, nc_H)
 
 
-def ode_rhs(_, y, __):
+def ode_rhs(_, y):
     """
     define the function that computes the rhs of dy/dt
     """
@@ -60,9 +58,9 @@ y_0 = initial_fractional_abundances
 solver = ode(ode_rhs, jac=None).set_integrator('vode',
                                                method='bdf',
                                                # with_jacobian = False,
-                                               rtol=1e-3)
+                                               rtol=1e-6)
 
-solver.set_initial_value(y_0, t_0).set_f_params(1.0)
+solver.set_initial_value(y_0, t_0)
 
 step_counter = 0
 t_all = []
@@ -86,10 +84,21 @@ t_all, x_all = numpy.array(t_all), numpy.vstack(x_all)
 #
 fig, axs = plt.subplots()
 
-axs.loglog(t_all, x_all[:, 0], 'r')
-axs.loglog(t_all, x_all[:, 1], 'g')
-axs.loglog(t_all, x_all[:, 2], 'b')
-axs.loglog(t_all, x_all[:, 3], 'k')
+colors = {
+    'r': '+',
+    'g': '+',
+    'b': '+',
+    'c': '+',
+    'k': '+',
+    'r--': '+',
+    'g--': '+',
+    'b--': '+',
+    'c--': '+',
+    'k--': '+'
+}
+
+for level_index in range(n_levels):
+    axs.loglog(t_all, x_all[:, level_index], colors.keys()[level_index])
 
 # get the equilibrium solution and plot them as crosses at t = t_f
 pop_dens_eq = population_density_at_steady_state(
@@ -98,10 +107,10 @@ pop_dens_eq = population_density_at_steady_state(
     T_rad,
     nc_H)
 
-axs.loglog(t_all[-1], pop_dens_eq[0], 'r+')
-axs.loglog(t_all[-1], pop_dens_eq[1], 'g+')
-axs.loglog(t_all[-1], pop_dens_eq[2], 'b+')
-axs.loglog(t_all[-1], pop_dens_eq[3], 'k+')
+for level_index in range(n_levels):
+    axs.loglog(
+        t_all[-1], pop_dens_eq[level_index], colors.values()[level_index]
+    )
 
 plt.ion()
 plt.show()
