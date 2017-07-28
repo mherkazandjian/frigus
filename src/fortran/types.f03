@@ -23,25 +23,25 @@ module types_and_parameters
     
     ! ENERGY LEVELS
     integer, parameter :: nlev = 301
-    integer, parameter :: nlev_lique = 108 ! 58 lique, 108 flower, 10 lipovka
-    integer, parameter :: vmax_lique = 6   ! 3  lique,   6 flower, 0 lipovka
-    integer, parameter :: jmax_lique = 23  ! 18 lique,  23 flower, 9 lipovka
+    integer, parameter :: nlev_lique = 58 ! 58 lique, 108 flower, 10 lipovka
+    integer, parameter :: vmax_lique = 3   ! 3  lique,   6 flower, 0 lipovka
+    integer, parameter :: jmax_lique = 18  ! 18 lique,  23 flower, 9 lipovka
 
     ! RADIATIVE TRANSITIONS
     integer, parameter :: jmax = 31
     integer, parameter :: vmax = 14
 
     ! COLLISIONAL TRANSITIONS
-    integer, parameter :: vimax = 6    ! 3 lique,   6 flower, 0 lipovka
-    integer, parameter :: jimax = 23   ! 18 lique, 23 flower, 9 lipovka
-    integer, parameter :: vfmax = 6    !  3 lique,  6 flower, 0 lipovka
-    integer, parameter :: jfmax = 23   ! 17 lique, 23 flower, 9 lipovka
-    integer, parameter :: ntemp = 60   ! 50 lique, 60 flower, 96 lipovka
-    integer, parameter :: ntrans = 5797 ! 1653 lique 5797 flower, tot 5832 54*54(ortho)+54*54(para), 55 lipovka
-    integer, parameter :: ilique_flag = 0
-    integer, parameter :: iflower_flag = 1
+    integer, parameter :: vimax = 3    ! 3 lique,   6 flower, 0 lipovka
+    integer, parameter :: jimax = 18   ! 18 lique, 23 flower, 9 lipovka
+    integer, parameter :: vfmax = 3    !  3 lique,  6 flower, 0 lipovka
+    integer, parameter :: jfmax = 17   ! 17 lique, 23 flower, 9 lipovka
+    integer, parameter :: ntemp = 50   ! 50 lique, 60 flower, 96 lipovka
+    integer, parameter :: ntrans = 1653 ! 1653 lique 5797 flower, tot 5832 54*54(ortho)+54*54(para), 55 lipovka
+    integer, parameter :: ilique_flag = 1
+    integer, parameter :: iflower_flag = 0
     integer, parameter :: ilipovka_flag = 0
-    integer, parameter :: norm_first_row = 0 ! 1 lique, 0 flower, check lipovka
+    integer, parameter :: norm_first_row = 1 ! 1 lique, 0 flower, check lipovka
 
       
     
