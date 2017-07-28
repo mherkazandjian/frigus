@@ -292,10 +292,10 @@ class DataSetTwoLevel_1(DataSetBase):
         self.raw_data.A = self.A_matrix / u.second
 
         #
-        # read the collisional rates for H2 with H
+        # read the collisional rates
         #
         collision_rates = numpy.loadtxt(
-            '../../data/two_levels_1/K_dex_matrix.txt')
+            '../../../data/two_levels_1/K_dex_matrix.txt')
         collision_rates = collision_rates * u.m**3 / u.second
         T_rng = 0.0 * u.K, 1e6 * u.K
 
