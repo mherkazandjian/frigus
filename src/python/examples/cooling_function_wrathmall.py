@@ -2,6 +2,8 @@
 """
 Calculate equilibrium population of species and the cooling function using the
 Lique data.
+
+.. warning:: this results in negative population densities. fix it.
 """
 from __future__ import print_function
 import matplotlib.pyplot as plt

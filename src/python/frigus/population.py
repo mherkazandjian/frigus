@@ -427,7 +427,7 @@ def compute_K_matrix_from_K_dex_matrix(energy_levels,
     return K_matrix
 
 
-def solveEquilibrium(M_matrix):
+def solve_equilibrium(M_matrix):
     """
     Solve for the equilibrium population densities given the right hand side of
     the linear system of the rate equations dx/dt as a matrix dx/dt = A.x
@@ -468,10 +468,23 @@ def solveEquilibrium(M_matrix):
     return x
 
 
-def compute_M_matrix():
+def compute_M_matrix(data_set,
+                     T_kin,
+                     T_rad,
+                     collider_density):
     """
+    compute the matrix M that can be used to compute the dn/dt
 
-    :return:
+    The rates dn/dt can be computed from M by multiplying it by the abundances
+    :math:`dn/dt = M.n`
+
+    :param DataSetBase: The data of the species
+    :param Quantity T_kin: The kinetic temperature at which the steady state
+     computation  will be done.
+    :param Quantity T_rad: The radiation temperature at which the steady state
+     computation will be done.
+    :param Quantity collider_density: The density of the collider species.
+    :return: Quantity ndarray: The M matrix as a nxn ndarray
     """
     energy_levels = data_set.energy_levels
     A_matrix = data_set.A_matrix
@@ -511,41 +524,23 @@ def population_density_at_steady_state(data_set,
     .. todo:: convert T_kin, T_rad, collidre_desnity to keywords and mention
     .. todo:: if these should have units or not
 
-    :param readers.DataSet data_set: The data of the species
-    :param T_kin: The kinetic temperature at which the steady state computation
-     will be done.
-    :param T_rad: The radiation temperature at which the steady state computation
-     will be done.
-    :param collider_density: The density of the collider species.
-    :return: The equilibrium population density
+    compute the matrix M that can be used to compute the dn/dt
+
+    The rates dn/dt can be computed from M by multiplying it by the abundances
+    :math:`dn/dt = M.n`
+
+    :param DataSetBase: The data of the species
+    :param Quantity T_kin: The kinetic temperature at which the steady state
+     computation  will be done.
+    :param Quantity T_rad: The radiation temperature at which the steady state
+     computation will be done.
+    :param Quantity collider_density: The density of the collider species.
+    :return: ndarray: The equilibrium population density as a column vector
     """
 
-    energy_levels = data_set.energy_levels
-    A_matrix = data_set.A_matrix
-    K_dex_matrix_interpolator = data_set.K_dex_matrix_interpolator
+    M_matrix = compute_M_matrix(data_set, T_kin, T_rad, collider_density)
 
-    # compute the stimulated emission and absorption coefficients matrix
-    B_J_nu_matrix = compute_B_J_nu_matrix_from_A_matrix(
-        energy_levels,
-        A_matrix,
-        T_rad)
-
-    # get the K matrix for a certain temperature in the tabulated range
-    K_matrix = compute_K_matrix_from_K_dex_matrix(
-        energy_levels,
-        K_dex_matrix_interpolator,
-        T_kin)
-
-    # compute the M matrix that can be used to compute the equilibrium state of
-    # the levels (see notebook)
-    O_matrix = (A_matrix + B_J_nu_matrix + K_matrix * collider_density).T
-
-    D_matrix = -numpy.eye(O_matrix.shape[0]) * O_matrix.sum(axis=0)
-
-    M_matrix = O_matrix + D_matrix
-
-    # solve the equilibrium population densities
-    x_equilibrium = solveEquilibrium(M_matrix.si.value)
+    x_equilibrium = solve_equilibrium(M_matrix.si.value)
 
     assert bool((x_equilibrium < 0.0).any()) is False
     assert numpy.fabs(1.0 - numpy.fabs(x_equilibrium.sum())) <= 1e-3
