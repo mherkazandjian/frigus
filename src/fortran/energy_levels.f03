@@ -66,13 +66,13 @@ module energy_levels
                     enddo
 
                     write(14,'(a5, 2x, 2(a1,4x))') 'label', 'v' , 'j'
-                    do i=1,nlev_lique
+                    do i=1,nlev
                        write(14,'(3(i3,2x),e14.7)') i, e%vl_lique(i), e%jl_lique(i), e%ene_lique(i)/q
                     enddo
                      
                     write(15,'(2(a7, 3x), 4(a2,6x))') 'lab_ini', 'lab_fin', 'v' , 'j', 'vp' , 'jp'
-                    do i=1,nlev_lique
-                       do j=1,nlev_lique                     
+                    do i=1,nlev
+                       do j=1,nlev
                            write(15,'(2(i3,8x),4(i3, 4x),e14.7)') i, j,                            &
                                                            e%vl_lique(i), e%jl_lique(i), &
                                                            e%vl_lique(j), e%jl_lique(j), & 
@@ -146,7 +146,7 @@ module energy_levels
                         enddo
                     enddo
 
-                    do i=1,nle
+                    do i=1,nlev
                        write(13,'(3(i3,2x))') i, e%vl(i), e%jl(i)
                     enddo
 
