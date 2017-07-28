@@ -23,24 +23,24 @@ module types_and_parameters
     
     ! ENERGY LEVELS
     integer, parameter :: nlev = 301
-    integer, parameter :: nlev_lique = 10 ! 58 lique, 108 flower, 10 lipovka
-    integer, parameter :: vmax_lique = 0   ! 3  lique,   6 flower, 0 lipovka
-    integer, parameter :: jmax_lique = 9  ! 18 lique,  23 flower, 9 lipovka
+    integer, parameter :: nlev_lique = 108 ! 58 lique, 108 flower, 10 lipovka
+    integer, parameter :: vmax_lique = 6   ! 3  lique,   6 flower, 0 lipovka
+    integer, parameter :: jmax_lique = 23  ! 18 lique,  23 flower, 9 lipovka
 
     ! RADIATIVE TRANSITIONS
     integer, parameter :: jmax = 31
     integer, parameter :: vmax = 14
 
     ! COLLISIONAL TRANSITIONS
-    integer, parameter :: vimax = 0    ! 3 lique,   6 flower, 0 lipovka
-    integer, parameter :: jimax = 9   ! 18 lique, 23 flower, 9 lipovka
-    integer, parameter :: vfmax = 0    !  3 lique,  6 flower, 0 lipovka
-    integer, parameter :: jfmax = 9   ! 17 lique, 23 flower, 9 lipovka
-    integer, parameter :: ntemp = 96   ! 50 lique, 60 flower, 96 lipovka
-    integer, parameter :: ntrans = 55 ! 1653 lique 5797 flower, tot 5832 54*54(ortho)+54*54(para), 55 lipovka
+    integer, parameter :: vimax = 6    ! 3 lique,   6 flower, 0 lipovka
+    integer, parameter :: jimax = 23   ! 18 lique, 23 flower, 9 lipovka
+    integer, parameter :: vfmax = 6    !  3 lique,  6 flower, 0 lipovka
+    integer, parameter :: jfmax = 23   ! 17 lique, 23 flower, 9 lipovka
+    integer, parameter :: ntemp = 60   ! 50 lique, 60 flower, 96 lipovka
+    integer, parameter :: ntrans = 5797 ! 1653 lique 5797 flower, tot 5832 54*54(ortho)+54*54(para), 55 lipovka
     integer, parameter :: ilique_flag = 0
-    integer, parameter :: iflower_flag = 0
-    integer, parameter :: ilipovka_flag = 1
+    integer, parameter :: iflower_flag = 1
+    integer, parameter :: ilipovka_flag = 0
     integer, parameter :: norm_first_row = 0 ! 1 lique, 0 flower, check lipovka
 
       
@@ -83,7 +83,7 @@ module types_and_parameters
 
     type :: collisional_coeffs
         integer  :: ntemp   ! # of temperatures @ which collisional data are given
-        real*8, dimension(1:ntemp)  :: temp, temp_flower   ! temperatures @ which collisional data are given
+        real*8, allocatable, dimension(:)  :: temp    ! temperatures @ which collisional data are given
         integer, dimension(1:ntrans)  :: vic, jic, vfc, jfc ! initial and final rovibrational levels (transitions          
                                                         ! order)
         real*8  :: reading(0:vimax, 0:jimax, 0:vfmax, 0:jfmax, 1:ntemp)

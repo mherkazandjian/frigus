@@ -33,6 +33,7 @@ module collisions
                  rr%reading = 0.d0
                  rr%matrix_lique = 0.d0
 
+                 allocate(rr%temp(1:ntemp))
                  rr%temp = [ (i, i=100,ntemp*100,100) ]
 
 
@@ -116,7 +117,7 @@ module collisions
                  rr%reading = 0.d0
                  rr%matrix_lique = 0.d0
 
-
+                 allocate(rr%temp(1:ntemp))
                  rr%temp = [ (i, i=100,ntemp*100,100) ]
 
                  !do i = 1, ntemp
@@ -227,8 +228,7 @@ module collisions
                  rr%reading = 0.d0
                  rr%matrix_lique = 0.d0
 
-                 !rr%temp = [ (i, i=100,ntemp*100,100) ]
-                 
+                 allocate(rr%temp(1:ntemp))
                  rr%temp = [ (i, i=100, 2000, 20) ]
 
                  !do i = 1, ntemp
