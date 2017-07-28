@@ -3,8 +3,7 @@ program cooling
                                      radiative_coeffs, collisional_coeffs,           &
                                      reaction_matrix, population,                    &
                                      ntemp, nlev_lique, Trad, nc,                    &
-                                     id_temp, id_temp_test, ndensity, ilique_flag,   &
-                                     iflower_flag, ilipovka_flag, norm_first_row
+                                     id_temp, id_temp_test, ndensity
 
      use read_data, only: get_data
 
@@ -22,7 +21,7 @@ program cooling
      character*7 :: char1
      character*19 :: filename
 
-     call get_data(ilique_flag, iflower_flag, ilipovka_flag, Trad,&
+     call get_data(0, 0, 1, Trad,&
      id_temp_test, energy, a21, b21, r21, b12, jnu, r12, rr, rr21, rr12)
      
 
@@ -50,41 +49,10 @@ program cooling
                 enddo
             enddo
 
-            if(rr%temp(id_temp).ge.100.d0.and.rr%temp(id_temp).le.1000.d0) then
-                    glover(id_temp) = 0.25*10**(-24.216387                                    & ! para-H2
-                                         +3.3237480*log10(rr%temp(id_temp)/1000.)        &
-                                         -11.642384*(log10(rr%temp(id_temp)/1000.))**2   &
-                                         -35.553366*(log10(rr%temp(id_temp)/1000.))**3   &
-                                         -35.105689*(log10(rr%temp(id_temp)/1000.))**4   &
-                                         -10.922078*(log10(rr%temp(id_temp)/1000.))**5)+ &
-                                      0.75*10**(-24.330855                                    & ! ortho-H2
-                                         +4.4404496*log10(rr%temp(id_temp)/1000.)        &
-                                         -4.0460989*(log10(rr%temp(id_temp)/1000.))**2   &
-                                         -1.1390725*(log10(rr%temp(id_temp)/1000.))**3   &
-                                         +9.8094223*(log10(rr%temp(id_temp)/1000.))**4   &
-                                         +8.6273872*(log10(rr%temp(id_temp)/1000.))**5)
-             elseif(1000 < rr%temp(id_temp).and.rr%temp(id_temp)<=6000) then
-                     glover(id_temp) = 0.25*10**(-24.216387                                &  ! para-H2
-                                     +4.2046488*log10(rr%temp(id_temp)/1000.)         &
-                                     -1.3155285*log10((rr%temp(id_temp)/1000.))**2    &  
-                                     -1.6552763*log10((rr%temp(id_temp)/1000.))**3    &
-                                     +4.1780102*log10((rr%temp(id_temp)/1000.))**4    &
-                                     -0.56949697*log10((rr%temp(id_temp)/1000.))**5   &
-                                     -3.3824407*log10((rr%temp(id_temp)/1000.))**6    &
-                                     +1.0904027*log10((rr%temp(id_temp)/1000.))**7) + &
-                                     0.75*10**(-24.329086                                  &  ! ortho-H2                                     
-                                     +4.6105087*log10(rr%temp(id_temp)/1000.)         &
-                                     -3.9505350*log10((rr%temp(id_temp)/1000.))**2    &  
-                                     +12.363818*log10((rr%temp(id_temp)/1000.))**3    &
-                                     -32.403165*log10((rr%temp(id_temp)/1000.))**4    &
-                                     +48.853562*log10((rr%temp(id_temp)/1000.))**5    &
-                                     -38.542008*log10((rr%temp(id_temp)/1000.))**6    &
-                                     +12.066770*log10((rr%temp(id_temp)/1000.))**7)
-             endif            
-            
+
             ln_hd = dlog10(nc(idensity)*1.d-6) ! the fit by lipovka is valid for densities in cm-3
             lt_kin = dlog10(rr%temp(id_temp))
-            
+
             lipovka(id_temp) =                                          &
                       10**(-42.57688                                    &
                        + 0.92433d0 *                   (ln_hd ** 1)     &
@@ -112,7 +80,6 @@ program cooling
                        - 0.001482d0 * (lt_kin ** 4)  * (ln_hd ** 3)     &
                     + 0.000061926d0 * (lt_kin ** 4)  * (ln_hd ** 4))
 
-            glover(id_temp) = glover(id_temp)*1.d-7
             lipovka(id_temp) = lipovka(id_temp)*1.d-7
 
             call tests(energy, rr, rr21, rr12, a21, b21, r21, b12, jnu, r12, coll_rad_matrix, id_temp_test)
@@ -131,13 +98,3 @@ program cooling
      enddo ! loop on the density
 
 end program cooling
-
-     !subroutine multiplication_by_nc(rr, rr21, rr12, nc) 
-     !   real*8 :: nc
-     !   type(collisional_coeffs) :: rr, rr21, rr12
-     !   write(*,'(a5, ES23.15)') 'nc = ', nc
-     !   rr%matrix_lique = rr%matrix_lique * nc
-     !   rr21%matrix_lique = rr21%matrix_lique * nc
-     !   rr12%matrix_lique = rr12%matrix_lique * nc
-     !   return
-     !end subroutine multiplication_by_nc
