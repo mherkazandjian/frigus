@@ -216,8 +216,7 @@ def compute_degeneracy_matrix(levels):
 
 def compute_B_J_nu_matrix_from_A_matrix(energy_levels,
                                         A_matrix,
-                                        T_rad,
-                                        debug=False):
+                                        T_rad):
     """
     Given the energy levels, returns the stimulated emission and absorption
     coefficients matrix.
@@ -257,9 +256,6 @@ def compute_B_J_nu_matrix_from_A_matrix(energy_levels,
     B_matrix = B_e_matrix + B_a_matrix
 
     B_J_nu_matrix = B_matrix * J_nu_matrix
-
-    if debug is True:
-        pass
 
     return B_J_nu_matrix
 
@@ -409,8 +405,7 @@ def compute_K_dex_matrix_interpolator(K_dex_vs_T, T_range):
 
 def compute_K_matrix_from_K_dex_matrix(energy_levels,
                                        K_dex_matrix_interpolator,
-                                       T_kin,
-                                       debug=True):
+                                       T_kin):
     """ .. todo:: add doc
 
     :param energy_levels: .. todo:: add doc
@@ -429,13 +424,10 @@ def compute_K_matrix_from_K_dex_matrix(energy_levels,
 
     K_matrix = K_dex_T + K_ex_T
 
-    if debug is True:
-        pass
-
     return K_matrix
 
 
-def solveEquilibrium(M_matrix, debug=False):
+def solveEquilibrium(M_matrix):
     """
     Solve for the equilibrium population densities given the right hand side of
     the linear system of the rate equations dx/dt as a matrix dx/dt = A.x
@@ -476,11 +468,42 @@ def solveEquilibrium(M_matrix, debug=False):
     return x
 
 
+def compute_M_matrix():
+    """
+
+    :return:
+    """
+    energy_levels = data_set.energy_levels
+    A_matrix = data_set.A_matrix
+    K_dex_matrix_interpolator = data_set.K_dex_matrix_interpolator
+
+    # compute the stimulated emission and absorption coefficients matrix
+    B_J_nu_matrix = compute_B_J_nu_matrix_from_A_matrix(
+        energy_levels,
+        A_matrix,
+        T_rad)
+
+    # get the K matrix for a certain temperature in the tabulated range
+    K_matrix = compute_K_matrix_from_K_dex_matrix(
+        energy_levels,
+        K_dex_matrix_interpolator,
+        T_kin)
+
+    # compute the M matrix that can be used to compute the equilibrium state of
+    # the levels (see notebook)
+    O_matrix = (A_matrix + B_J_nu_matrix + K_matrix * collider_density).T
+
+    D_matrix = -numpy.eye(O_matrix.shape[0]) * O_matrix.sum(axis=0)
+
+    M_matrix = O_matrix + D_matrix
+
+    return M_matrix
+
+
 def population_density_at_steady_state(data_set,
                                        T_kin,
                                        T_rad,
-                                       collider_density,
-                                       debug=False):
+                                       collider_density):
     """
     Compute the population density at steady state by solving the linear
      system. 
@@ -505,33 +528,26 @@ def population_density_at_steady_state(data_set,
     B_J_nu_matrix = compute_B_J_nu_matrix_from_A_matrix(
         energy_levels,
         A_matrix,
-        T_rad,
-        debug=debug)
+        T_rad)
 
     # get the K matrix for a certain temperature in the tabulated range
     K_matrix = compute_K_matrix_from_K_dex_matrix(
         energy_levels,
         K_dex_matrix_interpolator,
-        T_kin,
-        debug=debug)
+        T_kin)
 
     # compute the M matrix that can be used to compute the equilibrium state of
     # the levels (see notebook)
     O_matrix = (A_matrix + B_J_nu_matrix + K_matrix * collider_density).T
-    if debug is True:
-        pass
 
     D_matrix = -numpy.eye(O_matrix.shape[0]) * O_matrix.sum(axis=0)
-    if debug is True:
-        pass
 
     M_matrix = O_matrix + D_matrix
-    if debug is True:
-        pass
 
     # solve the equilibrium population densities
-    x_equilibrium = solveEquilibrium(M_matrix.si.value, debug=debug)
+    x_equilibrium = solveEquilibrium(M_matrix.si.value)
 
+    assert bool((x_equilibrium < 0.0).any()) is False
     assert numpy.fabs(1.0 - numpy.fabs(x_equilibrium.sum())) <= 1e-3
 
     return x_equilibrium
