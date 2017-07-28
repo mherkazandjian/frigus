@@ -708,3 +708,43 @@ def fit_lipovka_low_density(T):
         raise ValueError(msg)
 
     return retval * u.erg * u.s**-1
+
+
+def population_density_ratio_analytic_no_radiation(g,
+                                                   E,
+                                                   K_10,
+                                                   A_10,
+                                                   n_c,
+                                                   T_kin):
+    """
+    calculate the equilibrium population density ratio of a two level system
+
+    The provided parameters should all the compatible dimensions wise. i.e
+    no checks are done if the input arguments
+
+    At equilibrium, the ratio :math:`n_1 / n_0`:
+
+   .. math::
+
+          \\frac{n_1}{n_0} = \\frac{\\frac{g_1}{g_0}*K_{10}*\exp(-|delta(E)/(k_b T_{kin}))}{A_{10} + K_{10} n_c}
+
+    :param ndarray g: the degeneracies of the energy levels
+    :param astropy.units.quantity.Quantity E: The energy levels
+    :param astropy.units.quantity.Quantity K_10: The upper to lower
+     collisional coefficient
+    :param astropy.units.quantity.Quantity A_10: The upper to lower spontaneous
+     emission rate
+    :param astropy.units.quantity.Quantity n_c: The number density of the
+     colliding species
+    :param astropy.units.quantity.Quantity T_kin: The kintic temperature
+    :param astropy.units.quantity.Quantity T_rad: The radiation temperature
+    :return: float: The ratio of the upper to lower population density
+    """
+    g_0, g_1 = g
+    delta_E = numpy.abs(E[1] - E[0])
+
+    K_01 = (g_1/g_0)*K_10*exp(-delta_E/(kb*T_kin))
+
+    n_1_over_n_0 = K_01*n_c / (A_10 + K_10*n_c)
+
+    return n_1_over_n_0
