@@ -490,6 +490,9 @@ def population_density_at_steady_state(data_set,
     Compute the population density at steady state by solving the linear
      system. 
 
+    .. todo:: convert T_kin, T_rad, collidre_desnity to keywords and mention
+    .. todo:: if these should have units or not
+
     :param readers.DataSet data_set: The data of the species
     :param T_kin: The kinetic temperature at which the steady state computation
      will be done.
@@ -737,7 +740,6 @@ def population_density_ratio_analytic_no_radiation(g,
     :param astropy.units.quantity.Quantity n_c: The number density of the
      colliding species
     :param astropy.units.quantity.Quantity T_kin: The kintic temperature
-    :param astropy.units.quantity.Quantity T_rad: The radiation temperature
     :return: float: The ratio of the upper to lower population density
     """
     g_0, g_1 = g
