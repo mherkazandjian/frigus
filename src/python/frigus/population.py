@@ -172,6 +172,7 @@ def compute_delta_energy_matrix(levels):
     
     Given the energy levels, returns the delta energy matrix \Delta E = E - E^T
     that is documented in the notebook.
+
     :param read_energy_levels.EnergyLevelsBase levels: The energy levels
      object or a subclass of it that has the energies defined in the attribute
      record levels.data['E'].
@@ -191,10 +192,12 @@ def compute_delta_energy_matrix(levels):
 
 def compute_degeneracy_matrix(levels):
     """
-    Given the energy levels, returns the degeneracy matrix R that is strictly
-    upper triangular that is documented in the notebook.
+    compute the degeneracy matrix using an energy levels object as input
 
-    :param levels:  .. todo:: add doc
+    Given the energy levels, returns the degeneracy matrix R that is strictly
+    upper triangular that is documented in the notebook. .. todo:: add ref
+
+    :param EnergyLevelsSpeciesBase levels: The energy levels object
     :return: square strictly upper triangular matrix of shape n x n.
     """
     n = len(levels.data)
@@ -225,12 +228,12 @@ def compute_B_J_nu_matrix_from_A_matrix(energy_levels,
     .. todo:: replace the J_nu in the name of this function and in the body
     .. todo:: to something that represents energy density like u_nu
 
-    :param read_energy_levels.EnergyLevelsBase energy_levels: The energy levels
+    :param EnergyLevelsBase energy_levels: The energy levels
      object or a subclass of it that has the energies defined in the attribute
      record levels.data['E'] (see the documentation of
      compute_delta_energy_matrix).
-    :param A_matrix: The spontaneous emission coefficients matrix (A in the
-     ipython notebook).
+    :param astropy.units.quantity.Quantity A_matrix: The spontaneous emission
+     coefficients matrix (A in the ipython notebook).
     :param T_rad: The radiation temperature.
     :return: The B matrix defined in the notebook multiplied by J_nu
     """
@@ -473,14 +476,6 @@ def solveEquilibrium(M_matrix, debug=False):
     return x
 
 
-#def Tg2Tr(Tg):
-#    '''Given the array of kinetic temperatures, it returns the
-#     array with the corresponding radiation temperatures (through
-#     the redshift parameter z)
-#     '''
-#     return Tr
-
-
 def population_density_at_steady_state(data_set,
                                        T_kin,
                                        T_rad,
@@ -546,8 +541,8 @@ def cooling_rate_at_steady_state(data_set, T_kin, T_rad, collider_density):
     """.. todo:: add doc
 
     :param data_set: .. todo:: add doc
-    :param T_kin: .. todo:: add doc
-    :param T_Rad: .. todo:: add doc
+    :param astropy.units.quantity.Quantity T_kin: .. todo:: add doc
+    :param astropy.units.quantity.Quantity T_Rad: .. todo:: add doc
     :param collider_density: .. todo:: add doc
     :return: the cooling rate
     """
