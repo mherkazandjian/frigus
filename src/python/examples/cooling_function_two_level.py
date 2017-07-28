@@ -18,7 +18,7 @@ import matplotlib.pyplot as plt
 from frigus.readers import DataLoader
 from frigus.population import (
     population_density_at_steady_state,
-    population_density_ratio_analytic_no_radiation
+    population_density_ratio_analytic_two_level_system
 )
 
 #
@@ -28,7 +28,7 @@ species_data = DataLoader().load('two_level_1')
 
 n_c = 1e6 * u.meter ** -3
 T_kin = 100000.0 * u.Kelvin
-T_rad = 0.0 * u.Kelvin
+T_rad = 100.0 * u.Kelvin
 
 #
 # for each value in the temperature range
@@ -42,6 +42,7 @@ ratio_analytic_vs_T_kin = []
 T_kin_range = numpy.logspace(1.0, 10.0, 50) * u.Kelvin
 for T_kin in T_kin_range:
 
+    # population densities using matrix inversion
     pop_dens_eq_numeric = population_density_at_steady_state(
         species_data,
         T_kin,
@@ -50,13 +51,16 @@ for T_kin in T_kin_range:
     pop_dens_eq_ratio_numeric = pop_dens_eq_numeric[1] / pop_dens_eq_numeric[0]
     ratio_numeric_vs_T_kin.append(pop_dens_eq_ratio_numeric)
 
-    pop_dens_eq_ratio_analytic = population_density_ratio_analytic_no_radiation(
+    # popultation densities using analytic expressions
+    # pop_dens_eq_ratio_analytic = population_density_ratio_analytic_no_radiation(
+    pop_dens_eq_ratio_analytic = population_density_ratio_analytic_two_level_system(
         species_data.energy_levels.data['g'],
         species_data.energy_levels.data['E'],
         species_data.K_dex_matrix_interpolator(T_kin)[1, 0],
         species_data.A_matrix[1, 0],
         n_c,
-        T_kin
+        T_kin,
+        T_rad
     )
     ratio_analytic_vs_T_kin.append(pop_dens_eq_ratio_analytic)
     print(T_kin)

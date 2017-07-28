@@ -7,7 +7,7 @@ from astropy import units as u
 from frigus.readers import DataLoader
 from frigus.population import (
     population_density_at_steady_state,
-    population_density_ratio_analytic_no_radiation
+    population_density_ratio_analytic_two_level_system
 )
 
 
@@ -19,7 +19,7 @@ def test_that_two_level_population_density_ratios_agree_with_analytic_solution()
     species_data = DataLoader().load('two_level_1')
 
     n_c = 1e6 * u.meter ** -3
-    T_rad = 0.0 * u.Kelvin
+    T_rad = 1000.0 * u.Kelvin
 
     #
     # for each value in the temperature range
@@ -41,13 +41,14 @@ def test_that_two_level_population_density_ratios_agree_with_analytic_solution()
         pop_dens_eq_ratio_numeric = pop_dens_eq_numeric[1] / pop_dens_eq_numeric[0]
         ratio_numeric_vs_T_kin.append(pop_dens_eq_ratio_numeric)
 
-        pop_dens_eq_ratio_analytic = population_density_ratio_analytic_no_radiation(
+        pop_dens_eq_ratio_analytic = population_density_ratio_analytic_two_level_system(
             species_data.energy_levels.data['g'],
             species_data.energy_levels.data['E'],
             species_data.K_dex_matrix_interpolator(T_kin)[1, 0],
             species_data.A_matrix[1, 0],
             n_c,
-            T_kin
+            T_kin,
+            T_rad
         )
         ratio_analytic_vs_T_kin.append(pop_dens_eq_ratio_analytic)
         print(T_kin)
@@ -60,5 +61,5 @@ def test_that_two_level_population_density_ratios_agree_with_analytic_solution()
             ratio_analytic_vs_T_kin)
     )
 
-    assert relative_error.max() < 5.0e-16
-    assert relative_error.std() < 1.0e-16
+    assert relative_error.max() < 1.0e-15
+    assert relative_error.std() < 5.0e-16
