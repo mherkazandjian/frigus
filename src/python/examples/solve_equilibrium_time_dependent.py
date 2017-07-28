@@ -1,90 +1,118 @@
 # -*- coding: utf-8 -*-
 """
-calculate equilibrium population of species and the cooling function.
+<keywords>
+frigus, time, dependent, equilibrium, steady, state, compare, check
+</keywords>
+<description>
+  - evolve the population density of the levels of a species using an integrator
+  - compare the solution to the equilibrium solution using matrix inversion.
+</description>
+<seealso>
+</seealso>
 """
 from __future__ import print_function
-import pylab
 import numpy
 
 from astropy import units as u
 import matplotlib.pyplot as plt
+from scipy.integrate import ode
 
-from population import population_density_at_steady_state
-import utils
+from frigus.population import (
+    population_density_at_steady_state,
+    compute_transition_rate_matrix
+)
+from frigus.readers import DataLoader
 
-from readers import DataLoader
+# load the species data
+species_data = DataLoader().load('HD_lipovka')
 
-species_data = DataLoader().load('H2_lique')
-# species_data = DataLoader().load('HD_lipovka')
-def ode_rhs(t, y, args):
-    """defining the function which will be the rhs of df/dt"""
-    return dot(full, y)
+# time range and timestep
+t_0 = 0.0
+t_f = 1e10
+dt = 1e6
 
-# evolving with respect to time using scipy integrator
-if True:
-    r = ode(ode_rhs, jac = None).set_integrator('vode',
-    # r = ode(ode_rhs, jac = None).set_integrator('dopri',
-                                                method='bdf',
-                                                #with_jacobian = False,
-                                                rtol = 1e-3)
-    r.set_initial_value(f0, t0).set_f_params(1.0)
+# the environment parameters
+nc_H = 1e6 * u.meter ** -3
+T_kin = 1000.0 * u.Kelvin
+T_rad = 2.73 * u.Kelvin
 
-    i = 0
-    # while r.successful() and r.t < tf:
-    while r.t < tf:
-        r.integrate(r.t + dt)
-        t.append(r.t)
-        ft_0.append(r.y[lPlot[0]])
-        ft_1.append(r.y[lPlot[1]])
-        ft_2.append(r.y[lPlot[2]])
-        ft_3.append(r.y[lPlot[3]])
-        ft_4.append(r.y[lPlot[4]])
-        ft_5.append(r.y[lPlot[5]])
+# the rates matrix (that is fixed if the environemnt params above are fixed)
+# so it is computed once
+M_matrix = compute_transition_rate_matrix(species_data, T_kin, T_rad, nc_H)
 
-        if i % 100 == 0:
-            print 'i = %d t = %e' % (i, r.t), 1.0 - numpy.sum(r.y), 1.0 - r.y[0]/f[0]
-            print 'stepNum = %d t = %e, current dt = %e, 1 - sum(pop_dens) = %e' % (i, r.t, dt, 1.0 - numpy.sum(r.y))
 
-        i += 1
+def ode_rhs(_, y):
+    """
+    define the function that computes the rhs of dy/dt
+    """
+    return numpy.dot(M_matrix, y)
 
-# solving using my implementation of the bulrische stoer integrator
-if False:
-    rel_tol = 1e-3
-    dt0_bs = 1.0
 
-    # initial conditions
-    state = mylib.numerics.ode.State(f0.size)
-    state.t = 0.0
-    state.y[:] = f0
+# set the initial abundances for t = 0
+n_levels = len(species_data.energy_levels.data)
+initial_fractional_abundances = numpy.ones(n_levels) / n_levels
+y_0 = initial_fractional_abundances
 
-    # defining the function which will be the rhs of df/dt
-    def ode_rhs(state, state_der, parms=None):
 
-        state_der.y[:] = dot(full, state.y)
-        return True
+# define the solver
+solver = ode(ode_rhs, jac=None).set_integrator('vode',
+                                               method='bdf',
+                                               # with_jacobian = False,
+                                               rtol=1e-6)
 
-    solver = mylib.numerics.ode.BS(log_dir='.', dx0=dt0_bs, reltol=rel_tol,
-                                   state0=state, verbose=False)
-    solver.set_derivs_func(ode_rhs)
+solver.set_initial_value(y_0, t_0)
 
-    stepNum = 0
-    while solver.state.x <= tf:
+step_counter = 0
+t_all = []
+x_all = []
+while solver.t < t_f:
+    solver.integrate(solver.t + dt)
+    t_all.append(solver.t)
+    x_all.append(solver.y)
 
-        t.append(solver.state.x)
-        ft_0.append(solver.state.y[0])
-        ft_1.append(solver.state.y[1])
-        ft_2.append(solver.state.y[2])
-        ft_3.append(solver.state.y[3])
-        ft_4.append(solver.state.y[4])
-        ft_5.append(solver.state.y[5])
+    if step_counter % 100 == 0:
+        print('{} t={:e} 1-x.sum()={:e}'.format(
+            step_counter, solver.t, 1.0 - solver.y.sum()
+        ))
+    step_counter += 1
 
-        solver.advance_one_step()
 
-        if stepNum % 100 == 0:
-            print 'stepNum = %d t = %e, current dt = %e, 1 - sum(pop_dens) = %e' %\
-                  (stepNum, solver.state.x, solver.dx,
-                   1.0 - numpy.sum(solver.state.y))
+t_all, x_all = numpy.array(t_all), numpy.vstack(x_all)
 
-        stepNum += 1
+#
+# plot the solution
+#
+fig, axs = plt.subplots()
+
+colors = {
+    'r': '+',
+    'g': '+',
+    'b': '+',
+    'c': '+',
+    'k': '+',
+    'r--': '+',
+    'g--': '+',
+    'b--': '+',
+    'c--': '+',
+    'k--': '+'
+}
+
+for level_index in range(n_levels):
+    axs.loglog(t_all, x_all[:, level_index], colors.keys()[level_index])
+
+# get the equilibrium solution and plot them as crosses at t = t_f
+pop_dens_eq = population_density_at_steady_state(
+    species_data,
+    T_kin,
+    T_rad,
+    nc_H)
+
+for level_index in range(n_levels):
+    axs.loglog(
+        t_all[-1], pop_dens_eq[level_index], colors.values()[level_index]
+    )
+
+plt.ion()
+plt.show()
 
 print('done')

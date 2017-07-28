@@ -172,6 +172,7 @@ def compute_delta_energy_matrix(levels):
     
     Given the energy levels, returns the delta energy matrix \Delta E = E - E^T
     that is documented in the notebook.
+
     :param read_energy_levels.EnergyLevelsBase levels: The energy levels
      object or a subclass of it that has the energies defined in the attribute
      record levels.data['E'].
@@ -191,10 +192,12 @@ def compute_delta_energy_matrix(levels):
 
 def compute_degeneracy_matrix(levels):
     """
-    Given the energy levels, returns the degeneracy matrix R that is strictly
-    upper triangular that is documented in the notebook.
+    compute the degeneracy matrix using an energy levels object as input
 
-    :param levels:  .. todo:: add doc
+    Given the energy levels, returns the degeneracy matrix R that is strictly
+    upper triangular that is documented in the notebook. .. todo:: add ref
+
+    :param EnergyLevelsSpeciesBase levels: The energy levels object
     :return: square strictly upper triangular matrix of shape n x n.
     """
     n = len(levels.data)
@@ -213,8 +216,7 @@ def compute_degeneracy_matrix(levels):
 
 def compute_B_J_nu_matrix_from_A_matrix(energy_levels,
                                         A_matrix,
-                                        T_rad,
-                                        debug=False):
+                                        T_rad):
     """
     Given the energy levels, returns the stimulated emission and absorption
     coefficients matrix.
@@ -225,12 +227,12 @@ def compute_B_J_nu_matrix_from_A_matrix(energy_levels,
     .. todo:: replace the J_nu in the name of this function and in the body
     .. todo:: to something that represents energy density like u_nu
 
-    :param read_energy_levels.EnergyLevelsBase energy_levels: The energy levels
+    :param EnergyLevelsBase energy_levels: The energy levels
      object or a subclass of it that has the energies defined in the attribute
      record levels.data['E'] (see the documentation of
      compute_delta_energy_matrix).
-    :param A_matrix: The spontaneous emission coefficients matrix (A in the
-     ipython notebook).
+    :param astropy.units.quantity.Quantity A_matrix: The spontaneous emission
+     coefficients matrix (A in the ipython notebook).
     :param T_rad: The radiation temperature.
     :return: The B matrix defined in the notebook multiplied by J_nu
     """
@@ -254,9 +256,6 @@ def compute_B_J_nu_matrix_from_A_matrix(energy_levels,
     B_matrix = B_e_matrix + B_a_matrix
 
     B_J_nu_matrix = B_matrix * J_nu_matrix
-
-    if debug is True:
-        pass
 
     return B_J_nu_matrix
 
@@ -406,8 +405,7 @@ def compute_K_dex_matrix_interpolator(K_dex_vs_T, T_range):
 
 def compute_K_matrix_from_K_dex_matrix(energy_levels,
                                        K_dex_matrix_interpolator,
-                                       T_kin,
-                                       debug=True):
+                                       T_kin):
     """ .. todo:: add doc
 
     :param energy_levels: .. todo:: add doc
@@ -426,13 +424,10 @@ def compute_K_matrix_from_K_dex_matrix(energy_levels,
 
     K_matrix = K_dex_T + K_ex_T
 
-    if debug is True:
-        pass
-
     return K_matrix
 
 
-def solveEquilibrium(M_matrix, debug=False):
+def solve_equilibrium(M_matrix):
     """
     Solve for the equilibrium population densities given the right hand side of
     the linear system of the rate equations dx/dt as a matrix dx/dt = A.x
@@ -473,32 +468,24 @@ def solveEquilibrium(M_matrix, debug=False):
     return x
 
 
-#def Tg2Tr(Tg):
-#    '''Given the array of kinetic temperatures, it returns the
-#     array with the corresponding radiation temperatures (through
-#     the redshift parameter z)
-#     '''
-#     return Tr
-
-
-def population_density_at_steady_state(data_set,
-                                       T_kin,
-                                       T_rad,
-                                       collider_density,
-                                       debug=False):
+def compute_transition_rate_matrix(data_set,
+                                   T_kin,
+                                   T_rad,
+                                   collider_density):
     """
-    Compute the population density at steady state by solving the linear
-     system. 
+    compute the matrix M that can be used to compute the dn/dt
 
-    :param readers.DataSet data_set: The data of the species
-    :param T_kin: The kinetic temperature at which the steady state computation
-     will be done.
-    :param T_rad: The radiation temperature at which the steady state computation
-     will be done.
-    :param collider_density: The density of the collider species.
-    :return: The equilibrium population density
+    The rates dn/dt can be computed from M by multiplying it by the abundances
+    :math:`dn/dt = M.n`
+
+    :param DataSetBase: The data of the species
+    :param Quantity T_kin: The kinetic temperature at which the steady state
+     computation  will be done.
+    :param Quantity T_rad: The radiation temperature at which the steady state
+     computation will be done.
+    :param Quantity collider_density: The density of the collider species.
+    :return: Quantity ndarray: The M matrix as a nxn ndarray
     """
-
     energy_levels = data_set.energy_levels
     A_matrix = data_set.A_matrix
     K_dex_matrix_interpolator = data_set.K_dex_matrix_interpolator
@@ -507,33 +494,55 @@ def population_density_at_steady_state(data_set,
     B_J_nu_matrix = compute_B_J_nu_matrix_from_A_matrix(
         energy_levels,
         A_matrix,
-        T_rad,
-        debug=debug)
+        T_rad)
 
     # get the K matrix for a certain temperature in the tabulated range
     K_matrix = compute_K_matrix_from_K_dex_matrix(
         energy_levels,
         K_dex_matrix_interpolator,
-        T_kin,
-        debug=debug)
+        T_kin)
 
     # compute the M matrix that can be used to compute the equilibrium state of
     # the levels (see notebook)
     O_matrix = (A_matrix + B_J_nu_matrix + K_matrix * collider_density).T
-    if debug is True:
-        pass
 
     D_matrix = -numpy.eye(O_matrix.shape[0]) * O_matrix.sum(axis=0)
-    if debug is True:
-        pass
 
     M_matrix = O_matrix + D_matrix
-    if debug is True:
-        pass
 
-    # solve the equilibrium population densities
-    x_equilibrium = solveEquilibrium(M_matrix.si.value, debug=debug)
+    return M_matrix
 
+
+def population_density_at_steady_state(data_set,
+                                       T_kin,
+                                       T_rad,
+                                       collider_density):
+    """
+    Compute the population density at steady state by solving the linear
+     system. 
+
+    .. todo:: convert T_kin, T_rad, collidre_desnity to keywords and mention
+    .. todo:: if these should have units or not
+
+    compute the matrix M that can be used to compute the dn/dt
+
+    The rates dn/dt can be computed from M by multiplying it by the abundances
+    :math:`dn/dt = M.n`
+
+    :param DataSetBase: The data of the species
+    :param Quantity T_kin: The kinetic temperature at which the steady state
+     computation  will be done.
+    :param Quantity T_rad: The radiation temperature at which the steady state
+     computation will be done.
+    :param Quantity collider_density: The density of the collider species.
+    :return: ndarray: The equilibrium population density as a column vector
+    """
+
+    M_matrix = compute_transition_rate_matrix(data_set, T_kin, T_rad, collider_density)
+
+    x_equilibrium = solve_equilibrium(M_matrix.si.value)
+
+    assert bool((x_equilibrium < 0.0).any()) is False
     assert numpy.fabs(1.0 - numpy.fabs(x_equilibrium.sum())) <= 1e-3
 
     return x_equilibrium
@@ -543,8 +552,8 @@ def cooling_rate_at_steady_state(data_set, T_kin, T_rad, collider_density):
     """.. todo:: add doc
 
     :param data_set: .. todo:: add doc
-    :param T_kin: .. todo:: add doc
-    :param T_Rad: .. todo:: add doc
+    :param astropy.units.quantity.Quantity T_kin: .. todo:: add doc
+    :param astropy.units.quantity.Quantity T_Rad: .. todo:: add doc
     :param collider_density: .. todo:: add doc
     :return: the cooling rate
     """
@@ -708,3 +717,49 @@ def fit_lipovka_low_density(T):
         raise ValueError(msg)
 
     return retval * u.erg * u.s**-1
+
+
+def population_density_ratio_analytic_two_level_system(g,
+                                                       E,
+                                                       K_10,
+                                                       A_10,
+                                                       n_c,
+                                                       T_kin,
+                                                       T_rad):
+    """
+    calculate the equilibrium population density ratio of a two level system
+
+    The provided parameters should all the compatible dimensions wise. i.e
+    no checks are done if the input arguments
+
+    At equilibrium, the ratio :math:`n_1 / n_0`:
+
+   .. math::
+
+        \\frac{n_1}{n_0} = \frac{B_{01} + K_{01}n_c}{A_{10} + B_{10} + K_{10}n_c} = \frac{M_{01}}{M_{10}}
+
+    :param ndarray g: the degeneracies of the energy levels
+    :param astropy.units.quantity.Quantity E: The energy levels
+    :param astropy.units.quantity.Quantity K_10: The upper to lower
+     collisional coefficient
+    :param astropy.units.quantity.Quantity A_10: The upper to lower spontaneous
+     emission rate
+    :param astropy.units.quantity.Quantity n_c: The number density of the
+     colliding species
+    :param astropy.units.quantity.Quantity T_kin: The kintic temperature
+    :param astropy.units.quantity.Quantity T_rad: The radiation temperature
+    :return: float: The ratio of the upper to lower population density
+    """
+    g_0, g_1 = g
+    delta_E = numpy.abs(E[1] - E[0])
+
+    K_01 = (g_1 / g_0) * K_10 * exp(-delta_E / (kb*T_kin))
+
+    f_10 = 1.0 / (exp(delta_E / (kb*T_rad)) - 1.0)
+
+    B_10 = f_10 * A_10
+    B_01 = (g_1 / g_0) * f_10 * A_10
+
+    n_1_over_n_0 = (B_01 + K_01*n_c) / (A_10 + B_10 + K_10*n_c)
+
+    return n_1_over_n_0

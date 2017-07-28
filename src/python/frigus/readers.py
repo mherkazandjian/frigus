@@ -383,9 +383,16 @@ class DataSetTwoLevel(DataSetBase):
         self.A_matrix = A_matrix
         self.raw_data.A = self.A_matrix / u.second
 
-        collision_rates, T_rng, collision_rates_info_nnz = \
-            read_collision_coefficients_lique_and_wrathmall(
-                "../../../data/two_levels/K_dex_matrix.txt")
+        #
+        # read the collisional rates
+        #
+        collision_rates = numpy.loadtxt(
+            '../../../data/two_levels_1/K_dex_matrix.txt')
+        collision_rates = collision_rates * u.m**3 / u.second
+        T_rng = 0.0 * u.K, 1e6 * u.K
+
+        self.K_dex_matrix_interpolator = lambda T_kin: collision_rates
+
         self.raw_data.collision_rates = collision_rates
         self.raw_data.collision_rates_T_range = T_rng
         self.raw_data.collision_rates_info_nnz = collision_rates_info_nnz
