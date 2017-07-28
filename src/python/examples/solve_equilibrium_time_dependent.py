@@ -1,6 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-calculate equilibrium population of species and the cooling function.
+<keywords>
+frigus, time, dependent, equilibrium, steady, state, compare, check
+</keywords>
+<description>
+evolve the population density of the levels of a species using an integrator
+and compare the solution to the equilibrium solution using matrix inversion.
+</description>
+<seealso>
+</seealso>
 """
 from __future__ import print_function
 import numpy
@@ -97,47 +105,5 @@ axs.loglog(t_all[-1], pop_dens_eq[3], 'k+')
 
 plt.ion()
 plt.show()
-
-'''
-# solving using my implementation of the bulrische stoer integrator
-if False:
-    rel_tol = 1e-3
-    dt0_bs = 1.0
-
-    # initial conditions
-    state = mylib.numerics.ode.State(f0.size)
-    state.t = 0.0
-    state.y[:] = f0
-
-    # defining the function which will be the rhs of df/dt
-    def ode_rhs(state, state_der, parms=None):
-
-        state_der.y[:] = dot(full, state.y)
-        return True
-
-    solver = mylib.numerics.ode.BS(log_dir='.', dx0=dt0_bs, reltol=rel_tol,
-                                   state0=state, verbose=False)
-    solver.set_derivs_func(ode_rhs)
-
-    stepNum = 0
-    while solver.state.x <= tf:
-
-        t.append(solver.state.x)
-        ft_0.append(solver.state.y[0])
-        ft_1.append(solver.state.y[1])
-        ft_2.append(solver.state.y[2])
-        ft_3.append(solver.state.y[3])
-        ft_4.append(solver.state.y[4])
-        ft_5.append(solver.state.y[5])
-
-        solver.advance_one_step()
-
-        if stepNum % 100 == 0:
-            print 'stepNum = %d t = %e, current dt = %e, 1 - sum(pop_dens) = %e' %\
-                  (stepNum, solver.state.x, solver.dx,
-                   1.0 - numpy.sum(solver.state.y))
-
-        stepNum += 1
-'''
 
 print('done')
