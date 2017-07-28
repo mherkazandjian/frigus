@@ -468,10 +468,10 @@ def solve_equilibrium(M_matrix):
     return x
 
 
-def compute_M_matrix(data_set,
-                     T_kin,
-                     T_rad,
-                     collider_density):
+def compute_transition_rate_matrix(data_set,
+                                   T_kin,
+                                   T_rad,
+                                   collider_density):
     """
     compute the matrix M that can be used to compute the dn/dt
 
@@ -538,7 +538,7 @@ def population_density_at_steady_state(data_set,
     :return: ndarray: The equilibrium population density as a column vector
     """
 
-    M_matrix = compute_M_matrix(data_set, T_kin, T_rad, collider_density)
+    M_matrix = compute_transition_rate_matrix(data_set, T_kin, T_rad, collider_density)
 
     x_equilibrium = solve_equilibrium(M_matrix.si.value)
 
