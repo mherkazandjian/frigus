@@ -10,17 +10,10 @@ import numpy
 
 from astropy import units as u
 
-import matplotlib.pyplot as plt
+from frigus.population import (fit_glover,
+                               cooling_rate_at_steady_state)
 
-import population
-from population import (fit_glover,
-                        cooling_rate_at_steady_state,
-                        population_density_at_steady_state)
-import utils
-
-import pdb
-
-from readers import DataLoader
+from frigus.readers import DataLoader
 
 # density of the colliding species, in m^3
 nc_H = 1e2 * u.meter**-3
