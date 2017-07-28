@@ -227,9 +227,9 @@ module collisions
                  rr%reading = 0.d0
                  rr%matrix_lique = 0.d0
 
-                 rr%temp = [ (i, i=100,ntemp*100,100) ]
+                 !rr%temp = [ (i, i=100,ntemp*100,100) ]
                  
-                 !rr%temp = [ (i, i=100, 2000, 20) ]
+                 rr%temp = [ (i, i=100, 2000, 20) ]
 
                  !do i = 1, ntemp
                  !   print*, 'temperature', i, rr%temp(i)
