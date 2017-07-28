@@ -7,7 +7,7 @@ module matrix_construction
                                     reaction_matrix, population,          &
                                     Trad, nc,                             &
                                     row, col, fin, ntemp, xm,             &
-                                    id_temp, id_temp_test
+                                    id_temp, id_temp_test, norm_first_row
 
     use testing_data, only: tests, writing_files
 
@@ -64,16 +64,22 @@ module matrix_construction
     
     
     
-     subroutine initialize_level_population(x)
+     subroutine initialize_level_population(norm_first_row, x)
          type(population) :: x
          
-          do i = 2, nlev_lique !1, nlev_lique-1
-             x%pop(i) = 0.d0
-          enddo
-
-          !x%pop(nlev_lique) = 1.d0
-          x%pop(1) = 1.d0          
          
+         if(norm_first_row.eq.1) then
+             x%pop(1) = 1.d0
+             do i = 2, nlev_lique
+                x%pop(i) = 0.d0
+             enddo
+         else
+             x%pop(nlev_lique) = 1.d0
+             do i = 1, nlev_lique-1
+                x%pop(i) = 0.d0
+             enddo
+         endif
+
      end subroutine initialize_level_population
     
 end module matrix_construction

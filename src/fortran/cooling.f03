@@ -4,7 +4,7 @@ program cooling
                                      reaction_matrix, population,                    &
                                      ntemp, nlev_lique, Trad, nc,                    &
                                      id_temp, id_temp_test, ndensity, ilique_flag,   &
-                                     iflower_flag, ilipovka_flag
+                                     iflower_flag, ilipovka_flag, norm_first_row
 
      use read_data, only: get_data
 
@@ -34,7 +34,8 @@ program cooling
         rr12%matrix_lique = rr12%matrix_lique * nc(idensity)
 
         do id_temp = 1, ntemp 
-            call lev_pop(energy, a21, b21, r21, b12, jnu, r12, rr, rr21, rr12, id_temp, nc(idensity), coll_rad_matrix, x)
+            call lev_pop(norm_first_row, energy, a21, b21, r21, b12, jnu,&
+            r12, rr, rr21, rr12, id_temp, nc(idensity), coll_rad_matrix, x)
             write(6, '(a17, ES23.15)') 'gas temperature: ', rr%temp(id_temp)
             cooling_rate(id_temp) = 0.d0
             glover(id_temp) = 0.d0

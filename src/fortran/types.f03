@@ -41,6 +41,7 @@ module types_and_parameters
     integer, parameter :: ilique_flag = 0
     integer, parameter :: iflower_flag = 1
     integer, parameter :: ilipovka_flag = 0
+    integer, parameter :: norm_first_row = 0 ! 1 lique, 0 flower, check lipovka
 
       
     
