@@ -1,6 +1,6 @@
 unset label
 set log
-set output "cf_lipovka.eps"
+set output "cf_lipovka_new_refactoring_fortran.eps"
 set term postscript eps monochrome enhanced "Helvetica" 20
 set format y "10^{%T}" 
 set xlabel "T_g"

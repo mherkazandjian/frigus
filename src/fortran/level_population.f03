@@ -7,7 +7,8 @@ module level_population
                                     population,                           &
                                     Trad, nc, ini, fin, it,               &
                                     nlev_lique, vi, vf, ji, jf,           &
-                                    ndensity, id_temp
+                                    ndensity, id_temp,                    &
+                                    norm_first_row
 
     use linear_algebra, only: sparsity_calc,                              &
                               ndim, info, lda, ldb, nrhs, ipiv
@@ -16,7 +17,7 @@ module level_population
     
     contains
     
-    subroutine lev_pop(energy, a21, b21, r21, b12, jnu, r12, rr, rr21, rr12, id_temp, nc, coll_rad_matrix, x)
+    subroutine lev_pop(norm_first_row, energy, a21, b21, r21, b12, jnu, r12, rr, rr21, rr12, id_temp, nc, coll_rad_matrix, x)
          type(energy_lev) :: energy
          type(radiative_coeffs) :: a21, b21, b12, jnu, r21, r12, rad
          type(collisional_coeffs) :: rr, rr21, rr12
@@ -29,23 +30,27 @@ module level_population
 
          call matrix_builder(rad, rr, id_temp, coll_rad_matrix)
          
-         call solve_steady_state(energy, coll_rad_matrix, x)
+         call solve_steady_state(norm_first_row, energy, coll_rad_matrix, x)
 
         return
     end subroutine lev_pop
 
 
     
-    subroutine solve_steady_state(energy, coll_rad_matrix, x)
+    subroutine solve_steady_state(norm_first_row, energy, coll_rad_matrix, x)
         type(energy_lev) :: energy
         type(reaction_matrix)  :: coll_rad_matrix, coll_rad_matrix_mher
         type(population) :: x, y
 
-          call initialize_level_population(y)
+          call initialize_level_population(norm_first_row, y)
 
+          
+          if(norm_first_row.eq.1) then
           ! normalizing the sum of the fractional abundances to 1
-          coll_rad_matrix%M(1, 1:nlev_lique) = 1.d0
-          !coll_rad_matrix%M(1, 1:nlev_lique) = 1.d0
+            coll_rad_matrix%M(1, 1:nlev_lique) = 1.d0
+          else
+            coll_rad_matrix%M(nlev_lique, 1:nlev_lique) = 1.d0
+          endif
           
           x%pop = y%pop
 
