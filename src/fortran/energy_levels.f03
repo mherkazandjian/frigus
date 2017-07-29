@@ -263,8 +263,8 @@ module energy_levels
                    ! modified version of data from lique; keeping only the actual levels given in the 
                    ! reaction rates file                   
                    open(13, file='../../data/read/lev_labels', status = 'unknown')
-                   open(14, file='../../data/read/lev_labels_lique', status = 'unknown')
-                   open(15, file='../../data/read/frequencies_lique', status = 'unknown')                   
+                   open(14, file='../../data/read/lev_labels_lipovka', status = 'unknown')
+                   open(15, file='../../data/read/frequencies_lipovka', status = 'unknown')                   
                    
                     allocate(e%en(0:vmax,0:jmax))
                     allocate(e%ene(1:nlev))
