@@ -5,7 +5,7 @@ FFLAGS_gnu = -Wall -fcheck=all -g -fbacktrace -fbounds-check -ffpe-trap=invalid,
 
 FFLAGS_intel = -extend_source 132 
 FC     = gfortran
-OBJ    = types.o sort.o energy_levels.o radiation.o collisions.o  testing_data.o read_data.o linear_algebra.o matrix_construction.o level_population.o
+OBJ    = types.o sort.o energy_levels.o radiation.o collisions.o testing_data.o read_data.o linear_algebra.o matrix_construction.o level_population.o
 LIBS   = -llapack -L/usr/lib/lapack -lblas -L/usr/lib/libblas
 
 target_h2 = cooling_H2.f03
@@ -19,6 +19,9 @@ hd: $(OBJ)
 	
 %.o: %.f03
 	$(FC) $(FFLAGS_gnu) -c $^ -o $@
+	
+tests: $(OBJ)
+	$(FC) $(FFLAGS_gnu) tests/test_cooling_function_hd.f03 $(OBJ) $(LIBS)
 	
 clean:
 	rm -fvr a.out *.o *.mod
