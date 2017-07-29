@@ -1,4 +1,4 @@
-program cooling
+program cooling_hd
      use types_and_parameters, only: energy_lev,                                     &
                                      radiative_coeffs, collisional_coeffs,           &
                                      reaction_matrix, population,                    &
@@ -17,7 +17,7 @@ program cooling
      type(reaction_matrix)  :: coll_rad_matrix
      type(population) :: x
      real*8 :: ln_hd, lt_kin
-     real*8, dimension(1:ntemp) :: cooling_rate, glover, lipovka
+     real*8, dimension(1:ntemp) :: cooling_rate, lipovka
      character*7 :: char1
      character*19 :: filename
 
@@ -37,7 +37,6 @@ program cooling
             r12, rr, rr21, rr12, id_temp, nc(idensity), coll_rad_matrix, x)
             write(6, '(a17, ES23.15)') 'gas temperature: ', rr%temp(id_temp)
             cooling_rate(id_temp) = 0.d0
-            glover(id_temp) = 0.d0
             lipovka(id_temp) = 0.d0
             do i = 1, nlev_lique
                 do j = 1, nlev_lique
@@ -97,4 +96,4 @@ program cooling
         rr12%matrix_lique = rr12%matrix_lique / nc(idensity)
      enddo ! loop on the density
 
-end program cooling
+end program cooling_hd
