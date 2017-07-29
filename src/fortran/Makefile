@@ -49,4 +49,20 @@ object:
 
 clean:
 	rm -fvr a.out *.o *.mod
+	
+tests: 
+#	$(FC) $(FFLAGS_gnu) tests/test_cooling_function_h2_wrathmall.f03 -o tests/test_cooling_function_h2_wrathmall
+	#$(FC) $(FFLAGS_gnu) tests/test_cooling_function_h2_lique.f03 -o tests/test_cooling_function_h2_lique
+#	$(FC) $(FFLAGS_gnu) tests/test_cooling_function_h2_glover.f03 -o tests/test_cooling_function_h2_glover	
+	$(FC) $(FFLAGS_gnu) tests/test_cooling_function_hd.f03 -o tests/test_cooling_function_hd
+#	./tests/test_cooling_function_h2_wrathmall
+#	./tests/test_cooling_function_h2_lique
+	#./tests/test_cooling_function_h2_glover
+	./tests/test_cooling_function_hd
+# 	rm tests/test_cooling_function_h2_wrathmall
+# 	rm tests/test_cooling_function_h2_lique
+# 	rm tests/test_cooling_function_h2_glover	
+	rm tests/test_cooling_function_hd
 
+	
+	
