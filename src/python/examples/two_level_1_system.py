@@ -9,8 +9,8 @@ from numpy import exp, fabs, logspace, array, vstack
 from astropy import units as u
 from astropy.constants import k_B
 
-from frigus.population import population_density_at_steady_state
-from frigus.readers import DataLoader
+from population import population_density_at_steady_state
+from readers import DataLoader
 
 import pdb
 
@@ -21,7 +21,7 @@ nc = 1e14 * u.meter**-3
 T_kin = 3000.0 * u.Kelvin
 T_rad = 30.0 * u.Kelvin
 
-species_data = DataLoader().load('two_levels_system')
+species_data = DataLoader().load('two_level_1')
 
 def analytic_solution_no_radiation_field(species_data, T_kin, n_collider):
     """
