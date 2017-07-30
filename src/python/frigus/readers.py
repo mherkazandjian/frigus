@@ -8,7 +8,7 @@ energy levels and collision reaction rates.
 import numpy
 from astropy import units as u
 
-from frigus import read_energy_levels, read_einstien_coefficient
+from frigus import read_energy_levels, read_einstein_coefficient
 from frigus.read_collision_coefficients import (
     read_collision_coefficients_lique_and_wrathmall,
     read_collision_coefficients_lipovka)
@@ -117,7 +117,7 @@ class DataSetH2Lique(DataSetBase):
         #
         # read the einstein coefficients for the H2 transitions
         #
-        A, A_info_nnz = read_einstien_coefficient.read_einstein_simbotin()
+        A, A_info_nnz = read_einstein_coefficient.read_einstein_simbotin()
         self.raw_data.A = A
         self.raw_data.A_info_nnz = A_info_nnz
 
@@ -205,7 +205,7 @@ class DataSetH2Wrathmall(DataSetBase):
         #
         # read the einstein coefficients for the H2 transitions
         #
-        A, A_info_nnz = read_einstien_coefficient.read_einstein_simbotin()
+        A, A_info_nnz = read_einstein_coefficient.read_einstein_simbotin()
         self.raw_data.A = A
         self.raw_data.A_info_nnz = A_info_nnz
 
@@ -293,7 +293,7 @@ class DataSetH2Glover(DataSetBase):
         #
         # read the einstein coefficients for the H2 transitions
         #
-        A, A_info_nnz = read_einstien_coefficient.read_einstein_simbotin()
+        A, A_info_nnz = read_einstein_coefficient.read_einstein_simbotin()
         self.raw_data.A = A
         self.raw_data.A_info_nnz = A_info_nnz
 
@@ -479,7 +479,7 @@ class DataSetHDLipovka(DataSetBase):
         #
         # read the einstein coefficients for the HD transitions
         #
-        A, A_info_nnz = read_einstien_coefficient.read_einstein_coppola()
+        A, A_info_nnz = read_einstein_coefficient.read_einstein_coppola()
         self.raw_data.A = A
         self.raw_data.A_info_nnz = A_info_nnz
 
