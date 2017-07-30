@@ -792,8 +792,18 @@ def population_density_ratio_analytic_three_level_system(g,
     :param astropy.units.quantity.Quantity E: The energy levels
     :param astropy.units.quantity.Quantity K_10: The upper to lower
      collisional coefficient
+    :param astropy.units.quantity.Quantity K_10: The upper to lower
+     collisional coefficient from level 1 to level 0
+    :param astropy.units.quantity.Quantity K_20: The upper to lower
+     collisional coefficient from level 2 to level 0
+    :param astropy.units.quantity.Quantity K_21: The upper to lower
+     collisional coefficient from level 2 to level 1
     :param astropy.units.quantity.Quantity A_10: The upper to lower spontaneous
-     emission rate
+     emission rate from level 1 to level 0
+    :param astropy.units.quantity.Quantity A_20: The upper to lower spontaneous
+     emission rate from level 2 to level 0
+    :param astropy.units.quantity.Quantity A_21: The upper to lower spontaneous
+     emission rate from level 2 to level 1
     :param astropy.units.quantity.Quantity n_c: The number density of the
      colliding species
     :param astropy.units.quantity.Quantity T_kin: The kintic temperature
@@ -828,7 +838,6 @@ def population_density_ratio_analytic_three_level_system(g,
                     (R_10*R_20 + R_10*R_21 + R_12*R_20))
     n_2_over_n_0 = ((R_02*R_10 + R_02*R_12 + R_12*R_01) /
                     (R_10*R_20 + R_10*R_21 + R_12*R_20))
-
 
     return n_1_over_n_0, n_2_over_n_0
 
