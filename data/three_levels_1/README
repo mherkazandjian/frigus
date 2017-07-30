@@ -1,0 +1,4 @@
+this directory contains two files:
+
+A_matrix.txt: a 3x3 matrix of the Einstien coefficents
+K_matrix.txt: a 3x3 matrix of the collisional coefficients

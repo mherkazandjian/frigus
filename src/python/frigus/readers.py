@@ -397,6 +397,53 @@ class DataSetTwoLevel_1(DataSetBase):
         self.raw_data.collision_rates_T_range = T_rng
 
 
+class DataSetThreeLevel_1(DataSetBase):
+    """
+    Data of a synthetic three level system
+    """
+    def __init__(self):
+        """
+        constructor. The raw data is already reduced and in usable form without
+        the need to reducing it.
+        """
+        super(DataSetThreeLevel_1, self).__init__()
+        self.read_raw_data()
+
+    def read_raw_data(self):
+        """read the raw three level system data"""
+
+        #
+        # read the energy levels (v, j, energy)
+        #
+        energy_levels = read_energy_levels.read_levels_two_levels_test_1(
+            '../../../data/three_levels_1/energy_levels.txt')
+        self.energy_levels = energy_levels
+        self.raw_data.energy_levels = energy_levels
+
+        #
+        # read the einstein coefficients
+        #
+        A_matrix = numpy.loadtxt(
+            '../../../data/three_levels_1/A_matrix.txt')
+        A_matrix = A_matrix / u.second
+        self.A_matrix = A_matrix
+        self.raw_data.A = self.A_matrix / u.second
+
+        #
+        # read the collisional rates
+        #
+        collision_rates = numpy.loadtxt(
+            '../../../data/three_levels_1/K_dex_matrix.txt')
+        collision_rates = collision_rates * u.m**3 / u.second
+        T_rng = 0.0 * u.K, 1e6 * u.K
+
+        self.K_dex_matrix_interpolator = lambda T_kin: collision_rates
+
+        self.raw_data.collision_rates = collision_rates
+        self.raw_data.collision_rates_T_range = T_rng
+
+
+
 class DataSetHDLipovka(DataSetBase):
     """
     Data of H2 colliding with H using collisional data use by Lipovka.
@@ -505,14 +552,16 @@ class DataLoader(object):
         """
         if name == 'H2_lique':
             return DataSetH2Lique()
-        elif name == 'two_level_1':
-            return DataSetTwoLevel_1()
         elif name == 'HD_lipovka':
             return DataSetHDLipovka()
         elif name == 'H2_wrathmall':
             return DataSetH2Wrathmall()
         elif name == 'H2_low_energy_levels':
             return DataSetH2Glover()
+        elif name == 'two_level_1':
+            return DataSetTwoLevel_1()
+        elif name == 'three_level_1':
+            return DataSetThreeLevel_1()
         else:
             msg = '''not data loader defined for {}'''.format(name)
             raise ValueError(msg)
