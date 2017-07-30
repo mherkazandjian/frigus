@@ -60,3 +60,4 @@ src/fortran/cooling_function_lipovka\.dat
 .coverage
 
 htmlcov
+/doc/sphinx/_build/
