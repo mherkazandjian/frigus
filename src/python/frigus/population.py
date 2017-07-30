@@ -763,3 +763,72 @@ def population_density_ratio_analytic_two_level_system(g,
     n_1_over_n_0 = (B_01 + K_01*n_c) / (A_10 + B_10 + K_10*n_c)
 
     return n_1_over_n_0
+
+
+def population_density_ratio_analytic_three_level_system(g,
+                                                         E,
+                                                      K_10,
+                                                      K_20,
+                                                      K_21,
+                                                      A_10,
+                                                      A_20,
+                                                      A_21,
+                                                      n_c,
+                                                      T_kin,
+                                                      T_rad):
+    """
+    calculate the equilibrium population density ratio of a three level system
+
+    The provided parameters should all the compatible dimensions wise. i.e
+    no checks are done if the input arguments
+
+    At equilibrium, the ratio :math:`n_1 / n_0`:
+
+   .. math::
+
+        \\frac{n_1}{n_0} = \frac{B_{01} + K_{01}n_c}{A_{10} + B_{10} + K_{10}n_c} = \frac{M_{01}}{M_{10}}
+
+    :param ndarray g: the degeneracies of the energy levels
+    :param astropy.units.quantity.Quantity E: The energy levels
+    :param astropy.units.quantity.Quantity K_10: The upper to lower
+     collisional coefficient
+    :param astropy.units.quantity.Quantity A_10: The upper to lower spontaneous
+     emission rate
+    :param astropy.units.quantity.Quantity n_c: The number density of the
+     colliding species
+    :param astropy.units.quantity.Quantity T_kin: The kintic temperature
+    :param astropy.units.quantity.Quantity T_rad: The radiation temperature
+    :return: float: The ratio of the upper to lower population density
+    """
+    g_0, g_1, g_2 = g
+
+    K_01 = (g_1 / g_0) * K_10 * exp(- numpy.abs(E[1] - E[0])/ (kb*T_kin))
+    K_02 = (g_2 / g_0) * K_20 * exp(- numpy.abs(E[2] - E[0]) / (kb * T_kin))
+    K_12 = (g_2 / g_1) * K_21 * exp(- numpy.abs(E[2] - E[1]) / (kb * T_kin))
+
+    f_10 = 1.0 / (exp(numpy.abs(E[1] - E[0]) / (kb*T_rad)) - 1.0)
+    f_20 = 1.0 / (exp(numpy.abs(E[2] - E[0]) / (kb * T_rad)) - 1.0)
+    f_21 = 1.0 / (exp(numpy.abs(E[2] - E[1]) / (kb * T_rad)) - 1.0)
+
+    B_10 = f_10 * A_10
+    B_20 = f_20 * A_20
+    B_21 = f_21 * A_21
+    B_01 = (g_1 / g_0) * f_10 * A_10
+    B_02 = (g_2 / g_0) * f_20 * A_20
+    B_12 = (g_2 / g_1) * f_21 * A_21
+
+    R_10 = K_10*n_c + A_10 + B_10
+    R_20 = K_20*n_c + A_20 + B_20
+    R_21 = K_21*n_c + A_21 + B_21
+    R_01 = K_01*n_c + B_01
+    R_02 = K_02*n_c + B_02
+    R_12 = K_12*n_c + B_12
+
+    n_1_over_n_0 = ((R_01*R_20 + R_01*R_21 + R_21*R_02) /
+                    (R_10*R_20 + R_10*R_21 + R_12*R_20))
+    n_2_over_n_0 = ((R_02*R_10 + R_02*R_12 + R_12*R_01) /
+                    (R_10*R_20 + R_10*R_21 + R_12*R_20))
+
+
+    return n_1_over_n_0, n_2_over_n_0
+
