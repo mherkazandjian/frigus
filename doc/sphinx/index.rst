@@ -12,7 +12,7 @@ Contents:
    getting_started.rst
    examples.rst
    custom_system.rst
-   codestructure.rst
+   code_structure.rst
 
 
 Indices and tables
