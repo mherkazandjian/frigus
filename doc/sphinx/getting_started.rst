@@ -27,6 +27,14 @@ To run the tests after cloning the repo
     cd frigus/src/python/tests
     PYTHONPATH=..:${PYTHONPATH} py.test -v .
 
+Once Frigus is installed or the path to Frigus is set in the PYTHONPATH,
+it can be imported through
+
+.. code-block:: python
+
+    import frigus
+
+
 Building the documentation
 --------------------------
 The documentation is handled through the sphinx package and is
