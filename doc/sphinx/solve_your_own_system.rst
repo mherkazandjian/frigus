@@ -8,4 +8,6 @@ in the framework of Frigus, such that the following would be possible:
 
      from frigus.readers import DataLoader
      species = DataLoader().load('my_custom_species')
+
+     from frigus.population import cooling_rate_at_steady_state
      cooling_rate = cooling_rate_at_steady_state(species, T_kin, T_rad, nc)
