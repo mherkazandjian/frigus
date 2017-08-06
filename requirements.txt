@@ -1,10 +1,4 @@
 numpy>=1.13.1
 scipy
-pandas
 matplotlib
-pytest
-pytest-cov
-ipython
-jupyter
-sphinx
 astropy>=2.0
