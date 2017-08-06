@@ -1,6 +1,9 @@
 Getting started
 ===============
 
+Obtaining and Installation
+--------------------------
+
 The official repository of Frigus is:
 
     git@github.com:mherkazandjian/frigus.git
@@ -23,3 +26,12 @@ To run the tests after cloning the repo
 
     cd frigus/src/python/tests
     PYTHONPATH=..:${PYTHONPATH} py.test -v .
+
+Building the documentation
+--------------------------
+The documentation is handled through the sphinx package and is
+available at https://readthedocs.org/frigus ( .. todo:: set correct link)
+
+    cd frigus/doc/sphinx
+    PYTHONPATH=../../src/python:$PYTHONPATH make html
+    firefox _build/html/index.html
