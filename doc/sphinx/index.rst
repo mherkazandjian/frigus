@@ -11,7 +11,7 @@ Contents:
 
    getting_started.rst
    examples.rst
-   custom_systems.rst
+   solve_your_own_system.rst
    code_structure.rst
 
 
