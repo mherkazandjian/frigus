@@ -446,6 +446,12 @@ def solve_equilibrium(M_matrix):
 
     sz = M_matrix.shape[0]
 
+    #
+    # set to zero rates that could be problematic while solving the system
+    #
+    # THRESHOLD_RATE = 1.0e-45
+    # M_matrix[numpy.abs(M_matrix) < THRESHOLD_RATE] = 0.0
+
     # solving directly. replacing the first row with the conservation equation
     # i.e the sum of the independent variable is 1, i.e the sum of the
     # population levels is
@@ -470,13 +476,13 @@ def solve_equilibrium(M_matrix):
 
     #detA = scipy.linalg.det(A, overwrite_a=False, check_finite=True)
 
-    # x = linalg.solve(A, b)
-    x = solve_svd(A, b)
+    x = linalg.solve(A, b)
+    # x = solve_svd(A, b)
     if (x < 0.0).any():
         print('found negative population densities solving with 64bit\n'
               'numpy arrays. Solving with extended precision')
-        # x_mp = solve_lu_mp(A, b)
-        x_mp = solve_svd_mp(A, b)
+        x_mp = solve_lu_mp(A, b)
+        # x_mp = solve_svd_mp(A, b)
         if (x_mp < 0.0).any():
             raise ValueError('negative population densities even with mp')
         else:
