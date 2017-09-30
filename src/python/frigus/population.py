@@ -1,8 +1,12 @@
 from __future__ import print_function
 
 import numpy
-from numpy import (zeros, fabs, arange, array_equal, exp, ones, log10,
+from numpy import (zeros, fabs, arange, exp, array_equal, ones, log10,
                    linalg, eye, dot, where, intersect1d, setdiff1d, in1d, pi)
+
+import mpmath
+from mpmath import svd_r
+
 import scipy
 from scipy import interpolate
 
@@ -435,7 +439,7 @@ def solve_equilibrium(M_matrix):
     is replaces by the conservation equation.
 
     :param matrix_like M_matrix: The right hand side matrix of the rate
-    equation as an n x n matrix.
+    equation as/home/carla an n x n matrix.
     :return: The population densities as a column vector. 
     """
 
@@ -460,13 +464,28 @@ def solve_equilibrium(M_matrix):
     #
     # DEBUG: examine the condition number of A
     #
-    # cond = numpy.linalg.cond(A)
+    cond = numpy.linalg.cond(A)
     # ============ done conditioning the linear system ===============
 
-    x = linalg.solve(A, b)
+    #detA = scipy.linalg.det(A, overwrite_a=False, check_finite=True)
 
+
+    x = svdsolve(A,b)
+    print(x)
+    #x = linalg.solve(A, b)
+    #x = scipy.sparse.linalg.lsqr(A, b, damp=0.0001, atol=1e-08, btol=1e-08,
+    #                         conlim=100000000.0, iter_lim=None, show=False,
+    #                         calc_var=False)
+    return x, cond
+
+
+def svdsolve(a,b):
+    u, s, v = mpmath.svd_r(a)
+    #u,s,v = numpy.linalg.svd(a)
+    c = numpy.dot(u.T,b)
+    w = numpy.linalg.solve(numpy.diag(s),c)
+    x = numpy.dot(v.T,w)
     return x
-
 
 def compute_transition_rate_matrix(data_set,
                                    T_kin,
@@ -540,12 +559,12 @@ def population_density_at_steady_state(data_set,
 
     M_matrix = compute_transition_rate_matrix(data_set, T_kin, T_rad, collider_density)
 
-    x_equilibrium = solve_equilibrium(M_matrix.si.value)
+    x_equilibrium, cond = solve_equilibrium(M_matrix.si.value)
 
-    assert bool((x_equilibrium < 0.0).any()) is False
-    assert numpy.fabs(1.0 - numpy.fabs(x_equilibrium.sum())) <= 1e-3
+    #assert bool((x_equilibrium < 0.0).any()) is False
+    #assert numpy.fabs(1.0 - numpy.fabs(x_equilibrium.sum())) <= 1e-3
 
-    return x_equilibrium
+    return x_equilibrium, cond
 
 
 def cooling_rate_at_steady_state(data_set, T_kin, T_rad, collider_density):
