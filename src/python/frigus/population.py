@@ -6,7 +6,7 @@ from numpy import (zeros, fabs, arange, exp, array_equal, ones, log10,
 
 import mpmath
 from mpmath import svd_r
-mpmath.mp.dps = 35
+mpmath.mp.dps = 50
 
 import scipy
 from scipy import interpolate
@@ -470,11 +470,13 @@ def solve_equilibrium(M_matrix):
 
     #detA = scipy.linalg.det(A, overwrite_a=False, check_finite=True)
 
-    x = linalg.solve(A, b)
+    # x = linalg.solve(A, b)
+    x = solve_svd(A, b)
     if (x < 0.0).any():
         print('found negative population densities solving with 64bit\n'
               'numpy arrays. Solving with extended precision')
-        x_mp = solve_lu_mp(A, b)
+        # x_mp = solve_lu_mp(A, b)
+        x_mp = solve_svd_mp(A, b)
         if (x_mp < 0.0).any():
             raise ValueError('negative population densities even with mp')
         else:
@@ -502,11 +504,47 @@ def solve_lu_mp(A, b):
     x_mp = mpmath.lu_solve(A_mp, b_mp)
     x = numpy.array(x_mp.tolist(), 'f8')
 
-    # u, s, v = mpmath.svd_r(A_mp)
-    # u, s, v = numpy.linalg.svd(a)
-    # c = numpy.dot(u.T, b)
-    # w = numpy.linalg.solve(numpy.diag(s), c)
-    # x = numpy.dot(v.T,w)
+    return x
+
+
+def solve_svd(A, b):
+    """
+    solve a linear system using svd decomposition using numpy
+
+    :param ndarray A: The linear system
+    :param ndarray b: The right hand side
+    :return: ndarray
+    """
+    u, s, v = numpy.linalg.svd(A)
+
+    c = numpy.dot(u.T, b)
+    w = numpy.linalg.solve(numpy.diag(s), c)
+    x = numpy.dot(v.T, w)
+
+    return x
+
+
+def solve_svd_mp(A, b):
+    """
+    solve a linear system using svd decomposition using mpmath
+
+    :param ndarray A: The linear system
+    :param ndarray b: The right hand side
+    :return: ndarray
+    """
+    A_mp = mpmath.matrix([list(row) for row in A])
+    b_mp = mpmath.matrix([list(row) for row in b])
+
+    u, s, v = svd_r(A_mp)
+
+    # x = V*((U'.b)./ diag(S))
+    # x = V*(  c   ./ diag(S))
+    # x = V*(       g        )
+
+    c = u.T * b_mp
+    w = mpmath.lu_solve(mpmath.diag(s), c)
+    x_mp = v.T * w
+    x = numpy.array(x_mp.tolist(), 'f8')
 
     return x
 
