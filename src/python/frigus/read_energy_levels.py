@@ -117,7 +117,7 @@ def read_levels(fname):
     to numpy arrays and provide utilities to get information from the data.
       # Rovibrational energy levels for H_2
       # v   J        -binding energy
-      #           a.u.            cm-1
+      #           a.u./home/carla            cm-1
         0   0  0.16456626E+00  0.36118114E+05
         0   1  0.16402653E+00  0.35999657E+05
         0   2  0.16295202E+00  0.35763830E+05
@@ -141,25 +141,18 @@ def read_levels(fname):
     v, j = numpy.int32(v), numpy.int32(j)
 
     # conversion of the energies from cm-1 -> Joule
-    energies *= 1.98630e-23
+    energies = energies / u.cm
+    energies = (energies * constants.h * constants.c).si
 
-    nv_max, nj_max = v.max(), j.max()
+    energy_levels = EnergyLevelsMolecule(v.size, energy_unit=u.eV)
 
-    enh2 = numpy.zeros((nv_max+1, nj_max+1), 'f8')
+    energy_levels.data['v'] = v
+    energy_levels.data['j'] = j
+    energy_levels.data['g'] = 2*j + 1
+    energy_levels.data['E'] = energies.to(u.eV)
+    energy_levels.data['label'] = linear_2d_index(v, j)
 
-    # having v=0 as 0 for the energies, the bottom of the well
-    # is at -2179.0 cm-1 + convention into Joule
-    # bottom = 2179.0*1.98630e-23
-
-    # filling the matrix enh2 with the values read from the text file
-    for i in range(len(v)):
-        vi, ji = v[i], j[i]
-        enh2[vi, ji] = energies[i]
-
-#        depth = enh2[0,0] + bottom
-#        enh2[vi,ji]  =  enh2[vi,ji] - depth
-
-    return enh2
+    return energy_levels
 
 
 def read_levels_lique(fname):
