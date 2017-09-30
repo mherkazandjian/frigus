@@ -64,7 +64,6 @@ if True:
                                                          T_rad,
                                                          nc_H)]
 
-
     lambda_vs_T_kin = u.Quantity(lambda_vs_T_kin)
     lambda_vs_T_kin_glover = u.Quantity([fit_glover(T_kin) for T_kin in
                                          T_rng.value]) * nc_H

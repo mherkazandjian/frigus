@@ -6,6 +6,7 @@ from numpy import (zeros, fabs, arange, exp, array_equal, ones, log10,
 
 import mpmath
 from mpmath import svd_r
+mpmath.mp.dps = 35
 
 import scipy
 from scipy import interpolate
@@ -469,23 +470,46 @@ def solve_equilibrium(M_matrix):
 
     #detA = scipy.linalg.det(A, overwrite_a=False, check_finite=True)
 
+    x = linalg.solve(A, b)
+    if (x < 0.0).any():
+        print('found negative population densities solving with 64bit\n'
+              'numpy arrays. Solving with extended precision')
+        x_mp = solve_lu_mp(A, b)
+        if (x_mp < 0.0).any():
+            raise ValueError('negative population densities even with mp')
+        else:
+            x = x_mp
 
-    x = svdsolve(A,b)
-    print(x)
+    # print(x)
     #x = linalg.solve(A, b)
     #x = scipy.sparse.linalg.lsqr(A, b, damp=0.0001, atol=1e-08, btol=1e-08,
     #                         conlim=100000000.0, iter_lim=None, show=False,
     #                         calc_var=False)
-    return x, cond
 
-
-def svdsolve(a,b):
-    u, s, v = mpmath.svd_r(a)
-    #u,s,v = numpy.linalg.svd(a)
-    c = numpy.dot(u.T,b)
-    w = numpy.linalg.solve(numpy.diag(s),c)
-    x = numpy.dot(v.T,w)
     return x
+
+
+def solve_lu_mp(A, b):
+    """
+    solve a linear system using mpmath
+
+    :param ndarray A: The linear system
+    :param ndarray b: The right hand side
+    :return: ndarray
+    """
+    A_mp = mpmath.matrix([list(row) for row in A])
+    b_mp = mpmath.matrix([list(row) for row in b])
+    x_mp = mpmath.lu_solve(A_mp, b_mp)
+    x = numpy.array(x_mp.tolist(), 'f8')
+
+    # u, s, v = mpmath.svd_r(A_mp)
+    # u, s, v = numpy.linalg.svd(a)
+    # c = numpy.dot(u.T, b)
+    # w = numpy.linalg.solve(numpy.diag(s), c)
+    # x = numpy.dot(v.T,w)
+
+    return x
+
 
 def compute_transition_rate_matrix(data_set,
                                    T_kin,
@@ -559,12 +583,12 @@ def population_density_at_steady_state(data_set,
 
     M_matrix = compute_transition_rate_matrix(data_set, T_kin, T_rad, collider_density)
 
-    x_equilibrium, cond = solve_equilibrium(M_matrix.si.value)
+    x_equilibrium = solve_equilibrium(M_matrix.si.value)
 
     #assert bool((x_equilibrium < 0.0).any()) is False
     #assert numpy.fabs(1.0 - numpy.fabs(x_equilibrium.sum())) <= 1e-3
 
-    return x_equilibrium, cond
+    return x_equilibrium
 
 
 def cooling_rate_at_steady_state(data_set, T_kin, T_rad, collider_density):
