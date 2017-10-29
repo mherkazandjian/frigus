@@ -56,4 +56,12 @@ CD = C11 - np.dot(C12, C21)
 
 x1 = la.solve(CD, b[0:2])
 
+x2 = - np.dot(C21, x1.T)
+
+x1_list = x1[:][0].tolist()
+
+x2_list = x2[:,0].tolist()
+
+x = (x1_list + x2_list).flatten()
+
 

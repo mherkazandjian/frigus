@@ -465,8 +465,12 @@ def solve_equilibrium(M_matrix):
     # ============ condition the linear system ========================
     #
     # scale the rows by normalizing w.r.t the diagonal element
+    # for i in arange(sz):
+    #    A[i, :] = A[i, :] / A[i, i]
+
+    # scale the columns by normalizing w.r.t the diagonal element
     for i in arange(sz):
-        A[i, :] = A[i, :] / A[i, i]
+        A[:, i] = A[:, i] / A[i, i]
 
     #
     # DEBUG: examine the condition number of A
@@ -478,15 +482,15 @@ def solve_equilibrium(M_matrix):
 
     x = linalg.solve(A, b)
     # x = solve_svd(A, b)
-    if (x < 0.0).any():
-        print('found negative population densities solving with 64bit\n'
-              'numpy arrays. Solving with extended precision')
-        x_mp = solve_lu_mp(A, b)
-        # x_mp = solve_svd_mp(A, b)
-        if (x_mp < 0.0).any():
-            raise ValueError('negative population densities even with mp')
-        else:
-            x = x_mp
+    #if (x < 0.0).any():
+    #    print('found negative population densities solving with 64bit\n'
+    #          'numpy arrays. Solving with extended precision')
+    #    x_mp = solve_lu_mp(A, b)
+    #    # x_mp = solve_svd_mp(A, b)
+    #    if (x_mp < 0.0).any():
+    #        raise ValueError('negative population densities even with mp')
+    #    else:
+    #        x = x_mp
 
     # print(x)
     #x = linalg.solve(A, b)
@@ -592,6 +596,8 @@ def compute_transition_rate_matrix(data_set,
     # compute the M matrix that can be used to compute the equilibrium state of
     # the levels (see notebook)
     O_matrix = (A_matrix + B_J_nu_matrix + K_matrix * collider_density).T
+
+
 
     D_matrix = -numpy.eye(O_matrix.shape[0]) * O_matrix.sum(axis=0)
 
