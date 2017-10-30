@@ -10,6 +10,8 @@ mpmath.mp.dps = 50
 
 import scipy
 from scipy import interpolate
+import scipy.linalg as la
+
 
 from astropy import units as u
 from astropy.constants import c as c_light
@@ -465,12 +467,12 @@ def solve_equilibrium(M_matrix):
     # ============ condition the linear system ========================
     #
     # scale the rows by normalizing w.r.t the diagonal element
-    # for i in arange(sz):
-    #    A[i, :] = A[i, :] / A[i, i]
+    for i in arange(sz):
+        A[i, :] = A[i, :] / A[i, i]
 
     # scale the columns by normalizing w.r.t the diagonal element
-    for i in arange(sz):
-        A[:, i] = A[:, i] / A[i, i]
+    #for i in arange(sz):
+    #    A[:, i] = A[:, i] / A[i, i]
 
     #
     # DEBUG: examine the condition number of A
@@ -480,7 +482,7 @@ def solve_equilibrium(M_matrix):
 
     #detA = scipy.linalg.det(A, overwrite_a=False, check_finite=True)
 
-    x = linalg.solve(A, b)
+    #x = linalg.solve(A, b)
     # x = solve_svd(A, b)
     #if (x < 0.0).any():
     #    print('found negative population densities solving with 64bit\n'
@@ -498,6 +500,29 @@ def solve_equilibrium(M_matrix):
     #                         conlim=100000000.0, iter_lim=None, show=False,
     #                         calc_var=False)
 
+    A_copy = numpy.copy(A)
+    #A_copy = A
+    n = 3
+    C11 = A_copy[0:n, 0:n]
+
+    C12 = A_copy[0:n, n:]
+
+    A22 = A_copy[n:, n:]
+    A21 = A_copy[n:, 0:n] # A21 = A[n:, 0:n-1] worked - good condition number and
+                     #  no negative population densities
+    C21 = la.solve(A22, A21)
+
+    CD = C11 - numpy.dot(C12, C21)
+
+    x1 = la.solve(CD, b[0:n])
+
+    x2 = - numpy.dot(C21, x1.T)
+
+    x = numpy.vstack((x1, x2))
+
+    if (x.any() < 0):
+        print('found negative population densities solving with 64bit\n'
+               'numpy arrays. Solving with extended precision')
     return x
 
 
