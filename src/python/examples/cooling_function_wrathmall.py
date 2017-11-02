@@ -21,7 +21,7 @@ species_data = DataLoader().load('H2_wrathmall')
 
 # Calculate the population density and the cooling rate per particle
 # for one value of kinetic temperature and gas density of H
-if True:
+if False:
 
     # density of the colliding species, in m^3
     nc_H = 1e6 * u.meter ** -3

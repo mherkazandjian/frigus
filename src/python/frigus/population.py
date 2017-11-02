@@ -3,6 +3,8 @@ from __future__ import print_function
 import numpy
 from numpy import (zeros, fabs, arange, exp, array_equal, ones, log10,
                    linalg, eye, dot, where, intersect1d, setdiff1d, in1d, pi)
+from numpy.linalg import solve, cond
+
 
 import mpmath
 from mpmath import svd_r
@@ -434,6 +436,35 @@ def compute_K_matrix_from_K_dex_matrix(energy_levels,
     return K_matrix
 
 
+def solve_linear_system_two_step(A, b, n_sub=1):
+    """
+    Solve the linaer system by sub-dividing into two linear systems
+
+    The M-matrix property is exploited.
+
+    :return: the solution of the linear system
+    """
+    n = n_sub
+
+    C11 = A[0:n, 0:n]
+
+    C12 = A[0:n, n:]
+
+    A22 = A[n:, n:]
+    A21 = A[n:, 0:n]
+
+    C21 = la.solve(A22, A21)
+
+    CD = C11 - numpy.dot(C12, C21)
+
+    x1 = la.solve(CD, b[0:n])
+
+    x2 = - numpy.dot(C21, x1.T)
+
+    x = numpy.vstack((x1, x2))
+
+    return x
+
 def solve_equilibrium(M_matrix):
     """
     Solve for the equilibrium population densities given the right hand side of
@@ -470,65 +501,27 @@ def solve_equilibrium(M_matrix):
     for i in arange(sz):
         A[i, :] = A[i, :] / A[i, i]
 
-    # scale the columns by normalizing w.r.t the diagonal element
-    #for i in arange(sz):
-    #    A[:, i] = A[:, i] / A[i, i]
-
     #
     # DEBUG: examine the condition number of A
     #
-    cond = numpy.linalg.cond(A)
+    # cond = numpy.linalg.cond(A)
     # ============ done conditioning the linear system ===============
 
-    #detA = scipy.linalg.det(A, overwrite_a=False, check_finite=True)
+    x = solve_linear_system_two_step(A, b, n_sub=1)
 
-    #x = linalg.solve(A, b)
-    # x = solve_svd(A, b)
-    #if (x < 0.0).any():
-    #    print('found negative population densities solving with 64bit\n'
-    #          'numpy arrays. Solving with extended precision')
-    #    x_mp = solve_lu_mp(A, b)
-    #    # x_mp = solve_svd_mp(A, b)
-    #    if (x_mp < 0.0).any():
-    #        raise ValueError('negative population densities even with mp')
-    #    else:
-    #        x = x_mp
+    if x.any() < 0.0:
+        print(
+            'WARNING: found negative population densities\n'
+            'accurary of the solution is not guaranteed.\n'
+            'Check the linear system, rates, condition number..etc..\n'
+        )
 
-    # print(x)
-    #x = linalg.solve(A, b)
-    #x = scipy.sparse.linalg.lsqr(A, b, damp=0.0001, atol=1e-08, btol=1e-08,
-    #                         conlim=100000000.0, iter_lim=None, show=False,
-    #                         calc_var=False)
-
-    A_copy = numpy.copy(A)
-    #A_copy = A
-    n = 3
-    C11 = A_copy[0:n, 0:n]
-
-    C12 = A_copy[0:n, n:]
-
-    A22 = A_copy[n:, n:]
-    A21 = A_copy[n:, 0:n] # A21 = A[n:, 0:n-1] worked - good condition number and
-                     #  no negative population densities
-    C21 = la.solve(A22, A21)
-
-    CD = C11 - numpy.dot(C12, C21)
-
-    x1 = la.solve(CD, b[0:n])
-
-    x2 = - numpy.dot(C21, x1.T)
-
-    x = numpy.vstack((x1, x2))
-
-    if (x.any() < 0):
-        print('found negative population densities solving with 64bit\n'
-               'numpy arrays. Solving with extended precision')
     return x
 
 
 def solve_lu_mp(A, b):
     """
-    solve a linear system using mpmath
+    Solve a linear system using mpmath
 
     :param ndarray A: The linear system
     :param ndarray b: The right hand side
