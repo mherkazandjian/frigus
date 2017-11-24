@@ -29,11 +29,11 @@ species_data = DataLoader().load('HD_lipovka')
 # time range and timestep
 t_0 = 0.0
 t_f = 1e10
-dt = 1e6
+dt = 1e5
 
 # the environment parameters
-nc_H = 1e6 * u.meter ** -3
-T_kin = 1000.0 * u.Kelvin
+nc_H = 1e8 * u.meter ** -3
+T_kin = 2000.0 * u.Kelvin
 T_rad = 2.73 * u.Kelvin
 
 # the rates matrix (that is fixed if the environemnt params above are fixed)
@@ -85,20 +85,17 @@ t_all, x_all = numpy.array(t_all), numpy.vstack(x_all)
 fig, axs = plt.subplots()
 
 colors = {
-    'r': '+',
-    'g': '+',
-    'b': '+',
-    'c': '+',
-    'k': '+',
+    'r': '-',
+    'g': '--',
+    'b': '-.',
+    'k': '-..',
+    'y': '+',
     'r--': '+',
     'g--': '+',
     'b--': '+',
     'c--': '+',
     'k--': '+'
 }
-
-for level_index in range(n_levels):
-    axs.loglog(t_all, x_all[:, level_index], colors.keys()[level_index])
 
 # get the equilibrium solution and plot them as crosses at t = t_f
 pop_dens_eq = population_density_at_steady_state(
@@ -107,10 +104,28 @@ pop_dens_eq = population_density_at_steady_state(
     T_rad,
     nc_H)
 
-for level_index in range(n_levels):
+#for level_index in range(n_levels):
+for level_index in [0, 1, 2]:
+
+    x = t_all
+    y = numpy.abs(1.0 - x_all[:, level_index] / pop_dens_eq[level_index])
+
     axs.loglog(
-        t_all[-1], pop_dens_eq[level_index], colors.values()[level_index]
+        x,
+        y,
+        colors.keys()[level_index] + colors.values()[level_index],
+        alpha=0.5,
+        label='level {}'.format(level_index)
     )
+
+axs.set_xlabel('t [s]')
+axs.set_ylabel('relative difference')
+plt.legend()
+
+#for level_index in range(n_levels):
+#    axs.loglog(
+#        t_all[-1], pop_dens_eq[level_index], colors.values()[level_index]
+#    )
 
 plt.ion()
 plt.show()
