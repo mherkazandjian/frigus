@@ -52,7 +52,6 @@ for T_kin in T_kin_range:
     ratio_numeric_vs_T_kin.append(pop_dens_eq_ratio_numeric)
 
     # popultation densities using analytic expressions
-    # pop_dens_eq_ratio_analytic = population_density_ratio_analytic_no_radiation(
     pop_dens_eq_ratio_analytic = population_density_ratio_analytic_two_level_system(
         species_data.energy_levels.data['g'],
         species_data.energy_levels.data['E'],

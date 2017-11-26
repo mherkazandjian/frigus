@@ -22,7 +22,7 @@ from frigus.population import (
 )
 
 #
-# load the two level species data
+# load the three level species data
 #
 species_data = DataLoader().load('three_level_1')
 
