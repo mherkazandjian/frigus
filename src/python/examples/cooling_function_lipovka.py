@@ -49,8 +49,8 @@ if True:
     nc_H_rng = [1.e6, 1.e7, 1.e8, 1.e9, 1.e10, 1.e11, 1.e12, 1.e13, 1.e14]
     T_rad = 0.0 * u.Kelvin
 
-    #T_rng = np.logspace(2, 3.2, 10)
-    T_rng = species_data.raw_data.collision_rates_T_range
+    T_rng = np.logspace(2, 3.2, 10) * u.Kelvin
+    # T_rng = species_data.raw_data.collision_rates_T_range
     for nc_H in nc_H_rng:
         lambda_vs_T_kin = []
         pop_dens_vs_T_kin = []
