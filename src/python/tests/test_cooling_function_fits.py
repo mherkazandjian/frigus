@@ -3,7 +3,7 @@ import numpy
 from numpy.testing import assert_allclose
 from astropy import units as u
 import py.test
-from frigus.population import fit_lipovka, fit_glover, fit_lipovka_low_density
+from frigus.population import fit_lipovka
 
 
 def test_that_lipovka_cooling_function_fit_is_computed_correctly():
@@ -18,20 +18,6 @@ def test_that_lipovka_cooling_function_fit_is_computed_correctly():
         cooling_function[[0, 50, -1]].cgs.value,
         expected_values,
         rtol=1e-6,
-        atol=0.0)
+        atol=0.0
+    )
 
-
-def test_that_lipovka_cooling_function_fit_is_computed_correctly_at_low_densities():
-
-    py.test.skip('not implemented')
-
-def test_that_glover_cooling_function_fit_is_computed_correctly():
-    expected_values = [3.6341638e-29, 1.5221534e-26, 4.8841725e-25]
-    assert_allclose(
-        u.Quantity([
-            fit_glover(100.0),
-            fit_glover(500.0),
-            fit_glover(1000.0)]).cgs.value,
-        expected_values,
-        rtol=1e-6,
-        atol=0.0)

@@ -1,19 +1,11 @@
 from __future__ import print_function
 
 import numpy
-from numpy import (zeros, fabs, arange, exp, array_equal, ones, log10,
-                   linalg, eye, dot, where, intersect1d, setdiff1d, in1d, pi)
-from numpy.linalg import solve, cond
-
-
-import mpmath
-from mpmath import svd_r
-mpmath.mp.dps = 50
+from numpy import zeros, fabs, arange, exp, log10, where, in1d, pi
 
 import scipy
 from scipy import interpolate
 import scipy.linalg as la
-
 
 from astropy import units as u
 from astropy.constants import c as c_light
@@ -519,22 +511,6 @@ def solve_equilibrium(M_matrix):
     return x
 
 
-def solve_lu_mp(A, b):
-    """
-    Solve a linear system using mpmath
-
-    :param ndarray A: The linear system
-    :param ndarray b: The right hand side
-    :return: ndarray
-    """
-    A_mp = mpmath.matrix([list(row) for row in A])
-    b_mp = mpmath.matrix([list(row) for row in b])
-    x_mp = mpmath.lu_solve(A_mp, b_mp)
-    x = numpy.array(x_mp.tolist(), 'f8')
-
-    return x
-
-
 def solve_svd(A, b):
     """
     solve a linear system using svd decomposition using numpy
@@ -548,31 +524,6 @@ def solve_svd(A, b):
     c = numpy.dot(u.T, b)
     w = numpy.linalg.solve(numpy.diag(s), c)
     x = numpy.dot(v.T, w)
-
-    return x
-
-
-def solve_svd_mp(A, b):
-    """
-    solve a linear system using svd decomposition using mpmath
-
-    :param ndarray A: The linear system
-    :param ndarray b: The right hand side
-    :return: ndarray
-    """
-    A_mp = mpmath.matrix([list(row) for row in A])
-    b_mp = mpmath.matrix([list(row) for row in b])
-
-    u, s, v = svd_r(A_mp)
-
-    # x = V*((U'.b)./ diag(S))
-    # x = V*(  c   ./ diag(S))
-    # x = V*(       g        )
-
-    c = u.T * b_mp
-    w = mpmath.lu_solve(mpmath.diag(s), c)
-    x_mp = v.T * w
-    x = numpy.array(x_mp.tolist(), 'f8')
 
     return x
 
@@ -711,35 +662,6 @@ def cooling_rate(population_densities, energy_levels, A_matrix):
     retval = (A_matrix * delta_e_matrix * population_densities).sum()
 
     return retval * energy_levels_unit * A_matrix_unit
-
-
-def fit_glover(T):
-    """
-    fit of the cooling rate of H2 as a function of temperature (in K) in units
-    of erg x cm^3 x s^-1
-    .. todo:: add ref
-
-    :param T: .. todo:: add doc
-    :return: .. todo:: add doc
-    """
-    if 100.0 <= T and T <= 1000:
-      retval = 10**(-24.311209
-               +3.5692468*log10(T/1000.)
-               -11.332860*(log10(T/1000.))**2
-               -27.850082*(log10(T/1000.))**3
-               -21.328264*(log10(T/1000.))**4
-               -4.2519023*(log10(T/1000.))**5)
-    elif 1000 < T and T <=6000:
-      retval = 10**(-24.311209
-               +4.6450521*log10(T/1000.)
-               -3.7209846*log10((T/1000.))**2
-               +5.9369081*log10((T/1000.))**3
-               -5.5108047*log10((T/1000.))**4
-               +1.5538288*log10((T/1000.))**5)
-    else:
-        raise ValueError("""out of bound""")
-
-    return retval * u.erg * u.s**-1 * u.cm**3
 
 
 def fit_lipovka(T, n_hd):
