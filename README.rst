@@ -20,7 +20,9 @@ Installation
 ------------
 
    $ git clone https://github.com/mherkazandjian/frigus.git
+
    $ pip install -r requirements.txt
+
    $ python setup.py install
 
 Tests
