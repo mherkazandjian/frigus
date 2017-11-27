@@ -34,15 +34,15 @@ The test suite can be run through:
 
 To run the examples:
 
-   $ FRIGUS_SOURCE_ROOT/src/python/examples>  cooling_function_two_level.py
+   $ FRIGUS_SOURCE_ROOT/src/python/examples>  python cooling_function_two_level.py
 
    $ FRIGUS_SOURCE_ROOT/src/python/examples>  python cooling_function_three_level.py
 
 The following two scripts repreduce two of the figures of the FRIGUS paper:
 
-   $ FRIGUS_SOURCE_ROOT/src/python/examples>  cooling_function_lipovka.py
+   $ FRIGUS_SOURCE_ROOT/src/python/examples>  python cooling_function_lipovka.py
 
-   $ FRIGUS_SOURCE_ROOT/src/python/examples>  solve_equilibrium_time_dependent_paper_figure.py
+   $ FRIGUS_SOURCE_ROOT/src/python/examples>  python solve_equilibrium_time_dependent_paper_figure.py
 
 
 
