@@ -1,8 +1,8 @@
 Dear Dr Ballantyne,
 
 Thanks for your feedback. We have updated the README.rst file of Frigus
-including the paths and explanations for each of the files included in the
-package (please find these information at the end of the file).
+including the paths and explanations for each of the files included in
+the package (please find these information at the end of the file).
 
 We look forward to hearing from you.
 
