@@ -132,11 +132,11 @@ def fit_lambda(x_fit, y_fit, data_to_fit):
 
     plt.show()
 
-    lambda_flatten = [item for sublist in data_to_fit for item in sublist]
+    #lambda_flatten = [item for sublist in data_to_fit for item in sublist]
 
     popt, pcov = \
     curve_fit(func, (np.log10(x_fit), np.log10(y_fit)),
-                     np.log10(lambda_flatten), D)
+                     np.log10(data_to_fit), D)
 
     return popt, pcov
 
