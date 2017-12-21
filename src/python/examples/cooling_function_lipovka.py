@@ -6,6 +6,10 @@ the Lipovka data
 from __future__ import print_function
 import numpy as np
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+from scipy.optimize import curve_fit
+from frigus.multivariate_fit import func, fit_lambda
+
 
 from astropy import units as u
 
@@ -16,6 +20,11 @@ from frigus.population import (fit_lipovka,
 from frigus.readers import DataLoader
 
 species_data = DataLoader().load('HD_lipovka')
+
+
+x_fit = []
+y_fit = []
+data_to_fit = []
 
 plt.ion()
 fig, axs = plt.subplots()
@@ -66,7 +75,15 @@ if True:
                     T_rad,
                     nc_H)]
 
+            x_fit.append(T_kin.value)
+            y_fit.append(nc_H.cgs.value)
+
+
+
         lambda_vs_T_kin = u.Quantity(lambda_vs_T_kin)
+
+        data_to_fit.append(lambda_vs_T_kin.cgs.value)
+
 
         lambda_vs_T_kin_lipovka = fit_lipovka(T_rng, nc_H)
 
@@ -82,6 +99,32 @@ if True:
         axs.set_ylabel('cooling function [erg s$^{-1}$]')
 
         plt.legend()
-        plt.show()
+        #plt.show()
+
+
+
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+
+ax.set_xscale('log')
+ax.set_yscale('log')
+ax.set_zscale('log')
+
+ax.scatter(x_fit, y_fit, data_to_fit)
+ax.set_xlabel('Temperature [K]')
+ax.set_ylabel('Density')
+ax.set_zlabel('cooling function')
+
+plt.show()
+
+popt, pcov = fit_lambda(x_fit, y_fit, data_to_fit)
+
+lambda_flatten = [item for sublist in data_to_fit for item in sublist]
+
+for i in np.arange(len(x_fit)):
+    X_new = x_fit[i], y_fit[i]
+    new_func = func(np.log10(X_new), *popt)
+    new_lambda = 10 ** new_func
+    print(new_lambda, lambda_flatten)
 
 print('done')
