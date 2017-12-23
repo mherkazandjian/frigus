@@ -44,13 +44,13 @@ if False:
         T_rad,
         nc_H)
 
-    cooling_rate = cooling_rate_at_steady_state(
-        species_data,
-        T_kin,
-        T_rad,
-        nc_H)
+    axs.loglog(
+        T_rng.value, lambda_vs_T_kin.to(u.J / u.s).value,
+        '-x', color='black', label='')
 
-if True:
+    axs.loglog(
+        T_rng.value, lambda_vs_T_kin_lipovka.to(u.J / u.s).value,
+        'r--', color='black', label='')
 
     # density of the colliding species, in m^3
     # nc_H = 1e6 * u.meter ** -3
