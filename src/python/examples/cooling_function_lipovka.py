@@ -76,8 +76,26 @@ if False:
 
             x_fit.append(T_kin.value)
             y_fit.append(nc_H.cgs.value)
-            lambda_vs_T_kin = u.Quantity(lambda_vs_T_kin)
-            data_to_fit.append(lambda_vs_T_kin.cgs.value)
+
+
+
+        lambda_vs_T_kin = u.Quantity(lambda_vs_T_kin)
+
+        data_to_fit.append(lambda_vs_T_kin.cgs.value)
+
+
+        lambda_vs_T_kin_lipovka = fit_lipovka(T_rng, nc_H)
+
+
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+
+ax.set_xscale('log')
+ax.set_yscale('log')
+ax.set_zscale('log')
+
+        plt.legend()
+        #plt.show()
 
 
 
@@ -97,14 +115,12 @@ plt.show()
 
 popt, pcov = fit_lambda(x_fit, y_fit, data_to_fit)
 
-#lambda_flatten = [item for sublist in data_to_fit for item in sublist]
+lambda_flatten = [item for sublist in data_to_fit for item in sublist]
 
 for i in np.arange(len(x_fit)):
     X_new = x_fit[i], y_fit[i]
     new_func = func(np.log10(X_new), *popt)
     new_lambda = 10 ** new_func
-    lambda_vs_T_kin_lipovka = fit_lipovka(x_fit[i] * u.Kelvin,
-                                          y_fit[i] * u.cm**-3)
-    print(new_lambda, data_to_fit[i], lambda_vs_T_kin_lipovka.si.value)
+    print(new_lambda, lambda_flatten)
 
 print('done')
