@@ -705,8 +705,8 @@ def cooling_rate(population_densities, energy_levels, A_matrix):
     energy_levels_unit = energy_levels.data['E'].unit
     A_matrix_unit = A_matrix.unit
 
-    delta_e_matrix = fabs(compute_delta_energy_matrix(energy_levels)).si.value
-    A_matrix = A_matrix.si.value
+    delta_e_matrix = fabs(compute_delta_energy_matrix(energy_levels)).value
+    A_matrix = A_matrix.value
 
     retval = (A_matrix * delta_e_matrix * population_densities).sum()
 
