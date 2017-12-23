@@ -49,14 +49,14 @@ for nc_H in nc_H_rng:
 
     axs.loglog(
         T_rng.value, lambda_vs_T_kin.si.value,
-        '-x', color = 'black', label='')
+        '-x', color='black', label='')
 
     axs.loglog(
         T_rng.value, lambda_vs_T_kin_lipovka.si.value,
-        'r--', color = 'black', label='')
+        'r--', color='black', label='')
 
     axs.set_xlabel('T$_\mathrm{kin}$ [K]')
-    axs.set_ylabel('cooling function [erg s$^{-1}$]')
+    axs.set_ylabel('cooling function [J s$^{-1}$]')
 
     plt.legend()
 
