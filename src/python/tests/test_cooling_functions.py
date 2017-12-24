@@ -36,7 +36,7 @@ def test_that_the_lipovka_cooling_function_is_computed_correctly():
     )
 
     assert_allclose(
-        cooling_rate_for_T_array.si.value, cooling_rate_expected.si.value,
+        cooling_rate_for_T_array.cgs.value, cooling_rate_expected.cgs.value,
         rtol=1e-6, atol=0.0
     )
 
@@ -70,6 +70,6 @@ def test_that_the_lique_cooling_function_is_computed_correctly():
     )
 
     assert_allclose(
-        cooling_rate_for_T_array.si.value, cooling_rate_expected.si.value,
+        cooling_rate_for_T_array.cgs.value, cooling_rate_expected.cgs.value,
         rtol=1e-6, atol=0.0
     )
