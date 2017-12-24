@@ -44,13 +44,13 @@ if False:
         T_rad,
         nc_H)
 
-    axs.loglog(
-        T_rng.value, lambda_vs_T_kin.to(u.J / u.s).value,
-        '-x', color='black', label='')
+    cooling_rate = cooling_rate_at_steady_state(
+        species_data,
+        T_kin,
+        T_rad,
+        nc_H)
 
-    axs.loglog(
-        T_rng.value, lambda_vs_T_kin_lipovka.to(u.J / u.s).value,
-        'r--', color='black', label='')
+if True:
 
     # density of the colliding species, in m^3
     # nc_H = 1e6 * u.meter ** -3
@@ -66,7 +66,6 @@ if False:
         for T_kin in T_rng:
             print(T_kin, nc_H)
 
-
             lambda_vs_T_kin = cooling_rate_at_steady_state(
                     species_data,
                     T_kin,
@@ -76,9 +75,7 @@ if False:
 
             x_fit.append(T_kin.value)
             y_fit.append(nc_H.cgs.value)
-            lambda_vs_T_kin = u.Quantity(lambda_vs_T_kin)
             data_to_fit.append(lambda_vs_T_kin.cgs.value)
-
 
 
 fig = plt.figure()
@@ -103,8 +100,11 @@ for i in np.arange(len(x_fit)):
     X_new = x_fit[i], y_fit[i]
     new_func = func(np.log10(X_new), *popt)
     new_lambda = 10 ** new_func
-    lambda_vs_T_kin_lipovka = fit_lipovka(x_fit[i] * u.Kelvin,
-                                          y_fit[i] * u.cm**-3)
-    print(new_lambda, data_to_fit[i], lambda_vs_T_kin_lipovka.si.value)
+    lambda_vs_T_kin_lipovka = fit_lipovka(
+        x_fit[i] * u.Kelvin,
+        y_fit[i] * u.cm**-3
+    )
+
+    print(new_lambda, data_to_fit[i], lambda_vs_T_kin_lipovka.cgs.value)
 
 print('done')
