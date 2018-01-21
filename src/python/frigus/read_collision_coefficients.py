@@ -255,13 +255,13 @@ def read_collision_coefficients_lipovka(fname):
             lines = iter(filter(lambda x: len(x) > 0, block.split('\n')))
 
             # get the temperature
-            T = lines.next()
+            T = next(lines)
             assert 'K' in T
             tkin = T.replace('K', '')
             # print T, tkin
 
             # get the header (levels)
-            levels = lines.next().replace(' ', '').replace(')(', ':')[
+            levels = next(lines).replace(' ', '').replace(')(', ':')[
                      1:-1].split(':')
             v, j = [], []
             for level in levels:
