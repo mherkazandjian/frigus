@@ -507,7 +507,15 @@ def solve_equilibrium(M_matrix):
     # cond = numpy.linalg.cond(A)
     # ============ done conditioning the linear system ===============
 
-    x = solve_linear_system_two_step(A, b, n_sub=1)
+    try:
+        x = solve_linear_system_two_step(A, b, n_sub=1)
+    except la.LinAlgError as exc:
+        print('solving the linear system with conditioning failed')
+        print('due an singular matrix exception')
+        print(exc)
+        print('try to solve the system using extended precision')
+        print('caution: this might take very long')
+        x = solve_lu_mp(A, b)
 
     if x.any() < 0.0:
         print(
