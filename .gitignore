@@ -60,3 +60,7 @@ src/fortran/cooling_function_lipovka\.dat
 .coverage
 
 htmlcov
+
+build
+dist
+frigus.egg-info
