@@ -8,14 +8,16 @@ except ImportError:
     from io import StringIO
 
 import numpy
-from numpy import (loadtxt, arange, int32, zeros, unique, void,
-                   ascontiguousarray, dtype, hstack, fabs, exp)
+from numpy import (loadtxt, int32, zeros, unique, void,
+                   ascontiguousarray, dtype, hstack)
 
 from astropy import units as u
 
 
 def unique_level_pairs(vj):
-    """from a list of levels find the list of unique levels and return them.
+    """
+    From a list of levels find the list of unique levels and return them.
+
     :param iterable vj: the list of v levels where each item vj[x] is a level.
     The shape of vj should be (2,n) where n is the number of levels.
     :return: (ndarray) The unique levels. The shape of this array is
@@ -27,7 +29,6 @@ def unique_level_pairs(vj):
                     [4, 4, 3, 5, 3, 6, 3, 8, 2, 5, 7, 8, 8, 6, 6, 9, 1, 0, 9]])
         vj_unique = unique_level_pairs(vj)
     """
-
     assert vj.shape[0] == 2
 
     a = vj.T
@@ -40,8 +41,10 @@ def unique_level_pairs(vj):
 
 def read_collision_coefficients_lique_and_wrathmall(fname):
     """
-    Parse the collisional data by François. These are the coefficient rates
-    K_ij where i > j (so these fill the lower triangular K matrix).
+    Parse the collisional data by François.
+
+    These are the coefficient rates K_ij where i > j (so these fill the lower
+    triangular K matrix).
 
     Supplementary Information for manuscript:
     "Revisited study of the ro-vibrational excitation of H$_2$ by H: Towards a
@@ -85,16 +88,20 @@ def read_collision_coefficients_lique_and_wrathmall(fname):
            which are the collisional coefficient rates with non-zero values
            for each value of temperature in the T array.
     """
-
     def find_temperature_array():
-        """search the header of the data file and return the range of
-         temperatures used. The temperature range is assumed to be on the
-         10th line of the header"""
+        """
+        Search the header of the data file and return the range of
+        temperatures used. The temperature range is assumed to be on the
+        10th line of the header
+        """
+        T_values = None
         with open(fname) as fobj:
             for line_num, line in enumerate(fobj):
                 if line_num == 8:
                     T_values = loadtxt(StringIO(line), delimiter=',') * u.Kelvin
                     break
+
+        assert T_values is not None
         return T_values
 
     T_values = find_temperature_array()
@@ -133,8 +140,10 @@ def read_collision_coefficients_lique_and_wrathmall(fname):
 
 def read_collision_coefficients_lipovka(fname):
     """
-    Parse the collisional data used by lipovka. These are the coefficient
-    rates K_ij where i > j (so these fill the lower triangular K matrix).
+    Parse the collisional data used by lipovka.
+
+    These are the coefficient rates K_ij where i > j (so these fill the lower
+    triangular K matrix).
 
     The table contains the HD-H collisional rate coefficients
 
@@ -176,19 +185,19 @@ def read_collision_coefficients_lipovka(fname):
            to the ini, fin collision rates of the first and second element
            in the tuple mentioned earlier.
     """
-
     class Reader(object):
-        """parse the  data by Flower and Roueff contained in the file
-           flower_roueff_data.dat downloaded from http://massey.dur.ac.uk/drf/HD_H
+        """
+        Parse the  data by Flower and Roueff contained in the file
+        flower_roueff_data.dat downloaded from http://massey.dur.ac.uk/drf/HD_H
 
-           A block of data (for a certain temperature) is defined as everything
-           between:
+        A block of data (for a certain temperature) is defined as everything
+        between:
 
-           100
-           (0,0) (0,1) (0,2) (0,3) (0,4) (0,5) (0,6) (0,7) (0,8) (0, 9)
-           1.0D-09 1.5D-11 5.4D-13 4.0D-14 7.8D-15 6.1D-16 2.4D-17 8.7D-18 2.2D-18 2.3D-19
-           ...
-           ...
+        100
+        (0,0) (0,1) (0,2) (0,3) (0,4) (0,5) (0,6) (0,7) (0,8) (0, 9)
+        1.0D-09 1.5D-11 5.4D-13 4.0D-14 7.8D-15 6.1D-16 2.4D-17 8.7D-18 2.2D-18 2.3D-19
+        ...
+        ...
 
         .. code-block:: python
 
@@ -200,19 +209,23 @@ def read_collision_coefficients_lipovka(fname):
             print reader.data[v, j, vp, jp, :]
         """
         def __init__(self, fname, tiny=1e-70):
-            """constructor"""
+            """Constructor"""
 
             self.fname = fname
-            self.data = None  #: the collision rates for all the transitions for all the tempratures
-            self.ini = None  #: the initial v,j of all the transitions
-            self.fin = None  #: the final v,j of all the transitions
-            self.tkin = None  #: the temperatures at which the collisional data are given
+            self.data = None
+            """the collision rates for all the transitions for all the
+            tempratures
+            """
+
+            self.ini = None   #: the initial v,j of all the transitions
+            self.fin = None   #: the final v,j of all the transitions
+            self.tkin = None
+            """the temperatures at which the collisional data are given"""
 
             self.read_data()
 
         def read_data(self):
             """read all the data to temporary storage in self.data"""
-
             with open(self.fname) as fobj:
                 linesold = fobj.readlines()
                 lines = []
@@ -231,7 +244,6 @@ def read_collision_coefficients_lipovka(fname):
             """
             Parses the read data into blocks, one block for each temperature
             """
-
             # split the raw data into blocks
             blocks = raw_data.split('T =')[1:]
 
@@ -250,18 +262,20 @@ def read_collision_coefficients_lipovka(fname):
             return cr_tkin, ini_tkin, fin_tkin, tkin
 
         def parse_block(self, block):
-            """parse a block of data and return the temperature, the levels
-            and the collision rates"""
+            """
+            Parse a block of data and return the temperature, the levels and
+            the collision rates
+            """
             lines = iter(filter(lambda x: len(x) > 0, block.split('\n')))
 
             # get the temperature
-            T = lines.next()
+            T = next(lines)
             assert 'K' in T
             tkin = T.replace('K', '')
             # print T, tkin
 
             # get the header (levels)
-            levels = lines.next().replace(' ', '').replace(')(', ':')[
+            levels = next(lines).replace(' ', '').replace(')(', ':')[
                      1:-1].split(':')
             v, j = [], []
             for level in levels:

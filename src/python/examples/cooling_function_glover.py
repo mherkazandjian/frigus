@@ -30,14 +30,15 @@ if False:
         species_data,
         T_kin,
         T_rad,
-        nc_H,
-        debug=True)
+        nc_H
+    )
 
     cooling_rate = cooling_rate_at_steady_state(
         species_data,
         T_kin,
         T_rad,
-        nc_H)
+        nc_H
+    )
 
 if True:
 
@@ -63,25 +64,25 @@ if True:
                                                          T_rad,
                                                          nc_H)]
 
-
     lambda_vs_T_kin = u.Quantity(lambda_vs_T_kin)
-    lambda_vs_T_kin_glover = u.Quantity([fit_glover(T_kin) for T_kin in
-                                         T_rng.value]) * nc_H
+    lambda_vs_T_kin_glover = u.Quantity(
+        [fit_glover(T_kin) for T_kin in T_rng.value]
+    ) * nc_H
 
     plt.ion()
     fig, axs = plt.subplots(2)
 
     axs[0].loglog(
-        T_rng.value, lambda_vs_T_kin.si.value,
+        T_rng.value, lambda_vs_T_kin.cgs.value,
         '-o', label='cooling H2 (low energy levels)')
     axs[0].loglog(
-        T_rng.value, lambda_vs_T_kin_glover.si.value,
+        T_rng.value, lambda_vs_T_kin_glover.cgs.value,
         'r--', label='cooling H2 glover')
 
     pop_dens_vs_T_kin = numpy.array(pop_dens_vs_T_kin)[:, :, 0]
     axs[1].plot(
         T_rng.value,
-        lambda_vs_T_kin.si.value / lambda_vs_T_kin_glover.si.value,
+        lambda_vs_T_kin.si.value / lambda_vs_T_kin_glover.cgs.value,
         '-', label='lambda / lambda_glover')
 
     axs[1].plot(
