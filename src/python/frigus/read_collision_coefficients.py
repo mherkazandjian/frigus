@@ -2,7 +2,11 @@
 """
 Read the collisional rates (collision coefficients)
 """
-from StringIO import StringIO
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
+
 import numpy
 from numpy import (loadtxt, arange, int32, zeros, unique, void,
                    ascontiguousarray, dtype, hstack, fabs, exp)

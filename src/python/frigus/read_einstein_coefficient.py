@@ -66,7 +66,7 @@ def read_einstein_simbotin():
 
         # opening the original ascii file and discard empty lines
         with open(fname, 'r') as fobj:
-            lines = filter(lambda x: x.strip() != '', fobj.readlines())
+            lines = list(filter(lambda x: x.strip() != '', fobj.readlines()))
 
         lines = lines[skip_rows:]
         while True:
@@ -76,7 +76,7 @@ def read_einstein_simbotin():
 
             line = lines.pop(0)
 
-            vp_all = map(int, line.split())
+            vp_all = list(map(int, line.split()))
 
             while True:
                 # processing a block and break the loop only when the last line
