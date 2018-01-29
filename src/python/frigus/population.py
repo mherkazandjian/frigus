@@ -623,8 +623,6 @@ def compute_transition_rate_matrix(data_set,
     # the levels (see notebook)
     O_matrix = (A_matrix + B_J_nu_matrix + K_matrix * collider_density).T
 
-
-
     D_matrix = -numpy.eye(O_matrix.shape[0]) * O_matrix.sum(axis=0)
 
     M_matrix = O_matrix + D_matrix
