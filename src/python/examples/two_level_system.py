@@ -9,8 +9,8 @@ from numpy import exp, fabs, logspace, array, vstack
 from astropy import units as u
 from astropy.constants import k_B
 
-from population import population_density_at_steady_state
-from readers import DataLoader
+from frigus.population import population_density_at_steady_state
+from frigus.readers.dataset import DataLoader
 
 import pdb
 
@@ -81,4 +81,4 @@ if True:
     pylab.show()
 
 
-print 'done'
+print('done')

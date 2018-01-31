@@ -55,10 +55,15 @@ y_0 = initial_fractional_abundances
 
 
 # define the solver
-solver = ode(ode_rhs, jac=None).set_integrator('vode',
-                                               method='bdf',
-                                               # with_jacobian = False,
-                                               rtol=1e-6)
+solver = ode(
+    ode_rhs,
+    jac=None
+).set_integrator(
+    'vode',
+    method='bdf',
+    # with_jacobian = False,
+    rtol=1e-6
+)
 
 solver.set_initial_value(y_0, t_0)
 

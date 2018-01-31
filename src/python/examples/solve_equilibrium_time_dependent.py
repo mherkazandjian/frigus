@@ -104,7 +104,7 @@ pop_dens_eq = population_density_at_steady_state(
     T_rad,
     nc_H)
 
-#for level_index in range(n_levels):
+# for level_index in range(n_levels):
 for level_index in [0, 1, 2]:
 
     x = t_all
@@ -113,7 +113,7 @@ for level_index in [0, 1, 2]:
     axs.loglog(
         x,
         y,
-        colors.keys()[level_index] + colors.values()[level_index],
+        list(colors.keys())[level_index] + list(colors.values())[level_index],
         alpha=0.5,
         label='level {}'.format(level_index)
     )
@@ -122,7 +122,7 @@ axs.set_xlabel('t [s]')
 axs.set_ylabel('relative difference')
 plt.legend()
 
-#for level_index in range(n_levels):
+# for level_index in range(n_levels):
 #    axs.loglog(
 #        t_all[-1], pop_dens_eq[level_index], colors.values()[level_index]
 #    )
