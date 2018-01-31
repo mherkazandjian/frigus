@@ -1,6 +1,4 @@
 import numpy
-import os
-from numpy.testing import assert_approx_equal
 
 
 def linear_2d_index(i, j, n_i=None):

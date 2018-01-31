@@ -13,7 +13,7 @@ from frigus.population import (fit_glover,
                                cooling_rate_at_steady_state,
                                population_density_at_steady_state)
 
-from frigus.readers import DataLoader
+from frigus.readers.dataset import DataLoader
 
 species_data = DataLoader().load('H2_lique')
 

@@ -13,7 +13,7 @@ from astropy import units as u
 from frigus.population import (fit_glover,
                                cooling_rate_at_steady_state)
 
-from frigus.readers import DataLoader
+from frigus.readers.dataset import DataLoader
 
 # density of the colliding species, in m^3
 nc_H = 1e2 * u.meter**-3

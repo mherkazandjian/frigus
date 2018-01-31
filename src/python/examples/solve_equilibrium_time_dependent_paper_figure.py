@@ -21,7 +21,7 @@ from frigus.population import (
     population_density_at_steady_state,
     compute_transition_rate_matrix
 )
-from frigus.readers import DataLoader
+from frigus.readers.dataset import DataLoader
 
 # load the species data
 species_data = DataLoader().load('HD_lipovka')
