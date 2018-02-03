@@ -8,3 +8,4 @@ ipython
 jupyter
 sphinx
 astropy>=2.0
+mpmath
