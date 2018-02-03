@@ -21,7 +21,7 @@ from frigus.population import (
     population_density_at_steady_state,
     compute_transition_rate_matrix
 )
-from frigus.readers import DataLoader
+from frigus.readers.dataset import DataLoader
 
 # load the species data
 species_data = DataLoader().load('HD_lipovka')
@@ -55,10 +55,15 @@ y_0 = initial_fractional_abundances
 
 
 # define the solver
-solver = ode(ode_rhs, jac=None).set_integrator('vode',
-                                               method='bdf',
-                                               # with_jacobian = False,
-                                               rtol=1e-6)
+solver = ode(
+    ode_rhs,
+    jac=None
+).set_integrator(
+    'vode',
+    method='bdf',
+    # with_jacobian = False,
+    rtol=1e-6
+)
 
 solver.set_initial_value(y_0, t_0)
 

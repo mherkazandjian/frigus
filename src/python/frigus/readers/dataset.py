@@ -8,14 +8,12 @@ import os
 import numpy
 from astropy import units as u
 
-from frigus import utils
-from frigus import read_energy_levels, read_einstein_coefficient
-from frigus.read_collision_coefficients import (
+from frigus import utils, population
+from frigus.readers import read_energy_levels, read_einstein_coefficient
+from frigus.readers.read_collision_coefficients import (
     read_collision_coefficients_lique_and_wrathmall,
     read_collision_coefficients_lipovka
 )
-
-from frigus import population
 
 DATADIR = utils.datadir_path()
 
