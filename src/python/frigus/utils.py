@@ -1,6 +1,16 @@
 import numpy
 import os
-from numpy.testing import assert_approx_equal
+import frigus
+
+
+def datadir_path():
+    """
+    Return the path to the data dir of the frigus package
+    """
+    if 'FRIGUS_DATADIR_ROOT' in os.environ:
+        return os.environ['FRIGUS_DATADIR_ROOT']
+    else:
+        return os.path.join(os.path.dirname(frigus.__file__), '..', 'data')
 
 
 def linear_2d_index(i, j, n_i=None):

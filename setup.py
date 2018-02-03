@@ -180,16 +180,26 @@ def _test():
     # It also runs doctest, but only on the modules in TESTS_DIRECTORY.
     return pytest.main(PYTEST_FLAGS + [TESTS_DIRECTORY])
 
+
 def find_all_files_in_datadir():
+    data_files = []
 
-    root_dir = 'data'
-    look_for = '*'
+    # files under data/*
+    data_files.append(
+        (
+            'data',
+            list(filter(os.path.isfile, glob.glob('data/*')))
+        )
+    )
 
-    matches = []
-    for root, dirnames, filenames in os.walk(root_dir):
-        for filename in fnmatch.filter(filenames, look_for):
-            matches.append(os.path.join(root, filename))
-    return matches
+    # subdirs with their files under data/**/*
+    directories = list(filter(os.path.isdir, glob.glob('data/*')))
+    for directory in directories:
+        files = glob.glob(os.path.join(directory, '*'))
+        data_files.append((directory, files))
+
+    return data_files
+
 
 def _test_all():
     """Run lint and tests.
@@ -256,11 +266,11 @@ setup_dict = dict(
         'Topic :: System :: Software Distribution',
     ],
     packages=['frigus'],
-    package_dir={'frigus': 'src/python/frigus'},
+    package_dir={'frigus': os.path.join('src', 'python', 'frigus')},
     package_data={
-        'frigus': glob.glob('src/python/frigus/*.py'),
+        'frigus': glob.glob(os.path.join('src', 'python', 'frigus', '*.py')),
     },
-    data_files=[('data', find_all_files_in_datadir())],
+    data_files=find_all_files_in_datadir(),
     install_requires=[
         # your module dependencies
     ] + python_version_specific_requires,
@@ -272,11 +282,6 @@ setup_dict = dict(
     ],
     cmdclass={'test': TestAllCommand},
     zip_safe=False,  # don't use eggs
-    # entry_points={
-    #     'console_scripts': [
-    #         'pytest_ds_cli = pytest_ds.main:entry_point'
-    #     ],
-    # },
 )
 
 
