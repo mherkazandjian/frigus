@@ -1,6 +1,4 @@
 import numpy
-import os
-from numpy.testing import assert_approx_equal
 
 
 def linear_2d_index(i, j, n_i=None):
@@ -123,82 +121,3 @@ def find_matching_indices(v1, v2, check=True):
     inds_v1_of_v2_in_v1 = inds_rec_v1[inds_v1_of_v2u_in_v1]
 
     return inds_v1_of_v2_in_v1
-
-
-def load_ascii_matrix_data():
-    A_matrix_mher = numpy.loadtxt(
-        os.path.expanduser(
-            '~/dropbox/Dropbox/us/cooling_function/mher/A_matrix.txt'))
-    B_matrix_mher = numpy.loadtxt(
-        os.path.expanduser(
-            '~/dropbox/Dropbox/us/cooling_function/mher/B_matrix.txt'))
-    J_nu_matrix_mher = numpy.loadtxt(
-        os.path.expanduser(
-            '~/dropbox/Dropbox/us/cooling_function/mher/J_nu_matrix.txt'))
-    K_matrix_mher = numpy.loadtxt(
-        os.path.expanduser(
-            '~/dropbox/Dropbox/us/cooling_function/mher/K_nc_matrix.txt'))
-    O_matrix_mher = numpy.loadtxt(
-        os.path.expanduser(
-            '~/dropbox/Dropbox/us/cooling_function/mher/O_matrix.txt'))
-    D_matrix_mher = numpy.loadtxt(
-        os.path.expanduser(
-            '~/dropbox/Dropbox/us/cooling_function/mher/D_matrix.txt'))
-    M_matrix_mher = numpy.loadtxt(
-        os.path.expanduser(
-            '~/dropbox/Dropbox/us/cooling_function/mher/M_matrix.txt'))
-
-
-    A_matrix_carla = numpy.loadtxt(
-        os.path.expanduser(
-            '~/dropbox/Dropbox/us/cooling_function/carla/A_matrix.txt')).T
-    B_matrix_carla = numpy.loadtxt(
-        os.path.expanduser(
-            '~/dropbox/Dropbox/us/cooling_function/carla/B_matrix.txt')).T
-    J_nu_matrix_carla = numpy.loadtxt(
-        os.path.expanduser(
-            '~/dropbox/Dropbox/us/cooling_function/carla/J_nu_matrix.txt')).T
-    K_matrix_carla = numpy.loadtxt(
-        os.path.expanduser(
-            '~/dropbox/Dropbox/us/cooling_function/carla/K_nc_matrix.txt')).T
-    O_matrix_carla = numpy.loadtxt(
-        os.path.expanduser(
-            '~/dropbox/Dropbox/us/cooling_function/carla/O_matrix.txt')).T
-    D_matrix_carla = numpy.loadtxt(
-        os.path.expanduser(
-            '~/dropbox/Dropbox/us/cooling_function/carla/D_matrix.txt')).T
-    M_matrix_carla = numpy.loadtxt(
-        os.path.expanduser(
-            '~/dropbox/Dropbox/us/cooling_function/carla/M_matrix.txt')).T
-
-
-    rel_diff_A = 1.0 - A_matrix_carla / A_matrix_mher
-    rel_diff_A[numpy.where(numpy.isnan(rel_diff_A))] = 0.0
-    assert rel_diff_A.sum() < 1e-14
-
-    rel_diff_B = 1.0 - B_matrix_carla / B_matrix_mher
-    rel_diff_B[numpy.where(numpy.isnan(rel_diff_B))] = 0.0
-    assert numpy.fabs(rel_diff_B.sum()) < 1e-4
-    assert numpy.fabs(rel_diff_B.max()) < 1e-7
-
-    rel_diff_J_nu = 1.0 - J_nu_matrix_carla / J_nu_matrix_mher
-    rel_diff_J_nu[numpy.where(numpy.isnan(rel_diff_J_nu))] = 0.0
-    assert numpy.fabs(rel_diff_J_nu).max() < 1e-6
-
-    rel_diff_K = 1.0 - K_matrix_carla / K_matrix_mher
-    rel_diff_K[numpy.where(numpy.isnan(rel_diff_K))] = 0.0
-    assert numpy.fabs(rel_diff_K).max() < 1e-12
-
-    rel_diff_O = 1.0 - O_matrix_carla / O_matrix_mher
-    rel_diff_O[numpy.where(numpy.isnan(rel_diff_O))] = 0.0
-    assert numpy.fabs(rel_diff_O).max() < 1e-12
-
-    rel_diff_D = 1.0 - D_matrix_carla / D_matrix_mher
-    rel_diff_D[numpy.where(numpy.isnan(rel_diff_D))] = 0.0
-    assert numpy.fabs(rel_diff_D).max() < 1e-12
-
-    rel_diff_M = 1.0 - M_matrix_carla / M_matrix_mher
-    rel_diff_M[numpy.where(numpy.isnan(rel_diff_M))] = 0.0
-    assert numpy.fabs(rel_diff_M).max() < 1e-12
-
-    print('done checking')

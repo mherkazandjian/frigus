@@ -4,7 +4,7 @@ from numpy.testing import assert_allclose
 
 from astropy import units as u
 
-from frigus.readers import DataLoader
+from frigus.readers.dataset import DataLoader
 from frigus.population import (
     population_density_at_steady_state,
     population_density_ratio_analytic_two_level_system

@@ -15,7 +15,7 @@ import numpy
 from astropy import units as u
 import matplotlib.pyplot as plt
 
-from frigus.readers import DataLoader
+from frigus.readers.dataset import DataLoader
 from frigus.population import (
     population_density_at_steady_state,
     population_density_ratio_analytic_three_level_system

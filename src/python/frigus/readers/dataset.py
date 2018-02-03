@@ -8,10 +8,11 @@ energy levels and collision reaction rates.
 import numpy
 from astropy import units as u
 
-from frigus import read_energy_levels, read_einstein_coefficient
-from frigus.read_collision_coefficients import (
+from frigus.readers import read_energy_levels, read_einstein_coefficient
+from frigus.readers.read_collision_coefficients import (
     read_collision_coefficients_lique_and_wrathmall,
-    read_collision_coefficients_lipovka)
+    read_collision_coefficients_lipovka
+)
 
 from frigus import population
 
