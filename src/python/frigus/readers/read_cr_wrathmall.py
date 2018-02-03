@@ -65,7 +65,7 @@ class Reader(object):
             lines = []
             for line in linesold:
                 if line.isspace() is False:
-     		   lines.append(line)
+                    lines.append(line)
             raw_data = ''.join(lines)
 
         cr, ini, fin, tkin = self.parse_data(raw_data)
@@ -103,7 +103,7 @@ class Reader(object):
         T = lines.next()
         assert 'K' in T
         tkin = T.replace('K','')
-        print T, tkin
+        print(T, tkin)
 
         # get the header (levels)
         levels = lines.next().replace(' ','').replace(')(',':')[1:-1].split(':')
@@ -122,7 +122,7 @@ class Reader(object):
                for final, (vp, jp) in enumerate(zip(v,j)):
                    cr[v[initial], j[initial], vp, jp] = data[final]
                      
-               print data[0]
+               print(data[0])
 
         return ini, fin, tkin, cr
     
@@ -146,19 +146,23 @@ class Reader(object):
         # self.tkin
         raise NotImplementedError('not implelented yet')
 
-        self.v   = numpy.array( v , 'i' )
-        self.j   = numpy.array( j , 'i' )
-        self.ef  = numpy.array( ef, 'i' )
+        self.v = numpy.array(v , 'i')
+        self.j = numpy.array(j , 'i')
+        self.ef = numpy.array( ef, 'i')
         
         # create the 3D array of numpy array objects
         nv   = numpy.unique( self.v ).size
         nj   = numpy.unique( self.j ).size
         nef  = numpy.unique( self.ef).size
         
-        self.data = numpy.ndarray( (self.ef.max() + 1,
-                                    self.v.max()  + 1, 
-                                    self.j.max()  + 1),
-                                   'object' )
+        self.data = numpy.ndarray(
+            (
+                self.ef.max() + 1,
+                self.v.max()  + 1,
+                self.j.max()  + 1
+            ),
+            'object'
+        )
 
         self.data[:,:,:] = None
 
@@ -181,22 +185,22 @@ class Reader(object):
             '''            
    
     def info(self):
-        '''print a summary of the read info'''
+        """print a summary of the read info"""
 
-        unq_ef = numpy.unique( self.ef ) 
-        print 'unique final electronic states:'
-        print unq_ef
+        unq_ef = numpy.unique( self.ef )
+        print('unique final electronic states:')
+        print(unq_ef)
 
-        unq_v = numpy.unique( self.v ) 
-        print 'unique v levels:'
-        print unq_v
+        unq_v = numpy.unique( self.v )
+        print('unique v levels:')
+        print(unq_v)
 
-        unq_j = numpy.unique( self.j )
-        print 'unique j levels:'
-        print unq_j
+        unq_j = numpy.unique(self.j)
+        print('unique j levels:')
+        print(unq_j)
 
-        print 'number of unique (nef,v,j) levels:'
-        print '\t %d %d %d' %  ( unq_ef.size, unq_v.size, unq_j.size )
+        print('number of unique (nef,v,j) levels:')
+        print('\t %d %d %d' %  ( unq_ef.size, unq_v.size, unq_j.size ))
 
         # computing the amount of memory consumed by the data
         nBytes = 0
@@ -206,13 +210,15 @@ class Reader(object):
                     if type(self.data[i,j,k]) != type(None):
                         nBytes += self.data[i,j,k].nbytes
 
-        print 'total number of bytes in memory:%.2f MB' %\
-                  ( numpy.float64(nBytes) / 1024.0**2.0 )
+        print(
+            'total number of bytes in memory:%.2f MB' %
+            (numpy.float64(nBytes) / 1024.0**2.0)
+        )
 
         # plot the available transitions irrespective of the fina electronic state)
-#        pylab.plot( self.v, self.j, 'o' )
-#        pylab.xlabel('v')
-#        pylab.ylabel('j')
-#        pylab.show()
+        # pylab.plot( self.v, self.j, 'o' )
+        # pylab.xlabel('v')
+        # pylab.ylabel('j')
+        # pylab.show()
 
 

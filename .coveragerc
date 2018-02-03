@@ -1,0 +1,10 @@
+# .coveragerc to control coverage.py
+[run]
+branch = False
+
+source =
+    frigus
+
+[report]
+sort = cover
+omit = *tests*

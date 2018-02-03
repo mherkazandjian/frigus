@@ -3,6 +3,7 @@
 
 """
 from __future__ import print_function
+import os
 import numpy 
 from numpy import loadtxt
 
@@ -10,6 +11,7 @@ from astropy.table import QTable
 from astropy import units as u
 from astropy import constants
 
+import frigus
 from frigus.utils import linear_2d_index
 
 
@@ -26,7 +28,6 @@ class EnergyLevelsSpeciesBase(object):
         """
         the astropy table that holds the levels data
         """
-
 
     def set_labels(self):
         """

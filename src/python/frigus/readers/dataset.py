@@ -4,17 +4,18 @@ No parsing is done in this module. The parsing is done in other modules
 that implement the specific readers and parsers for e.g. einstien coefficient,
 energy levels and collision reaction rates.
 """
-
+import os
 import numpy
 from astropy import units as u
 
+from frigus import utils, population
 from frigus.readers import read_energy_levels, read_einstein_coefficient
 from frigus.readers.read_collision_coefficients import (
     read_collision_coefficients_lique_and_wrathmall,
     read_collision_coefficients_lipovka
 )
 
-from frigus import population
+DATADIR = utils.datadir_path()
 
 
 class DataSetRawBase(object):
@@ -102,17 +103,13 @@ class DataSetH2Lique(DataSetBase):
 
     def read_raw_data(self):
         """read the raw H2 data"""
-
         #
         # read the energy levels (v, j, energy)
         #
         energy_levels = read_energy_levels.read_levels_lique(
-            '../../../data/read/H2Xvjlevels_francois_mod.cs')
+            os.path.join(DATADIR, 'H2Xvjlevels_francois_mod.cs')
+        )
 
-        # en_H2 = read_levels.read_levels("Read/H2Xvjlevels.cs")
-        # print('{:3}{:3}{:10}'.format('v', 'j', 'E(eV)'))
-        # for level in levels:
-        #     print('{:<3}{:<3}{:<10}'.format(level['v'], level['j'], level['E']))
         self.raw_data.energy_levels = energy_levels
 
         #
@@ -127,7 +124,8 @@ class DataSetH2Lique(DataSetBase):
         #
         collision_rates, T_rng, collision_rates_info_nnz = \
             read_collision_coefficients_lique_and_wrathmall(
-                "../../../data/read/Rates_H_H2.dat")
+                os.path.join(DATADIR, "Rates_H_H2.dat")
+            )
         self.raw_data.collision_rates = collision_rates
         self.raw_data.collision_rates_T_range = T_rng
         self.raw_data.collision_rates_info_nnz = collision_rates_info_nnz
@@ -199,7 +197,8 @@ class DataSetH2Wrathmall(DataSetBase):
         # read the energy levels (v, j, energy)
         #
         energy_levels = read_energy_levels.read_levels_wrathmall_and_flower(
-            '../../../data/read/H2Xvjlevels_flower.cs')
+            os.path.join(DATADIR, 'H2Xvjlevels_flower.cs')
+        )
 
         self.raw_data.energy_levels = energy_levels
 
@@ -215,7 +214,12 @@ class DataSetH2Wrathmall(DataSetBase):
         #
         collision_rates, T_rng, collision_rates_info_nnz = \
             read_collision_coefficients_lique_and_wrathmall(
-                "../../../data/read/wrathmall/Rates_H_H2_flower_frigus_downwards.dat")
+                os.path.join(
+                    DATADIR,
+                    'wrathmall', 'Rates_H_H2_flower_frigus_downwards.dat'
+                )
+            )
+
         self.raw_data.collision_rates = collision_rates
         self.raw_data.collision_rates_T_range = T_rng
         self.raw_data.collision_rates_info_nnz = collision_rates_info_nnz
@@ -257,6 +261,7 @@ class DataSetH2Wrathmall(DataSetBase):
         K_dex_matrix_interpolator = population.compute_K_dex_matrix_interpolator(
             K_dex_matrix, self.raw_data.collision_rates_T_range)
         self.K_dex_matrix_interpolator = K_dex_matrix_interpolator
+
 
 class DataSetH2Glover(DataSetBase):
     """
@@ -287,7 +292,8 @@ class DataSetH2Glover(DataSetBase):
         # read the energy levels (v, j, energy)
         #
         energy_levels = read_energy_levels.read_levels_wrathmall_and_flower(
-            '../../../data/read/H2Xvjlevels_low_energies.dat')
+            os.path.join(DATADIR, 'H2Xvjlevels_low_energies.dat')
+        )
 
         self.raw_data.energy_levels = energy_levels
 
@@ -303,8 +309,13 @@ class DataSetH2Glover(DataSetBase):
         #
         collision_rates, T_rng, collision_rates_info_nnz = \
             read_collision_coefficients_lique_and_wrathmall(
-             "../../../data/read/wrathmall/"
-             "Rates_H_H2_flower_low_energy_frigus_downwards.dat")
+                os.path.join(
+                    DATADIR,
+                    "wrathmall",
+                    "Rates_H_H2_flower_low_energy_frigus_downwards.dat"
+                )
+            )
+
         self.raw_data.collision_rates = collision_rates
         self.raw_data.collision_rates_T_range = T_rng
         self.raw_data.collision_rates_info_nnz = collision_rates_info_nnz
@@ -348,10 +359,6 @@ class DataSetH2Glover(DataSetBase):
         self.K_dex_matrix_interpolator = K_dex_matrix_interpolator
 
 
-
-
-
-
 class DataSetTwoLevel_1(DataSetBase):
     """
     Data of a synthetic two level system
@@ -371,7 +378,10 @@ class DataSetTwoLevel_1(DataSetBase):
         # read the energy levels (v, j, energy)
         #
         energy_levels = read_energy_levels.read_levels_two_levels_test_1(
-            '../../../data/two_levels_1/energy_levels.txt')
+            os.path.join(
+                DATADIR, 'two_levels_1', 'energy_levels.txt')
+        )
+
         self.energy_levels = energy_levels
         self.raw_data.energy_levels = energy_levels
 
@@ -379,7 +389,9 @@ class DataSetTwoLevel_1(DataSetBase):
         # read the einstein coefficients
         #
         A_matrix = numpy.loadtxt(
-            '../../../data/two_levels_1/A_matrix.txt')
+            os.path.join(DATADIR, 'two_levels_1', 'A_matrix.txt')
+        )
+
         A_matrix = A_matrix / u.second
         self.A_matrix = A_matrix
         self.raw_data.A = self.A_matrix / u.second
@@ -388,7 +400,9 @@ class DataSetTwoLevel_1(DataSetBase):
         # read the collisional rates
         #
         collision_rates = numpy.loadtxt(
-            '../../../data/two_levels_1/K_dex_matrix.txt')
+            os.path.join(DATADIR, 'two_levels_1', 'K_dex_matrix.txt')
+        )
+
         collision_rates = collision_rates * u.m**3 / u.second
         T_rng = 0.0 * u.K, 1e6 * u.K
 
@@ -417,7 +431,9 @@ class DataSetThreeLevel_1(DataSetBase):
         # read the energy levels (v, j, energy)
         #
         energy_levels = read_energy_levels.read_levels_two_levels_test_1(
-            '../../../data/three_levels_1/energy_levels.txt')
+            os.path.join(DATADIR, 'three_levels_1', 'energy_levels.txt')
+        )
+
         self.energy_levels = energy_levels
         self.raw_data.energy_levels = energy_levels
 
@@ -425,7 +441,9 @@ class DataSetThreeLevel_1(DataSetBase):
         # read the einstein coefficients
         #
         A_matrix = numpy.loadtxt(
-            '../../../data/three_levels_1/A_matrix.txt')
+            os.path.join(DATADIR, 'three_levels_1', 'A_matrix.txt')
+        )
+
         A_matrix = A_matrix / u.second
         self.A_matrix = A_matrix
         self.raw_data.A = self.A_matrix / u.second
@@ -434,7 +452,9 @@ class DataSetThreeLevel_1(DataSetBase):
         # read the collisional rates
         #
         collision_rates = numpy.loadtxt(
-            '../../../data/three_levels_1/K_dex_matrix.txt')
+            os.path.join(DATADIR, 'three_levels_1', 'K_dex_matrix.txt')
+        )
+
         collision_rates = collision_rates * u.m**3 / u.second
         T_rng = 0.0 * u.K, 1e6 * u.K
 
@@ -442,7 +462,6 @@ class DataSetThreeLevel_1(DataSetBase):
 
         self.raw_data.collision_rates = collision_rates
         self.raw_data.collision_rates_T_range = T_rng
-
 
 
 class DataSetHDLipovka(DataSetBase):
@@ -473,7 +492,8 @@ class DataSetHDLipovka(DataSetBase):
         # read the energy levels (v, j, energy)
         #
         energy_levels = read_energy_levels.read_levels_lipovka(
-            '../../../data/read/lipovka/flower_roueff_data.dat')
+            os.path.join(DATADIR, 'lipovka', 'flower_roueff_data.dat')
+        )
 
         self.raw_data.energy_levels = energy_levels
 
@@ -489,7 +509,10 @@ class DataSetHDLipovka(DataSetBase):
         #
         collision_rates, T_rng, collision_rates_info_nnz = \
             read_collision_coefficients_lipovka(
-                '../../../data/read/lipovka/flower_roueff_data.dat')
+                os.path.join(
+                    DATADIR, 'lipovka', 'flower_roueff_data.dat'
+                )
+            )
 
         self.raw_data.collision_rates = collision_rates
         self.raw_data.collision_rates_T_range = T_rng

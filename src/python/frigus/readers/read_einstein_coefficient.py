@@ -2,11 +2,15 @@
 """
 read the Einstein coefficients
 """
-
+import os
 import numpy
 from numpy import zeros, testing, array
 
 from astropy import units as u
+
+from frigus import utils
+
+DATADIR = utils.datadir_path()
 
 
 def read_einstein_simbotin():
@@ -113,7 +117,7 @@ def read_einstein_simbotin():
     # The greatest rotational number for H2, starting from j = 0
     # (tot. rotational numbers: jmax=32). The greatest vibrational number for
     # H2, starting from v = 0 (tot. vibrational numbers: vmax=15)
-    with open('../../../data/read/j2jdown', 'r') as fobj:
+    with open(os.path.join(DATADIR, 'j2jdown')) as fobj:
         lines = fobj.readlines()
     jmax = numpy.array(lines[1].split(), dtype='i').max()
     vmax = numpy.array(lines[2].split(), dtype='i').max()
@@ -122,9 +126,9 @@ def read_einstein_simbotin():
     # they are provided in the data files)
     A = zeros((vmax + 1, jmax + 1, vmax + 1, jmax + 1), 'f8')
 
-    read_j2j_x('../../../data/read/j2jdown', A, delta_j=-2, skip_rows=3)
-    read_j2j_x('../../../data/read/j2j',     A, delta_j=0, skip_rows=1)
-    read_j2j_x('../../../data/read/j2jup',   A, delta_j=2, skip_rows=1)
+    read_j2j_x(os.path.join(DATADIR, 'j2jdown'), A, delta_j=-2, skip_rows=3)
+    read_j2j_x(os.path.join(DATADIR, 'j2j'),     A, delta_j=0, skip_rows=1)
+    read_j2j_x(os.path.join(DATADIR, 'j2jup'),   A, delta_j=2, skip_rows=1)
 
     testing.assert_approx_equal(A.sum(), 9.3724e-4, significant=4)
     testing.assert_approx_equal(A[7, 2, 4, 2], 4.133e-7, significant=4)
@@ -133,12 +137,13 @@ def read_einstein_simbotin():
     A_with_units = A / u.second
     A_nnz_with_units = A_nnz / u.second
 
-    return A_with_units,\
-           (array(vp_nnz, 'i4'),
-            array(jp_nnz, 'i4'),
-            array(vpp_nnz, 'i4'),
-            array(jpp_nnz, 'i4'),
-            A_nnz_with_units)
+    return A_with_units, (
+        array(vp_nnz, 'i4'),
+        array(jp_nnz, 'i4'),
+        array(vpp_nnz, 'i4'),
+        array(jpp_nnz, 'i4'),
+        A_nnz_with_units
+    )
 
 
 def read_einstein_coppola():
@@ -157,8 +162,9 @@ def read_einstein_coppola():
     vp_nnz, jp_nnz, vpp_nnz, jpp_nnz, A_nnz = [], [], [], [], []
 
     data = numpy.loadtxt(
-        '../../../data/read/lipovka/hd_einstein_coeffs.dat',
-        skiprows=2)
+        os.path.join(DATADIR, 'lipovka', 'hd_einstein_coeffs.dat'),
+        skiprows=2
+    )
 
     vp_nnz = data[:, 0].astype(numpy.int32)
     jp_nnz = data[:, 1].astype(numpy.int32)

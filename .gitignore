@@ -26,27 +26,16 @@ fortran/relative_diff_M_matrices.txt
 
 
 fortran/population_test_good\.txt
-
 fortran/population_test\.txt
-
 data/read/frequencies_lique
-
 src/fortran/cooling_nc=1\.0E\+06
-
 src/fortran/cooling_nc=1\.0E\+07
-
 src/fortran/cooling_nc=1\.0E\+08
-
 src/fortran/cooling_nc=1\.0E\+09
-
 src/fortran/cooling_nc=1\.0E\+10
-
 src/fortran/cooling_nc=1\.0E\+11
-
 src/fortran/cooling_nc=1\.0E\+12
-
 src/fortran/cooling_nc=1\.0E\+14
-
 src/fortran/cooling_nc=1\.0E\+13
 
 .ipynb_checkpoints
@@ -56,11 +45,13 @@ src/fortran/carla_matrix_M
 src/fortran/cooling_function_lipovka\.dat
 
 .cache
-
 .coverage
-
 htmlcov
-
 build
 dist
 frigus.egg-info
+.cache
+.coverage
+frigus.egg-info
+.pytest_cache
+.tox
