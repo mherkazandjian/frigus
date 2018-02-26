@@ -69,7 +69,7 @@ ratio_numeric_vs_T_kin = numpy.array(ratio_numeric_vs_T_kin).flatten()
 ratio_analytic_vs_T_kin = numpy.array(ratio_analytic_vs_T_kin).flatten()
 
 #
-# plot the population density computed numericall and analyticall and also
+# plot the population density computed numerically and analytically and also
 # plot the relative difference between them
 #
 fig, (ax0, ax1) = plt.subplots(nrows=1, ncols=2)
