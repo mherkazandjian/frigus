@@ -1,4 +1,5 @@
 import os
+from os.path import join, dirname, isdir
 import numpy
 import frigus
 
@@ -10,7 +11,19 @@ def datadir_path():
     if 'FRIGUS_DATADIR_ROOT' in os.environ:
         return os.environ['FRIGUS_DATADIR_ROOT']
     else:
-        return os.path.join(os.path.dirname(frigus.__file__), '..', 'data')
+        retval = None
+
+        datadir = join(dirname(frigus.__file__), '..', 'data')
+        if isdir(datadir):
+            retval = datadir
+
+        datadir = join(dirname(frigus.__file__), '..', '..', '..', 'data')
+        if isdir(datadir):
+            retval = datadir
+
+        assert retval is not None, "datadir is not found"
+
+        return retval
 
 
 def linear_2d_index(i, j, n_i=None):
