@@ -2,36 +2,57 @@ from __future__ import print_function
 import numpy
 from numpy.testing import assert_allclose
 from astropy import units as u
-import py.test
-from frigus.population import fit_lipovka, fit_glover, fit_lipovka_low_density
+from frigus.cooling_function.fits import (fit_lipovka,
+                                          fit_glover,
+                                          fit_lipovka_low_density)
 
+
+def test_that_glover_cooling_function_fit_is_computed_correctly():
+
+    computed_values = u.Quantity(
+        [
+            fit_glover(100.0),
+            fit_glover(500.0),
+            fit_glover(1000.0)
+        ]).cgs.value
+
+    expected_values = [3.6341638e-29, 1.5221534e-26, 4.8841725e-25]
+
+    assert_allclose(
+        computed_values,
+        expected_values,
+        rtol=1e-6,
+        atol=0.0
+    )
 
 def test_that_lipovka_cooling_function_fit_is_computed_correctly():
 
-    n_hd = 1e6 * u.m**-3
-    T = numpy.linspace(100.0, 2000.0, 100) * u.K
+    t_kin = numpy.linspace(100.0, 2000.0, 3) * u.K
+    n_hd = numpy.linspace(1.0e6, 1.0e14, 3) * u.m**-3
 
-    cooling_function = fit_lipovka(T, n_hd)
+    computed_values = fit_lipovka(t_kin, n_hd)
 
-    expected_values = [2.218094e-25, 7.523573e-24, 1.984604e-23]
+    expected_values = [2.218094e-25, 6.03779267e-19, 2.81066527e-18]
+
     assert_allclose(
-        cooling_function[[0, 50, -1]].cgs.value,
+        computed_values.cgs.value,
         expected_values,
         rtol=1e-6,
-        atol=0.0)
+        atol=0.0
+    )
 
 
-def test_that_lipovka_cooling_function_fit_is_computed_correctly_at_low_densities():
+def test_that_lipovka_cooling_low_density_function_fit_is_computed_correctly():
 
-    py.test.skip('not implemented')
+    t_kin = numpy.linspace(100.0, 20000.0, 3) * u.K
 
-def test_that_glover_cooling_function_fit_is_computed_correctly():
-    expected_values = [3.6341638e-29, 1.5221534e-26, 4.8841725e-25]
+    computed_values = fit_lipovka_low_density(t_kin)
+
+    expected_values = [2.38935126e-25, 2.71299166e-22, 7.11558046e-22]
+
     assert_allclose(
-        u.Quantity([
-            fit_glover(100.0),
-            fit_glover(500.0),
-            fit_glover(1000.0)]).cgs.value,
+        computed_values.cgs.value,
         expected_values,
         rtol=1e-6,
-        atol=0.0)
+        atol=0.0
+    )

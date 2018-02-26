@@ -608,10 +608,11 @@ def compute_transition_rate_matrix(data_set,
     K_dex_matrix_interpolator = data_set.K_dex_matrix_interpolator
 
     # compute the stimulated emission and absorption coefficients matrix
-    B_J_nu_matrix = compute_B_J_nu_matrix_from_A_matrix(
+    b_jnu_matrix = compute_B_J_nu_matrix_from_A_matrix(
         energy_levels,
         A_matrix,
-        T_rad)
+        T_rad
+    )
 
     # get the K matrix for a certain temperature in the tabulated range
     K_matrix = compute_K_matrix_from_K_dex_matrix(
@@ -621,7 +622,7 @@ def compute_transition_rate_matrix(data_set,
 
     # compute the M matrix that can be used to compute the equilibrium state of
     # the levels (see notebook)
-    O_matrix = (A_matrix + B_J_nu_matrix + K_matrix * collider_density).T
+    O_matrix = (A_matrix + b_jnu_matrix + K_matrix * collider_density).T
 
     D_matrix = -numpy.eye(O_matrix.shape[0]) * O_matrix.sum(axis=0)
 
@@ -655,40 +656,55 @@ def population_density_at_steady_state(data_set,
     :return: ndarray: The equilibrium population density as a column vector
     """
 
-    M_matrix = compute_transition_rate_matrix(data_set, T_kin, T_rad, collider_density)
+    m_matrix = compute_transition_rate_matrix(
+        data_set,
+        T_kin,
+        T_rad,
+        collider_density
+    )
 
-    x_equilibrium = solve_equilibrium(M_matrix.si.value)
+    x_equilibrium = solve_equilibrium(m_matrix.si.value)
 
-    #assert bool((x_equilibrium < 0.0).any()) is False
-    #assert numpy.fabs(1.0 - numpy.fabs(x_equilibrium.sum())) <= 1e-3
+    # assert bool((x_equilibrium < 0.0).any()) is False
+    # assert numpy.fabs(1.0 - numpy.fabs(x_equilibrium.sum())) <= 1e-3
 
     return x_equilibrium
 
 
-def cooling_rate_at_steady_state(data_set, T_kin, T_rad, collider_density):
-    """.. todo:: add doc
+def cooling_rate_at_steady_state(data_set, t_kin, t_rad, collider_density):
+    """
+    Compute the cooling rate at steady state
 
-    :param data_set: .. todo:: add doc
-    :param astropy.units.quantity.Quantity T_kin: .. todo:: add doc
-    :param astropy.units.quantity.Quantity T_Rad: .. todo:: add doc
-    :param collider_density: .. todo:: add doc
+    The cooling rate is computed for a certain:
+
+       - kinetic temparature
+       - radiation temperature
+       - collider density
+
+    :param DatasetBase data_set: The species dataset
+    :param astropy.units.quantity.Quantity t_kin: the kinetic temperature
+    :param astropy.units.quantity.Quantity t_rad: the radiation temperature
+    :param astropy.units.quantity.Quantity collider_density: The density of the
+     collider species
     :return: the cooling rate
     """
 
-    x_equilibrium = population_density_at_steady_state(data_set,
-                                                       T_kin,
-                                                       T_rad,
-                                                       collider_density)
+    x_equilibrium = population_density_at_steady_state(
+        data_set,
+        t_kin,
+        t_rad,
+        collider_density
+    )
 
     # compute the cooling rate (per particle)
-    c_rate = cooling_rate(x_equilibrium,
-                          data_set.energy_levels,
-                          data_set.A_matrix)
+    return cooling_rate(
+        x_equilibrium,
+        data_set.energy_levels,
+        data_set.A_matrix
+    )
 
-    return c_rate
 
-
-def cooling_rate(population_densities, energy_levels, A_matrix):
+def cooling_rate(population_densities, energy_levels, a_matrix):
     """
     Compute the cooling rate due to the spontaneous transitions.
 
@@ -698,7 +714,7 @@ def cooling_rate(population_densities, energy_levels, A_matrix):
     :param read_energy_levels.EnergyLevelsBase energy_levels: The energy levels
      object or a subclass of it that has the energies defined in the attribute
      record levels.data['E'].
-    :param array_lik A_matrix: A square matrix that has a shape n x n where n
+    :param array_lik a_matrix: A square matrix that has a shape n x n where n
      is the number of energy levels in "energy_levels". The elements of the
      matrix are the spontaneous transition rates. An element A[upper, lower] 
      should be read (interpreted) as: The spontaneous transition probability
@@ -709,131 +725,14 @@ def cooling_rate(population_densities, energy_levels, A_matrix):
      all the transitions in units of A_matrix.unit * energy_levels['E'].units. 
     """
     energy_levels_unit = energy_levels.data['E'].unit
-    A_matrix_unit = A_matrix.unit
+    a_matrix_unit = a_matrix.unit
 
     delta_e_matrix = fabs(compute_delta_energy_matrix(energy_levels)).value
-    A_matrix = A_matrix.value
+    a_matrix = a_matrix.value
 
-    retval = (A_matrix * delta_e_matrix * population_densities).sum()
+    retval = (a_matrix * delta_e_matrix * population_densities).sum()
 
-    return retval * energy_levels_unit * A_matrix_unit
-
-
-def fit_glover(T):
-    """
-    fit of the cooling rate of H2 as a function of temperature (in K) in units
-    of erg x cm^3 x s^-1
-    .. todo:: add ref
-
-    :param T: .. todo:: add doc
-    :return: .. todo:: add doc
-    """
-    if 100.0 <= T and T <= 1000:
-      retval = 10**(-24.311209
-               +3.5692468*log10(T/1000.)
-               -11.332860*(log10(T/1000.))**2
-               -27.850082*(log10(T/1000.))**3
-               -21.328264*(log10(T/1000.))**4
-               -4.2519023*(log10(T/1000.))**5)
-    elif 1000 < T and T <=6000:
-      retval = 10**(-24.311209
-               +4.6450521*log10(T/1000.)
-               -3.7209846*log10((T/1000.))**2
-               +5.9369081*log10((T/1000.))**3
-               -5.5108047*log10((T/1000.))**4
-               +1.5538288*log10((T/1000.))**5)
-    else:
-        raise ValueError("""out of bound""")
-
-    return retval * u.erg * u.s**-1 * u.cm**3
-
-
-def fit_lipovka(T, n_hd):
-    """
-    fit of the cooling rate of HD as a function of temperature (in K) in units
-    of erg / s.
-
-       HD revised cooling function - Lipovka, Nunez, Avila Reese 2005 
-
-    :param u.quantity.Quantity T: The temperature range as an astropy quantity
-    :param u.quantity.Quantity n_hd: The density of HD
-    :return: u.quantity.Quantity: The cooling function in erg / s for the
-     inpute T values
-
-    .. see-also:: test_plot_fit_lipovka.py
-    """
-    #
-    # make sure the intput temperatures and density value are within the
-    # validity range of the fit and are of the correct types
-    #
-    assert isinstance(T, u.quantity.Quantity)
-    assert isinstance(n_hd, u.quantity.Quantity)
-
-    assert T.min() >= 100.0 * u.K
-    assert T.max() <= 2000.0 * u.K
-    assert n_hd.min() >= 1e6 * u.m**-3
-    assert n_hd.max() <= 1e14 * u.m**-3
-
-    lt_kin = numpy.log10(T.value)
-    ln_hd = numpy.log10(n_hd.cgs.value)
-
-    retval = 10.**(- 42.57688 * lt_kin ** 0 * ln_hd ** 0
-                   + 0.92433 * lt_kin ** 0 * ln_hd ** 1
-                   + 0.54962 * lt_kin ** 0 * ln_hd ** 2
-                   - 0.07676 * lt_kin ** 0 * ln_hd ** 3
-                   + 0.00275 * lt_kin ** 0 * ln_hd ** 4
-
-                   + 21.93385 * lt_kin ** 1 * ln_hd ** 0
-                   + 0.77952 * lt_kin ** 1 * ln_hd ** 1
-                   - 1.06447 * lt_kin ** 1 * ln_hd ** 2
-                   + 0.11864 * lt_kin ** 1 * ln_hd ** 3
-                   - 0.00366 * lt_kin ** 1 * ln_hd ** 4
-
-                   - 10.19097 * lt_kin ** 2 * ln_hd ** 0
-                   - 0.54263 * lt_kin ** 2 * ln_hd ** 1
-                   + 0.62343 * lt_kin ** 2 * ln_hd ** 2
-                   - 0.07366 * lt_kin ** 2 * ln_hd ** 3
-                   + 0.002514 * lt_kin ** 2 * ln_hd ** 4
-
-                   + 2.19906 * lt_kin ** 3 * ln_hd ** 0
-                   + 0.11711 * lt_kin ** 3 * ln_hd ** 1
-                   - 0.13768 * lt_kin ** 3 * ln_hd ** 2
-                   + 0.01759 * lt_kin ** 3 * ln_hd ** 3
-                   - 0.000666317 * lt_kin ** 3 * ln_hd ** 4
-
-                   - 0.17334 * lt_kin ** 4 * ln_hd ** 0
-                   - 0.00835 * lt_kin ** 4 * ln_hd ** 1
-                   + 0.0106 * lt_kin ** 4 * ln_hd ** 2
-                   - 0.001482 * lt_kin ** 4 * ln_hd ** 3
-                   + 0.000061926 * lt_kin ** 4 * ln_hd ** 4)
-
-    return retval * u.erg * u.s**-1
-
-
-def fit_lipovka_low_density(T):
-    """
-    fit of the cooling rate of HD as a function of temperature (in K) in units
-    of erg x s^-1 for low temperature
-
-    .. todo:: add ref
-
-    :param T: .. todo:: add doc
-    :return: .. todo:: add doc
-    """
-
-    lt_kin = numpy.log10(T.value)
-
-    if numpy.log10(100.0) <= lt_kin and lt_kin <= numpy.log10(20000.0):
-        retval = 10.0**(- 42.45906
-                        + 21.90083 * lt_kin
-                        - 10.1954 * lt_kin**2
-                        + 2.19788 * lt_kin**3
-                        - 0.17286 * lt_kin**4)
-    else:
-        msg = """temperature value {} is out of bound""".format(T)
-        raise ValueError(msg)
-
-    return retval * u.erg * u.s**-1
+    return retval * energy_levels_unit * a_matrix_unit
 
 
 def population_density_ratio_analytic_two_level_system(g,
@@ -884,15 +783,15 @@ def population_density_ratio_analytic_two_level_system(g,
 
 def population_density_ratio_analytic_three_level_system(g,
                                                          E,
-                                                      K_10,
-                                                      K_20,
-                                                      K_21,
-                                                      A_10,
-                                                      A_20,
-                                                      A_21,
-                                                      n_c,
-                                                      T_kin,
-                                                      T_rad):
+                                                         K_10,
+                                                         K_20,
+                                                         K_21,
+                                                         A_10,
+                                                         A_20,
+                                                         A_21,
+                                                         n_c,
+                                                         T_kin,
+                                                         T_rad):
     """
     calculate the equilibrium population density ratio of a three level system
 

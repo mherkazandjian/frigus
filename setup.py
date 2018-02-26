@@ -265,7 +265,11 @@ setup_dict = dict(
         'Topic :: System :: Installation/Setup',
         'Topic :: System :: Software Distribution',
     ],
-    packages=['frigus', 'frigus.readers'],
+    packages=[
+        'frigus',
+        'frigus.readers',
+        'frigus.cooling_function'
+    ],
     package_dir={'frigus': os.path.join('src', 'python', 'frigus')},
     package_data={
         'frigus': glob.glob(os.path.join('src', 'python', 'frigus', '*.py')),
