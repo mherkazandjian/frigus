@@ -16,10 +16,8 @@ from astropy import units as u
 import matplotlib.pyplot as plt
 
 from frigus.readers.dataset import DataLoader
-from frigus.population import (
-    population_density_at_steady_state,
-    population_density_ratio_analytic_two_level_system
-)
+from frigus.population import population_density_at_steady_state
+from frigus.solvers import analytic
 
 #
 # load the two level species data
@@ -53,7 +51,7 @@ for t_kin in t_kin_range:
     ratio_numeric_vs_t_kin.append(pop_dens_eq_ratio_numeric)
 
     # popultation densities using analytic expressions
-    pop_dens_eq_ratio_analytic = population_density_ratio_analytic_two_level_system(
+    pop_dens_eq_ratio_analytic = analytic.population_density_ratio_analytic_two_level_system(
         species_data.energy_levels.data['g'],
         species_data.energy_levels.data['E'],
         species_data.k_dex_matrix_interpolator(t_kin)[1, 0],

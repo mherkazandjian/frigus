@@ -5,10 +5,8 @@ from numpy.testing import assert_allclose
 from astropy import units as u
 
 from frigus.readers.dataset import DataLoader
-from frigus.population import (
-    population_density_at_steady_state,
-    population_density_ratio_analytic_two_level_system
-)
+from frigus.population import population_density_at_steady_state
+from frigus.solvers import analytic
 
 
 def test_that_two_level_population_density_ratios_agree_with_analytic_solution():
@@ -41,7 +39,7 @@ def test_that_two_level_population_density_ratios_agree_with_analytic_solution()
         pop_dens_eq_ratio_numeric = pop_dens_eq_numeric[1] / pop_dens_eq_numeric[0]
         ratio_numeric_vs_t_kin.append(pop_dens_eq_ratio_numeric)
 
-        pop_dens_eq_ratio_analytic = population_density_ratio_analytic_two_level_system(
+        pop_dens_eq_ratio_analytic = analytic.population_density_ratio_analytic_two_level_system(
             species_data.energy_levels.data['g'],
             species_data.energy_levels.data['E'],
             species_data.k_dex_matrix_interpolator(t_kin)[1, 0],
