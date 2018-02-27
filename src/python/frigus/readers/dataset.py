@@ -286,7 +286,8 @@ class DataSetH2Wrathmall(DataSetBase):
 class DataSetH2Glover(DataSetBase):
     """
     Data of H2 colliding with H using collisional data by Wrathmall and Flower,
-    including only the low energy levels of H2 (to compare with the fit by Glover)
+    including only the low energy levels of H2 (to compare with the fit by
+    Glover)
 
       - energy levels of H2 (vibrational and rotational)
       - collisional coefficients of H2 with H (K_ij)
@@ -299,14 +300,14 @@ class DataSetH2Glover(DataSetBase):
     """
     def __init__(self):
         """
-        constructor
+        Constructor
         """
         super(DataSetH2Glover, self).__init__()
         self.read_raw_data()
         self.reduce_raw_data()
 
     def read_raw_data(self):
-        """read the raw H2 data"""
+        """Read the raw H2 data"""
 
         #
         # read the energy levels (v, j, energy)
@@ -342,7 +343,7 @@ class DataSetH2Glover(DataSetBase):
 
     def reduce_raw_data(self):
         """
-        use the raw data in self.raw_data to populate the A and K_dex matrices
+        Use the raw data in self.raw_data to populate the A and K_dex matrices
         """
 
         # find the maximum v and j from the Einstein and collisional rates data
@@ -385,14 +386,14 @@ class DataSetTwoLevel_1(DataSetBase):
     """
     def __init__(self):
         """
-        constructor. The raw data is already reduced and in usable form without
+        Constructor. The raw data is already reduced and in usable form without
         the need to reducing it.
         """
         super(DataSetTwoLevel_1, self).__init__()
         self.read_raw_data()
 
     def read_raw_data(self):
-        """read the raw two level system data"""
+        """Read the raw two level system data"""
 
         #
         # read the energy levels (v, j, energy)
@@ -438,14 +439,14 @@ class DataSetThreeLevel_1(DataSetBase):
     """
     def __init__(self):
         """
-        constructor. The raw data is already reduced and in usable form without
+        Constructor. The raw data is already reduced and in usable form without
         the need to reducing it.
         """
         super(DataSetThreeLevel_1, self).__init__()
         self.read_raw_data()
 
     def read_raw_data(self):
-        """read the raw three level system data"""
+        """Read the raw three level system data"""
 
         #
         # read the energy levels (v, j, energy)
@@ -506,7 +507,7 @@ class DataSetHDLipovka(DataSetBase):
         self.reduce_raw_data()
 
     def read_raw_data(self):
-        """read the raw HD data"""
+        """Read the raw HD data"""
 
         #
         # read the energy levels (v, j, energy)
@@ -540,7 +541,7 @@ class DataSetHDLipovka(DataSetBase):
 
     def reduce_raw_data(self):
         """
-        use the raw data in self.raw_data to populate the A and K_dex matrices
+        Use the raw data in self.raw_data to populate the A and K_dex matrices
         """
 
         # find the maximum v and j from the Einstein and collisional rates data
@@ -598,10 +599,10 @@ class DataLoader(object):
 
     def load(self, name):
         """
-        Load a dataset
+        Load a named dataset
 
-        :param string name: The name of the data set to be loaded
-        :return:
+        :param str name: The name of the data set to be loaded
+        :return: DatasetBase
         """
         retval = self.availabe_datasets.get(name)
         if retval is None:
