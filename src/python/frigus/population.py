@@ -54,8 +54,8 @@ def find_v_max_j_max_from_data(a_einstein_nnz, cr_coefficients_nnz):
     # find the non zeros elements and their corresponding indices of the
     # Einstein coefficients
     v_nnz, j_nnz, vp_nnz, jp_nnz, a_nnz = a_einstein_nnz
-    v_max_A = max(v_nnz.max(), vp_nnz.max())
-    j_max_A = max(j_nnz.max(), jp_nnz.max())
+    v_max_a = max(v_nnz.max(), vp_nnz.max())
+    j_max_a = max(j_nnz.max(), jp_nnz.max())
     # print('DEBUG: (v_max_A, j_max_A) = ', v_max_A, j_max_A)
 
     # find the non zeros elements and their corresponding indices of the
@@ -65,7 +65,7 @@ def find_v_max_j_max_from_data(a_einstein_nnz, cr_coefficients_nnz):
     j_max_cr = max(j_nnz.max(), jp_nnz.max())
     # print('DEBUG: (v_max_cr, j_max_cr) = ', v_max_cr, j_max_cr)
 
-    return max(v_max_A, v_max_cr), max(j_max_A, j_max_cr)
+    return max(v_max_a, v_max_cr), max(j_max_a, j_max_cr)
 
 
 def check_self_transitions_in_einstien_nnz_data(a_info_nnz):
