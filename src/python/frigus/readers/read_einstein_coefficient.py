@@ -32,13 +32,14 @@ DATADIR = utils.datadir_path()
 
 
 def read_einstein_simbotin():
-    """read the data provided by Simbotin from multiple files and returns the A
-     matrix for transitions (v', j') -> (v'', j'') with the limitation that
-     delta j i.e |j'' - j'| = 0 or 2
+    """
+    Read the data provided by Simbotin from multiple files and returns the A
+    matrix for transitions (v', j') -> (v'', j'') with the limitation that
+    delta j i.e |j'' - j'| = 0 or 2
 
-     0   j''=j'
+    0   j''=j'
                   14              13              12              11              10               9         .....     1
-     1    0   0.6094641D-13   0.1367911D-12   0.1860857D-12   0.1826816D-12   0.9029585D-13   0.8476571D-14   .....
+    1    0   0.6094641D-13   0.1367911D-12   0.1860857D-12   0.1826816D-12   0.9029585D-13   0.8476571D-14   .....
 
     The data is read from the following files:
           Read/j2jdown
@@ -62,7 +63,8 @@ def read_einstein_simbotin():
     vp_nnz, jp_nnz, vpp_nnz, jpp_nnz, A_nnz = [], [], [], [], []
 
     def read_j2j_x(fname, A, delta_j=None, skip_rows=None):
-        """read the Einstein coefficients from the file "fname" and modify the
+        """
+        Read the Einstein coefficients from the file "fname" and modify the
         corresponding entries of 'A'.
 
         .. warning:: this function modifies the values of A
@@ -87,7 +89,7 @@ def read_einstein_simbotin():
         """
 
         # opening the original ascii file and discard empty lines
-        with open(fname, 'r') as fobj:
+        with open(fname) as fobj:
             lines = list(filter(lambda x: x.strip() != '', fobj.readlines()))
 
         lines = lines[skip_rows:]
@@ -128,7 +130,6 @@ def read_einstein_simbotin():
                         break
                 else:
                     break
-    #
 
     # get the vmax and the jmax from the file j2jdown (the info is found only
     # in that file and not in j2j nor in j2jup)
@@ -165,8 +166,9 @@ def read_einstein_simbotin():
 
 
 def read_einstein_coppola():
-    """read the data provided by Coppola for transitions (v', j') -> (v'', j'')
-     with the limitation that delta j i.e |j'' - j'| = 1
+    """
+    Read the data provided by Coppola for transitions (v', j') -> (v'', j'')
+    with the limitation that delta j i.e |j'' - j'| = 1
 
     :return: A 4D matrix holding the A coefficients. A[v', j', v'', j'']
 

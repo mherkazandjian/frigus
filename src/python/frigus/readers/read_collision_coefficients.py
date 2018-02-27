@@ -112,17 +112,17 @@ def read_collision_coefficients_lique_and_wrathmall(fname):
         temperatures used. The temperature range is assumed to be on the
         10th line of the header
         """
-        T_values = None
+        _t_vals = None
         with open(fname) as fobj:
             for line_num, line in enumerate(fobj):
                 if line_num == 8:
-                    T_values = loadtxt(StringIO(line), delimiter=',') * u.Kelvin
+                    _t_vals = loadtxt(StringIO(line), delimiter=',') * u.Kelvin
                     break
 
-        assert T_values is not None
-        return T_values
+        assert _t_vals is not None
+        return _t_vals
 
-    T_values = find_temperature_array()
+    t_values = find_temperature_array()
 
     # read the data from the original ascii file
     data_read = loadtxt(fname, unpack=True, skiprows=10)
@@ -133,7 +133,7 @@ def read_collision_coefficients_lique_and_wrathmall(fname):
     # declare the array where the data will be stored
     nv, nj, nvp, njp = v.max()+1, j.max()+1, vp.max()+1, jp.max()+1
     nv_max, nj_max = int(max(nv, nvp)), int(max(nj, njp))
-    data = zeros((T_values.size, nv_max, nj_max, nv_max, nj_max), 'f8')
+    data = zeros((t_values.size, nv_max, nj_max, nv_max, nj_max), 'f8')
 
     # copy the read data into the container array
     for i, cri in enumerate(cr.T):
@@ -153,7 +153,7 @@ def read_collision_coefficients_lique_and_wrathmall(fname):
     data_with_units = data_with_units.to(u.m**3 / u.second)
     cr_with_units = cr_with_units.to(u.m**3 / u.second)
 
-    return data_with_units, T_values, (ini, fin, unique_levels, cr_with_units)
+    return data_with_units, t_values, (ini, fin, unique_levels, cr_with_units)
 
 
 def read_collision_coefficients_lipovka(fname):
@@ -231,8 +231,8 @@ def read_collision_coefficients_lipovka(fname):
 
             self.fname = fname
             self.data = None
-            """the collision rates for all the transitions for all the
-            tempratures
+            """
+            the collision rates for all the transitions for all the tempratures
             """
 
             self.ini = None   #: the initial v,j of all the transitions
@@ -287,14 +287,18 @@ def read_collision_coefficients_lipovka(fname):
             lines = iter(filter(lambda x: len(x) > 0, block.split('\n')))
 
             # get the temperature
-            T = next(lines)
-            assert 'K' in T
-            tkin = T.replace('K', '')
+            t_kin = next(lines)
+            assert 'K' in t_kin
+            tkin = t_kin.replace('K', '')
             # print T, tkin
 
             # get the header (levels)
-            levels = next(lines).replace(' ', '').replace(')(', ':')[
-                     1:-1].split(':')
+            levels = next(lines).replace(
+                ' ', ''
+            ).replace(
+                ')(', ':'
+            )[1:-1].split(':')
+
             v, j = [], []
             for level in levels:
                 v.append(int32(level.split(',')[0]))
@@ -317,7 +321,7 @@ def read_collision_coefficients_lipovka(fname):
 
     reader = Reader(fname)
 
-    T_values = reader.tkin
+    t_values = reader.tkin
 
     # read the data from the original ascii file
     # data_read = loadtxt(fname, unpack=True, skiprows=10)
@@ -329,15 +333,15 @@ def read_collision_coefficients_lipovka(fname):
     v, j = ini[0, :], ini[1, :]
     vp, jp = fin[0, :], fin[1, :]
 
-    n_transitions_per_T_value = v.size
+    n_transitions_per_t_value = v.size
 
     # declare the array where the data will be stored in a tensor
     nv, nj, nvp, njp = v.max()+1, j.max()+1, vp.max()+1, jp.max()+1
     nv_max, nj_max = max(nv, nvp), max(nj, njp)
-    data = zeros((T_values.size, nv_max, nj_max, nv_max, nj_max), 'f8')
+    data = zeros((t_values.size, nv_max, nj_max, nv_max, nj_max), 'f8')
 
     # declare the array where the data will be stored in a matrix
-    cr = numpy.zeros((T_values.size, n_transitions_per_T_value), 'f8')
+    cr = numpy.zeros((t_values.size, n_transitions_per_t_value), 'f8')
 
     # copy the read data into the container array
     for i, cri in enumerate(reader.data):
@@ -351,10 +355,10 @@ def read_collision_coefficients_lipovka(fname):
     # set the units of the data to be returned
     data_with_units = data * (u.cm**3 / u.second)
     cr_with_units = cr * (u.cm**3 / u.second)
-    T_values = T_values * u.K
+    t_values = t_values * u.K
 
     # convert the units to m^3/s
     data_with_units = data_with_units.to(u.m**3 / u.second)
     cr_with_units = cr_with_units.to(u.m**3 / u.second)
 
-    return data_with_units, T_values, (ini, fin, unique_levels, cr_with_units)
+    return data_with_units, t_values, (ini, fin, unique_levels, cr_with_units)

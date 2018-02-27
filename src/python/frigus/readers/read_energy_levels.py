@@ -18,18 +18,16 @@
 #    along with Frigus.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-
+module that implements energy levels readers
 """
 from __future__ import print_function
-import os
-import numpy 
+import numpy
 from numpy import loadtxt
 
 from astropy.table import QTable
 from astropy import units as u
 from astropy import constants
 
-import frigus
 from frigus.utils import linear_2d_index
 
 
@@ -57,15 +55,17 @@ class EnergyLevelsSpeciesBase(object):
 
 class EnergyLevelsOnDegreeOfFreedom(EnergyLevelsSpeciesBase):
     """
-
+    Energy levels of a one degree of freedom systems
     """
-    def __init__(self, n_levels=None, energy_unit=None, level_name='j',
+    def __init__(self,
+                 n_levels=None,
+                 energy_unit=None,
+                 level_name='j',
                  *args, **kwargs):
         """
-        constructor
+        Constructor
         """
         super(EnergyLevelsOnDegreeOfFreedom, self).__init__(*args, **kwargs)
-
 
         table_type = {
             level_name: numpy.zeros(n_levels, 'i4'),
@@ -86,7 +86,7 @@ class EnergyLevelsMolecule(EnergyLevelsSpeciesBase):
     """
     def __init__(self, n_levels, energy_unit=None, *args, **kwargs):
         """
-        constructor
+        Constructor
         """
         super(EnergyLevelsMolecule, self).__init__(n_levels, *args, **kwargs)
 
@@ -124,7 +124,8 @@ class EnergyLevelsMolecule(EnergyLevelsSpeciesBase):
 
 
 def read_levels(fname):
-    """parse the  data of
+    """
+    Parse the  data of
 
     :param fname: The name of the ascii file containing the levels information.
      (see below for an example of the content of the file). The file can be
@@ -175,8 +176,8 @@ def read_levels(fname):
         vi, ji = v[i], j[i]
         enh2[vi, ji] = energies[i]
 
-#        depth = enh2[0,0] + bottom
-#        enh2[vi,ji]  =  enh2[vi,ji] - depth
+        # depth = enh2[0,0] + bottom
+        # enh2[vi,ji]  =  enh2[vi,ji] - depth
 
     return enh2
 
@@ -311,7 +312,7 @@ def read_levels_lipovka(fname):
 
 def read_levels_two_levels_test_1(fname):
     """
-    read the energy levels of the two_levels_test_1 system.
+    Read the energy levels of the two_levels_test_1 system.
 
     :param fname: The paths to the ascii file containing the levels
      information.

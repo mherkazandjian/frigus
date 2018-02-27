@@ -21,8 +21,7 @@
 from __future__ import print_function
 
 import numpy
-from numpy import (zeros, fabs, arange, exp, array_equal, ones, log10,
-                   linalg, eye, dot, where, intersect1d, setdiff1d, in1d, pi)
+from numpy import zeros, fabs, exp, where, in1d, pi
 
 import scipy
 from scipy import interpolate
