@@ -30,16 +30,16 @@ class DataSetRawBase(object):
         self.energy_levels = None
         """The energy levels"""
 
-        self.A = None
+        self.a = None
         """The A transition rates"""
 
-        self.A_info_nnz = None
+        self.a_info_nnz = None
         """The non zero info of self.A"""
 
         self.collision_rates = None
         """The collision rates"""
 
-        self.collision_rates_T_range = None
+        self.collision_rates_t_range = None
         """The range over which the collision rates are provided"""
 
         self.collision_rates_info_nnz = None
@@ -59,10 +59,10 @@ class DataSetBase(object):
         self.energy_levels = None
         """The energy levels object"""
 
-        self.A_matrix = None
+        self.a_matrix = None
         """The matrix of the Einstein coefficients"""
 
-        self.K_dex_matrix_interpolator = None
+        self.k_dex_matrix_interpolator = None
         """An interpolation function that takes T_kin as an argument and
         returns an array of the same shape as self.A_matrix"""
 
@@ -115,19 +115,19 @@ class DataSetH2Lique(DataSetBase):
         #
         # read the einstein coefficients for the H2 transitions
         #
-        A, A_info_nnz = read_einstein_coefficient.read_einstein_simbotin()
-        self.raw_data.A = A
-        self.raw_data.A_info_nnz = A_info_nnz
+        a, a_info_nnz = read_einstein_coefficient.read_einstein_simbotin()
+        self.raw_data.a = a
+        self.raw_data.a_info_nnz = a_info_nnz
 
         #
         # read the collisional rates for H2 with H
         #
-        collision_rates, T_rng, collision_rates_info_nnz = \
+        collision_rates, t_rng, collision_rates_info_nnz = \
             read_collision_coefficients_lique_and_wrathmall(
                 os.path.join(DATADIR, "Rates_H_H2.dat")
             )
         self.raw_data.collision_rates = collision_rates
-        self.raw_data.collision_rates_T_range = T_rng
+        self.raw_data.collision_rates_t_range = t_rng
         self.raw_data.collision_rates_info_nnz = collision_rates_info_nnz
 
     def reduce_raw_data(self):
@@ -138,7 +138,7 @@ class DataSetH2Lique(DataSetBase):
         # find the maximum v and j from the Einstein and collisional rates data
         # sets and adjust the labels of the energy levels according to that
         v_max_data, j_max_data = population.find_v_max_j_max_from_data(
-            self.raw_data.A_info_nnz,
+            self.raw_data.a_info_nnz,
             self.raw_data.collision_rates_info_nnz)
 
         self.energy_levels = self.raw_data.energy_levels
@@ -150,23 +150,23 @@ class DataSetH2Lique(DataSetBase):
         # A_reduced_slow = population.reduce_einstein_coefficients_slow(
         #                                 self.raw_data.A_info_nnz,
         #                                 self.energy_levels)
-        A_matrix = population.reduce_einstein_coefficients(
-                          self.raw_data.A,
+        a_matrix = population.reduce_einstein_coefficients(
+                          self.raw_data.a,
                           self.energy_levels)
-        self.A_matrix = A_matrix
+        self.a_matrix = a_matrix
 
         # getting the collisional de-excitation matrix (K_dex) (for all
         # tabulated values)  [n_level, n_level, n_T_kin_values]
-        K_dex_matrix = population.reduce_collisional_coefficients_slow(
+        k_dex_matrix = population.reduce_collisional_coefficients_slow(
             self.raw_data.collision_rates_info_nnz,
             self.energy_levels,
             reduced_data_is_upper_to_lower_only=True
         )
 
         # compute the interpolator that produces K_dex at a certain temperature
-        K_dex_matrix_interpolator = population.compute_K_dex_matrix_interpolator(
-            K_dex_matrix, self.raw_data.collision_rates_T_range)
-        self.K_dex_matrix_interpolator = K_dex_matrix_interpolator
+        k_dex_matrix_interpolator = population.compute_k_dex_matrix_interpolator(
+            k_dex_matrix, self.raw_data.collision_rates_t_range)
+        self.k_dex_matrix_interpolator = k_dex_matrix_interpolator
 
 
 class DataSetH2Wrathmall(DataSetBase):
@@ -205,14 +205,14 @@ class DataSetH2Wrathmall(DataSetBase):
         #
         # read the einstein coefficients for the H2 transitions
         #
-        A, A_info_nnz = read_einstein_coefficient.read_einstein_simbotin()
-        self.raw_data.A = A
-        self.raw_data.A_info_nnz = A_info_nnz
+        A, a_info_nnz = read_einstein_coefficient.read_einstein_simbotin()
+        self.raw_data.a = A
+        self.raw_data.a_info_nnz = a_info_nnz
 
         #
         # read the collisional rates for H2 with H
         #
-        collision_rates, T_rng, collision_rates_info_nnz = \
+        collision_rates, t_rng, collision_rates_info_nnz = \
             read_collision_coefficients_lique_and_wrathmall(
                 os.path.join(
                     DATADIR,
@@ -221,7 +221,7 @@ class DataSetH2Wrathmall(DataSetBase):
             )
 
         self.raw_data.collision_rates = collision_rates
-        self.raw_data.collision_rates_T_range = T_rng
+        self.raw_data.collision_rates_t_range = t_rng
         self.raw_data.collision_rates_info_nnz = collision_rates_info_nnz
 
     def reduce_raw_data(self):
@@ -232,7 +232,7 @@ class DataSetH2Wrathmall(DataSetBase):
         # find the maximum v and j from the Einstein and collisional rates data
         # sets and adjust the labels of the energy levels according to that
         v_max_data, j_max_data = population.find_v_max_j_max_from_data(
-            self.raw_data.A_info_nnz,
+            self.raw_data.a_info_nnz,
             self.raw_data.collision_rates_info_nnz)
 
         self.energy_levels = self.raw_data.energy_levels
@@ -244,23 +244,23 @@ class DataSetH2Wrathmall(DataSetBase):
         # A_reduced_slow = population.reduce_einstein_coefficients_slow(
         #                                 self.raw_data.A_info_nnz,
         #                                 self.energy_levels)
-        A_matrix = population.reduce_einstein_coefficients(
-                          self.raw_data.A,
+        a_matrix = population.reduce_einstein_coefficients(
+                          self.raw_data.a,
                           self.energy_levels)
-        self.A_matrix = A_matrix
+        self.a_matrix = a_matrix
 
         # getting the collisional de-excitation matrix (K_dex) (for all
         # tabulated values)  [n_level, n_level, n_T_kin_values]
-        K_dex_matrix = population.reduce_collisional_coefficients_slow(
+        k_dex_matrix = population.reduce_collisional_coefficients_slow(
             self.raw_data.collision_rates_info_nnz,
             self.energy_levels,
             reduced_data_is_upper_to_lower_only=True
         )
 
         # compute the interpolator that produces K_dex at a certain temperature
-        K_dex_matrix_interpolator = population.compute_K_dex_matrix_interpolator(
-            K_dex_matrix, self.raw_data.collision_rates_T_range)
-        self.K_dex_matrix_interpolator = K_dex_matrix_interpolator
+        k_dex_matrix_interpolator = population.compute_k_dex_matrix_interpolator(
+            k_dex_matrix, self.raw_data.collision_rates_t_range)
+        self.k_dex_matrix_interpolator = k_dex_matrix_interpolator
 
 
 class DataSetH2Glover(DataSetBase):
@@ -300,14 +300,14 @@ class DataSetH2Glover(DataSetBase):
         #
         # read the einstein coefficients for the H2 transitions
         #
-        A, A_info_nnz = read_einstein_coefficient.read_einstein_simbotin()
-        self.raw_data.A = A
-        self.raw_data.A_info_nnz = A_info_nnz
+        A, a_info_nnz = read_einstein_coefficient.read_einstein_simbotin()
+        self.raw_data.a = A
+        self.raw_data.a_info_nnz = a_info_nnz
 
         #
         # read the collisional rates for H2 with H
         #
-        collision_rates, T_rng, collision_rates_info_nnz = \
+        collision_rates, t_rng, collision_rates_info_nnz = \
             read_collision_coefficients_lique_and_wrathmall(
                 os.path.join(
                     DATADIR,
@@ -317,7 +317,7 @@ class DataSetH2Glover(DataSetBase):
             )
 
         self.raw_data.collision_rates = collision_rates
-        self.raw_data.collision_rates_T_range = T_rng
+        self.raw_data.collision_rates_t_range = t_rng
         self.raw_data.collision_rates_info_nnz = collision_rates_info_nnz
 
     def reduce_raw_data(self):
@@ -328,7 +328,7 @@ class DataSetH2Glover(DataSetBase):
         # find the maximum v and j from the Einstein and collisional rates data
         # sets and adjust the labels of the energy levels according to that
         v_max_data, j_max_data = population.find_v_max_j_max_from_data(
-            self.raw_data.A_info_nnz,
+            self.raw_data.a_info_nnz,
             self.raw_data.collision_rates_info_nnz)
 
         self.energy_levels = self.raw_data.energy_levels
@@ -340,23 +340,23 @@ class DataSetH2Glover(DataSetBase):
         # A_reduced_slow = population.reduce_einstein_coefficients_slow(
         #                                 self.raw_data.A_info_nnz,
         #                                 self.energy_levels)
-        A_matrix = population.reduce_einstein_coefficients(
-                          self.raw_data.A,
+        a_matrix = population.reduce_einstein_coefficients(
+                          self.raw_data.a,
                           self.energy_levels)
-        self.A_matrix = A_matrix
+        self.a_matrix = a_matrix
 
         # getting the collisional de-excitation matrix (K_dex) (for all
         # tabulated values)  [n_level, n_level, n_T_kin_values]
-        K_dex_matrix = population.reduce_collisional_coefficients_slow(
+        k_dex_matrix = population.reduce_collisional_coefficients_slow(
             self.raw_data.collision_rates_info_nnz,
             self.energy_levels,
             reduced_data_is_upper_to_lower_only=True
         )
 
         # compute the interpolator that produces K_dex at a certain temperature
-        K_dex_matrix_interpolator = population.compute_K_dex_matrix_interpolator(
-            K_dex_matrix, self.raw_data.collision_rates_T_range)
-        self.K_dex_matrix_interpolator = K_dex_matrix_interpolator
+        k_dex_matrix_interpolator = population.compute_k_dex_matrix_interpolator(
+            k_dex_matrix, self.raw_data.collision_rates_t_range)
+        self.k_dex_matrix_interpolator = k_dex_matrix_interpolator
 
 
 class DataSetTwoLevel_1(DataSetBase):
@@ -388,13 +388,13 @@ class DataSetTwoLevel_1(DataSetBase):
         #
         # read the einstein coefficients
         #
-        A_matrix = numpy.loadtxt(
+        a_matrix = numpy.loadtxt(
             os.path.join(DATADIR, 'two_levels_1', 'A_matrix.txt')
         )
 
-        A_matrix = A_matrix / u.second
-        self.A_matrix = A_matrix
-        self.raw_data.A = self.A_matrix / u.second
+        a_matrix = a_matrix / u.second
+        self.a_matrix = a_matrix
+        self.raw_data.a = self.a_matrix / u.second
 
         #
         # read the collisional rates
@@ -404,12 +404,12 @@ class DataSetTwoLevel_1(DataSetBase):
         )
 
         collision_rates = collision_rates * u.m**3 / u.second
-        T_rng = 0.0 * u.K, 1e6 * u.K
+        t_rng = 0.0 * u.K, 1e6 * u.K
 
-        self.K_dex_matrix_interpolator = lambda T_kin: collision_rates
+        self.k_dex_matrix_interpolator = lambda t_kin: collision_rates
 
         self.raw_data.collision_rates = collision_rates
-        self.raw_data.collision_rates_T_range = T_rng
+        self.raw_data.collision_rates_t_range = t_rng
 
 
 class DataSetThreeLevel_1(DataSetBase):
@@ -440,13 +440,13 @@ class DataSetThreeLevel_1(DataSetBase):
         #
         # read the einstein coefficients
         #
-        A_matrix = numpy.loadtxt(
+        a_matrix = numpy.loadtxt(
             os.path.join(DATADIR, 'three_levels_1', 'A_matrix.txt')
         )
 
-        A_matrix = A_matrix / u.second
-        self.A_matrix = A_matrix
-        self.raw_data.A = self.A_matrix / u.second
+        a_matrix = a_matrix / u.second
+        self.a_matrix = a_matrix
+        self.raw_data.a = self.a_matrix / u.second
 
         #
         # read the collisional rates
@@ -456,12 +456,12 @@ class DataSetThreeLevel_1(DataSetBase):
         )
 
         collision_rates = collision_rates * u.m**3 / u.second
-        T_rng = 0.0 * u.K, 1e6 * u.K
+        t_rng = 0.0 * u.K, 1e6 * u.K
 
-        self.K_dex_matrix_interpolator = lambda T_kin: collision_rates
+        self.k_dex_matrix_interpolator = lambda t_kin: collision_rates
 
         self.raw_data.collision_rates = collision_rates
-        self.raw_data.collision_rates_T_range = T_rng
+        self.raw_data.collision_rates_t_range = t_rng
 
 
 class DataSetHDLipovka(DataSetBase):
@@ -500,14 +500,14 @@ class DataSetHDLipovka(DataSetBase):
         #
         # read the einstein coefficients for the HD transitions
         #
-        A, A_info_nnz = read_einstein_coefficient.read_einstein_coppola()
-        self.raw_data.A = A
-        self.raw_data.A_info_nnz = A_info_nnz
+        a, a_info_nnz = read_einstein_coefficient.read_einstein_coppola()
+        self.raw_data.a = a
+        self.raw_data.a_info_nnz = a_info_nnz
 
         #
         # read the collisional rates for HD with H
         #
-        collision_rates, T_rng, collision_rates_info_nnz = \
+        collision_rates, t_rng, collision_rates_info_nnz = \
             read_collision_coefficients_lipovka(
                 os.path.join(
                     DATADIR, 'lipovka', 'flower_roueff_data.dat'
@@ -515,7 +515,7 @@ class DataSetHDLipovka(DataSetBase):
             )
 
         self.raw_data.collision_rates = collision_rates
-        self.raw_data.collision_rates_T_range = T_rng
+        self.raw_data.collision_rates_t_range = t_rng
         self.raw_data.collision_rates_info_nnz = collision_rates_info_nnz
 
     def reduce_raw_data(self):
@@ -526,7 +526,7 @@ class DataSetHDLipovka(DataSetBase):
         # find the maximum v and j from the Einstein and collisional rates data
         # sets and adjust the labels of the energy levels according to that
         v_max_data, j_max_data = population.find_v_max_j_max_from_data(
-            self.raw_data.A_info_nnz,
+            self.raw_data.a_info_nnz,
             self.raw_data.collision_rates_info_nnz)
 
         self.energy_levels = self.raw_data.energy_levels
@@ -538,14 +538,14 @@ class DataSetHDLipovka(DataSetBase):
         # A_reduced_slow = population.reduce_einstein_coefficients_slow(
         #                                 self.raw_data.A_info_nnz,
         #                                 self.energy_levels)
-        A_matrix = population.reduce_einstein_coefficients(
-                          self.raw_data.A,
+        a_matrix = population.reduce_einstein_coefficients(
+                          self.raw_data.a,
                           self.energy_levels)
-        self.A_matrix = A_matrix
+        self.a_matrix = a_matrix
 
         # getting the collisional de-excitation matrix (K_dex) (for all
         # tabulated values)  [n_level, n_level, n_T_kin_values]
-        K_dex_matrix = population.reduce_collisional_coefficients_slow(
+        k_dex_matrix = population.reduce_collisional_coefficients_slow(
             self.raw_data.collision_rates_info_nnz,
             self.energy_levels,
             set_inelastic_coefficient_to_zero=True,
@@ -554,9 +554,9 @@ class DataSetHDLipovka(DataSetBase):
         )
 
         # compute the interpolator that produces K_dex at a certain temperature
-        K_dex_matrix_interpolator = population.compute_K_dex_matrix_interpolator(
-            K_dex_matrix, self.raw_data.collision_rates_T_range)
-        self.K_dex_matrix_interpolator = K_dex_matrix_interpolator
+        k_dex_matrix_interpolator = population.compute_k_dex_matrix_interpolator(
+            k_dex_matrix, self.raw_data.collision_rates_t_range)
+        self.k_dex_matrix_interpolator = k_dex_matrix_interpolator
 
 
 class DataLoader(object):
@@ -587,5 +587,5 @@ class DataLoader(object):
         elif name == 'three_level_1':
             return DataSetThreeLevel_1()
         else:
-            msg = '''not data loader defined for {}'''.format(name)
+            msg = 'not data loader defined for {}'.format(name)
             raise ValueError(msg)

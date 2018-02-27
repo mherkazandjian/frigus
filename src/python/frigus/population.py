@@ -24,53 +24,63 @@ from astropy.modeling.blackbody import blackbody_nu as B_nu
 from frigus.utils import linear_2d_index, find_matching_indices
 
 
-def find_v_max_j_max_from_data(A_einstein_nnz, cr_coefficients_nnz):
+def find_v_max_j_max_from_data(a_einstein_nnz, cr_coefficients_nnz):
     """
-    :param A_einstein_nnz: .. todo:: add doc
-    :param cr_coefficients_nnz:  .. todo:: add doc
-    :return:  .. todo:: add doc
+    Find the v_max and j_max from the Einstien and collisional coefficients data
+
+    The coeffients are for a two quantum number system (v,j).
+
+    :param tuple a_einstein_nnz: The Einstien coefficients for the transitions
+     provided as numpy arrays. (See DataSetRaw.A_info_nnz)
+    :param tuple cr_coefficients_nnz: The collisional coeffieints for the
+     transitions. (See DataSetRaw.collision_rates_info_nnz)
+    :return: tuple: v_max, j_max
     """
 
     # find the non zeros elements and their corresponding indices of the
     # Einstein coefficients
-    v_nnz, j_nnz, vp_nnz, jp_nnz, A_nnz = A_einstein_nnz
+    v_nnz, j_nnz, vp_nnz, jp_nnz, a_nnz = a_einstein_nnz
     v_max_A = max(v_nnz.max(), vp_nnz.max())
     j_max_A = max(j_nnz.max(), jp_nnz.max())
-    print('DEBUG: (v_max_A, j_max_A) = ', v_max_A, j_max_A)
+    # print('DEBUG: (v_max_A, j_max_A) = ', v_max_A, j_max_A)
 
     # find the non zeros elements and their corresponding indices of the
     # collisional coefficients
     (v_nnz, j_nnz), (vp_nnz, jp_nnz), unique_nnz, cr_nnz = cr_coefficients_nnz
     v_max_cr = max(v_nnz.max(), vp_nnz.max())
     j_max_cr = max(j_nnz.max(), jp_nnz.max())
-    print('DEBUG: (v_max_cr, j_max_cr) = ', v_max_cr, j_max_cr)
+    # print('DEBUG: (v_max_cr, j_max_cr) = ', v_max_cr, j_max_cr)
 
     return max(v_max_A, v_max_cr), max(j_max_A, j_max_cr)
 
 
-def check_self_transitions_in_Einstien_nnz_data(A_info_nnz):
-    """raises an error if there are self transitions in the non-zero data of
-    the Einstein coefficients.
+def check_self_transitions_in_einstien_nnz_data(a_info_nnz):
+    """
+    Raise an error if there are self transitions in the Einstein coefficient
 
-    :param A_info_nnz: a tuple of elements v_nnz, j_nnz, vp_nnz, jp_nnz, A_nnz
+    :param DataSetRawBase.A_info_nnz like a_info_nnz: a tuple of elements v_nnz,
+     j_nnz, vp_nnz, jp_nnz, A_nnz
     :return: True if everything ok, else error is raised
     """
-    v_nnz, j_nnz, vp_nnz, jp_nnz, A_nnz = A_info_nnz
+    v_nnz, j_nnz, vp_nnz, jp_nnz, a_nnz = a_info_nnz
 
-    for i, A in enumerate(A_nnz):
+    for i, A in enumerate(a_nnz):
         v, j, vp, jp = v_nnz[i], j_nnz[i], vp_nnz[i], jp_nnz[i]
         if v == vp and j == jp:
-            raise ValueError('v -> v, j -> j transition. This is'
-                             'not possible')
+            raise ValueError('v -> v, j -> j transition. This is not possible')
+    else:
+        return True
 
-    return True
 
+def reduce_einstein_coefficients_slow(a_info_nnz, energy_levels):
+    """
+    Construct the A_matrix from the nnz info of the Einstein coefficients
 
-def reduce_einstein_coefficients_slow(A_info_nnz, energy_levels):
-    """Use the nonzero entries of the Einstein coefficients to construct the
+    Use the nonzero entries of the Einstein coefficients to construct the
     A matrix for the levels found in the energy_levels parameter.
 
-    :param A_info_nnz: a tuple of elements v_nnz, j_nnz, vp_nnz, jp_nnz, A_nnz
+    :param DataSetRawBase.A_info_nnz like a_info_nnz: a tuple of elements v_nnz,
+     j_nnz, vp_nnz, jp_nnz, A_nnz
     :param energy_levels: numpy array array of N rows, the v and j levels and
      their corresponding energy. The elements of the array are stored in
      increasing order in the energy. This array can be obtained e.g. from
@@ -79,9 +89,9 @@ def reduce_einstein_coefficients_slow(A_info_nnz, energy_levels):
      is a lower triangular matrix containing the Einstein coefficients.
     """
 
-    check_self_transitions_in_Einstien_nnz_data(A_info_nnz)
+    check_self_transitions_in_einstien_nnz_data(a_info_nnz)
 
-    v_nnz, j_nnz, vp_nnz, jp_nnz, A_nnz = A_info_nnz
+    v_nnz, j_nnz, vp_nnz, jp_nnz, a_nnz = a_info_nnz
 
     levels = energy_levels
 
@@ -89,9 +99,9 @@ def reduce_einstein_coefficients_slow(A_info_nnz, energy_levels):
     labels_ini = linear_2d_index(v_nnz, j_nnz, n_i=levels.v_max_allowed)
     labels_fin = linear_2d_index(vp_nnz, jp_nnz, n_i=levels.v_max_allowed)
 
-    A_reduced = zeros((levels.size, levels.size), 'f8')
+    a_reduced = zeros((levels.size, levels.size), 'f8')
 
-    for i, A_i in enumerate(A_nnz):
+    for i, A_i in enumerate(a_nnz):
 
         # print('{:4}/{:4}'.format(i+1, len(A_nnz)))
 
@@ -105,10 +115,9 @@ def reduce_einstein_coefficients_slow(A_info_nnz, energy_levels):
         ind_fin = where(levels.data['label'] == labels_fin[i])[0]
 
         if ind_ini.size != 0 or ind_fin.size != 0:
-            A_reduced[ind_ini, ind_fin] = A_i
+            a_reduced[ind_ini, ind_fin] = A_i
         else:
             continue
-
 
     # DEBUG
     # A_reduced[A_reduced > 0.0] = numpy.log10(A_reduced[A_reduced > 0.0])
@@ -116,35 +125,38 @@ def reduce_einstein_coefficients_slow(A_info_nnz, energy_levels):
     # pylab.colorbar()
     # pylab.show()
 
-    return A_reduced
+    return a_reduced
 
 
-def reduce_einstein_coefficients(A, energy_levels):
+def reduce_einstein_coefficients(a_mat, energy_levels):
     """
-    .. todo:: rename this function to 
+    Recude a 4D A transition ndarray into a 2D matrix
+
+    .. todo:: rename this function to
      reduce_einstein_coeffients_two_quantum_numbers or a name that indicates a
      molecule whose levels are identified by two "quantum" numbers or labels.
+
     Given the array A that is indexed using four indices A[v, j, v', j']
     returns an array A_reduced that is indexed with two indices A_reduced[i, f]
     where i and f are the initial and final levels respectively.
 
-    :param A: A 4D matrix holding the A coefficients. A[v, j, v', j'] where
-     (v,j) are the initial levels and (v',j') are the final levels.
-    :param energy_levels: numpy array array of N rows, the v and j levels and
-     their corresponding energy. The elements of the array are stored in
-     increasing order in the energy. This array can be obtained e.g. from
-     read_levels.read_levels_lique()
+    :param ndarray a_mat: A 4D matrix holding the A coefficients.
+     A[v, j, v', j'] where (v,j) are the initial levels and (v',j') are the
+     final levels.
+    :param EnergyLevelsSpeciesBase energy_levels: numpy array array of N rows,
+     the v and j levels and their corresponding energy. The elements of the
+     array are stored in increasing order in the energy. This array can be
+     obtained e.g. from read_levels.read_levels_lique() .. todo:: check lique!!
     :return: A_reduced that is a square matrix of shape
      (energy_levels.size, energy_levels.size) with the nonzero values of A
      mapped to the indices of the levels in the array energy_levels.
     """
-
     levels = energy_levels
     n_levels = len(energy_levels.data)
     labels = energy_levels.data['label']
 
     # find the non zeros elements and their corresponding indices in A
-    (v_nnz, j_nnz, vp_nnz, jp_nnz), A_nnz = where(A > 0.0), A[A > 0.0]
+    (v_nnz, j_nnz, vp_nnz, jp_nnz), a_nnz = where(a_mat > 0), a_mat[a_mat > 0]
 
     # get the unique label for the (v,j) pairs
     labels_ini = linear_2d_index(v_nnz, j_nnz, n_i=levels.v_max_allowed)
@@ -154,7 +166,7 @@ def reduce_einstein_coefficients(A, energy_levels):
     # transition are found in energy_levels
     mask = in1d(labels_ini, labels)*in1d(labels_fin, labels)
     labels_ini, labels_fin = labels_ini[mask], labels_fin[mask]
-    A_nnz = A_nnz[mask]
+    a_nnz = a_nnz[mask]
 
     # get the indices of the labels of the levels in the transitions (that are
     # now all a subset of the energy_levels)
@@ -162,9 +174,9 @@ def reduce_einstein_coefficients(A, energy_levels):
     inds_fin = find_matching_indices(labels, labels_fin)
 
     # define the reduced A matrix and fill it up using inds_ini and inds_fin
-    A_reduced = zeros((n_levels, n_levels), 'f8') * A_nnz.unit
+    a_reduced = zeros((n_levels, n_levels), 'f8') * a_nnz.unit
 
-    A_reduced[inds_ini, inds_fin] = A_nnz
+    a_reduced[inds_ini, inds_fin] = a_nnz
 
     # DEBUG
     # A_reduced[A_reduced > 0.0] = numpy.log10(A_reduced[A_reduced > 0.0])
@@ -172,21 +184,21 @@ def reduce_einstein_coefficients(A, energy_levels):
     # pylab.colorbar()
     # pylab.show()
 
-    return A_reduced
+    return a_reduced
 
 
 def compute_delta_energy_matrix(levels):
     """
-    Compute the energy difference matrix (see notebook .. todo:: notebook ref)
-    
+    Compute the energy difference matrix
+
     Given the energy levels, returns the delta energy matrix \Delta E = E - E^T
-    that is documented in the notebook.
+    that is documented in the notebook doc/rate_equations_derivation.ipynb
 
     :param read_energy_levels.EnergyLevelsBase levels: The energy levels
      object or a subclass of it that has the energies defined in the attribute
      record levels.data['E'].
     :return: square matrix of shape n x n where n is the number of energy
-     levels (see notebook .. todo:: notebook ref).
+     levels
     """
     n = len(levels.data)
     energies_as_column = levels.data['E'].reshape(1, n)
@@ -201,10 +213,11 @@ def compute_delta_energy_matrix(levels):
 
 def compute_degeneracy_matrix(levels):
     """
-    compute the degeneracy matrix using an energy levels object as input
+    Compute the degeneracy matrix using an energy levels object as input
 
     Given the energy levels, returns the degeneracy matrix R that is strictly
-    upper triangular that is documented in the notebook. .. todo:: add ref
+    upper triangular that is documented in the notebook
+    doc/rate_equations_derivation.ipynb
 
     :param EnergyLevelsSpeciesBase levels: The energy levels object
     :return: square strictly upper triangular matrix of shape n x n.
@@ -215,20 +228,22 @@ def compute_degeneracy_matrix(levels):
     G = numpy.array(numpy.repeat(degeneracies_as_column, n, axis=0).T)
 
     # a strict upper triangular matrix
-    one_U_nn = numpy.tril(numpy.ones((n, n), 'f8'), -1).T
+    one_u_nn = numpy.tril(numpy.ones((n, n), 'f8'), -1).T
 
     # the R matrix (the ratios of the degeneracies)
-    R = (G * (1.0 / G.T)).T * one_U_nn
+    R = (G * (1.0 / G.T)).T * one_u_nn
 
     return R
 
 
-def compute_B_J_nu_matrix_from_A_matrix(energy_levels,
-                                        A_matrix,
-                                        T_rad):
+def compute_b_j_nu_matrix_from_a_matrix(energy_levels,
+                                        a_matrix,
+                                        t_rad):
     """
-    Given the energy levels, returns the stimulated emission and absorption
-    coefficients matrix.
+    Compute the stimulated emission and absorption coefficients matrix
+
+    These quantities are computed from the energy levels and the A_matrix.
+    see the notebook doc/rate_equations_derivation.ipynb for more details
 
     https://en.wikipedia.org/wiki/Einstein_coefficients
     http://www.ifa.hawaii.edu/users/kud/teaching_12/3_Radiative_transfer.pdf
@@ -240,33 +255,33 @@ def compute_B_J_nu_matrix_from_A_matrix(energy_levels,
      object or a subclass of it that has the energies defined in the attribute
      record levels.data['E'] (see the documentation of
      compute_delta_energy_matrix).
-    :param astropy.units.quantity.Quantity A_matrix: The spontaneous emission
+    :param astropy.units.quantity.Quantity a_matrix: The spontaneous emission
      coefficients matrix (A in the ipython notebook).
-    :param T_rad: The radiation temperature.
+    :param Quantity t_rad: The radiation temperature.
     :return: The B matrix defined in the notebook multiplied by J_nu
     """
     delta_e = compute_delta_energy_matrix(energy_levels)
 
     nu_matrix = (fabs(delta_e) / h_planck).to(u.Hz)
 
-    B_e_matrix = A_matrix / (8.0*pi*h_planck*nu_matrix**3/c_light**3)
-    numpy.fill_diagonal(B_e_matrix, 0.0)
+    b_e_matrix = a_matrix / (8.0 * pi * h_planck * nu_matrix**3 / c_light**3)
+    numpy.fill_diagonal(b_e_matrix, 0.0)
 
-    R_matrix = compute_degeneracy_matrix(energy_levels)
+    r_matrix = compute_degeneracy_matrix(energy_levels)
 
     # B_nu is the planck function, when multiplied by 4pi/c we obtain the
     # spectral energy density usually called u_i and that has dimensions
     # of Energy / Length^3 / Hz
-    J_nu_matrix = (4.0*pi*u.sr/c_light)*B_nu(nu_matrix, T_rad)
-    numpy.fill_diagonal(J_nu_matrix, 0.0)
+    j_nu_matrix = (4.0*pi*u.sr/c_light)*B_nu(nu_matrix, t_rad)
+    numpy.fill_diagonal(j_nu_matrix, 0.0)
 
-    B_a_matrix = B_e_matrix.T * R_matrix
+    b_a_matrix = b_e_matrix.T * r_matrix
 
-    B_matrix = B_e_matrix + B_a_matrix
+    b_matrix = b_e_matrix + b_a_matrix
 
-    B_J_nu_matrix = B_matrix * J_nu_matrix
+    b_j_nu_matrix = b_matrix * j_nu_matrix
 
-    return B_J_nu_matrix
+    return b_j_nu_matrix
 
 
 def reduce_collisional_coefficients_slow(
@@ -276,6 +291,8 @@ def reduce_collisional_coefficients_slow(
         set_excitation_coefficients_to_zero=False,
         reduced_data_is_upper_to_lower_only=True):
     """
+    Construct the K_matrix from the sparese nnz collisional coefficeints data
+
     Given the data that is available for the collisional transitions as a
     function of initial and final v,j -> v',j' levels and for different values
     of temperature, returns an array of the data reduced as a matrix for each
@@ -326,7 +343,7 @@ def reduce_collisional_coefficients_slow(
      for each temperature value. The shape of the matrix is
       (n_levels, n_levels, n_temperature_values)
     """
-    # check_self_transitions_in_Einstien_nnz_data(A_info_nnz)
+    # check_self_transitions_in_einstien_nnz_data(A_info_nnz)
 
     levels = energy_levels
     n_levels = len(energy_levels.data)
@@ -341,7 +358,7 @@ def reduce_collisional_coefficients_slow(
     # number of temperature value for which collisional data is available
     n_T = cr_nnz.shape[0]
 
-    K_dex_reduced = zeros((n_levels, n_levels, n_T), 'f8') * cr_nnz.unit
+    k_dex_reduced = zeros((n_levels, n_levels, n_T), 'f8') * cr_nnz.unit
 
     for i, cr_i in enumerate(cr_nnz.T):
 
@@ -357,7 +374,7 @@ def reduce_collisional_coefficients_slow(
         ind_fin = where(labels == labels_fin[i])[0]
 
         if ind_ini.size != 0 or ind_fin.size != 0:
-            K_dex_reduced[ind_ini, ind_fin, :] = cr_i
+            k_dex_reduced[ind_ini, ind_fin, :] = cr_i
         else:
             continue
 
@@ -366,16 +383,16 @@ def reduce_collisional_coefficients_slow(
     #
     if set_inelastic_coefficient_to_zero:
         i_diag, j_diag = numpy.diag_indices(n_levels)
-        K_dex_reduced[i_diag, j_diag, :] = 0.0
+        k_dex_reduced[i_diag, j_diag, :] = 0.0
     if set_excitation_coefficients_to_zero:
         i_upper, j_upper = numpy.triu_indices(n_levels, 1)
-        K_dex_reduced[i_upper, j_upper, :] = 0.0
+        k_dex_reduced[i_upper, j_upper, :] = 0.0
 
     if reduced_data_is_upper_to_lower_only:
         # check that the upper triangular matrices for all the temperatures
         # including the diagonal are zero since this is the K_dex matrix
         # (see doc)
-        assert numpy.triu(numpy.moveaxis(K_dex_reduced, -1, 0)).sum() == 0.0
+        assert numpy.triu(numpy.moveaxis(k_dex_reduced, -1, 0)).sum() == 0.0
 
     # DEBUG
     # K_dex_reduced[K_dex_reduced > 0.0] = numpy.log10(
@@ -384,7 +401,7 @@ def reduce_collisional_coefficients_slow(
     # pylab.colorbar()
     # pylab.show()
 
-    return K_dex_reduced
+    return k_dex_reduced
 
 
 def reduce_collisional_coefficients(cr, energy_levels):
@@ -397,43 +414,53 @@ def reduce_collisional_coefficients(cr, energy_levels):
     raise NotImplementedError("not implemented yet")
 
 
-def compute_K_dex_matrix_interpolator(K_dex_vs_T, T_range):
+def compute_k_dex_matrix_interpolator(k_dex_vs_tkin, t_range):
     """
 
-    :param K_dex_vs_T:
-    :param T_range:
-    :return:
+    :param ndarray k_dex_vs_tkin: The K dexcitation matrix as a function of
+     temperature. The last dimension k_dex_vs_tkin.shape[-1] and t_range.size
+     should have the same value
+    :param ndarray t_range: The values of the temperatures corresponding to the
+     last dimension of k_dex_vs_tkin
+    :return: callable: The interpolation function that returns a square matrix
+     of the collisional coefficient given a temperature.
     """
     # get the linear interpolator of the upper to lower collision rates as a
     # function of temperature (the last axis). This function returns an array
     # that is the same shape of K_dex[..., 0]
-    K_dex_interpolator = scipy.interpolate.interp1d(T_range, K_dex_vs_T)
+    k_dex_interpolator = scipy.interpolate.interp1d(t_range, k_dex_vs_tkin)
 
-    return lambda T_kin: K_dex_interpolator(T_kin)*K_dex_vs_T.unit
+    return lambda t_kin: k_dex_interpolator(t_kin) * k_dex_vs_tkin.unit
 
 
-def compute_K_matrix_from_K_dex_matrix(energy_levels,
-                                       K_dex_matrix_interpolator,
-                                       T_kin):
-    """ .. todo:: add doc
+def compute_k_matrix_from_k_dex_matrix(energy_levels,
+                                       k_dex_matrix_interpolator,
+                                       t_kin):
+    """
+    Compute the K matrix from K de-excitation matrix
 
-    :param energy_levels: .. todo:: add doc
-    :param K_dex_matrix_interpolator:  .. todo:: add doc
-    :param T_range: .. todo:: add doc
-    :param T_kin: .. todo:: add doc
-    :return: .. todo:: add doc
+    The K_dex matrix is a lower traignular matrix, it is used to populte the
+    the upper triangular matrix since they are related through the R matrix
+    (see rate_quations_derivation.ipynb notebook for details)
+
+    :param EnergyLevelsSpeciesBase energy_levels: The energy levels
+    :param callable k_dex_matrix_interpolator:  a callable function that takes
+     a kinetic temperature as an argument and returns k_dex matrix at that
+     specfied temperature (through e.g. interpolation).
+    :param float t_kin: The kinetic temperature
+    :return: ndarray: The K matrix
     """
     delta_e_matrix = fabs(compute_delta_energy_matrix(energy_levels))
 
-    R_matrix = compute_degeneracy_matrix(energy_levels)
+    r_matrix = compute_degeneracy_matrix(energy_levels)
 
     # R*K_{dex}^T(T) to be multiplied by the exp(-dE/kb*T) in the loop
-    K_dex_T = K_dex_matrix_interpolator(T_kin)
-    K_ex_T = R_matrix * K_dex_T.T * exp(-delta_e_matrix/(kb * T_kin))
+    k_dex_t = k_dex_matrix_interpolator(t_kin)
+    k_ex_t = r_matrix * k_dex_t.T * exp(-delta_e_matrix / (kb * t_kin))
 
-    K_matrix = K_dex_T + K_ex_T
+    k_matrix = k_dex_t + k_ex_t
 
-    return K_matrix
+    return k_matrix
 
 
 def solve_linear_system_two_step(A, b, n_sub=1):
@@ -465,19 +492,20 @@ def solve_linear_system_two_step(A, b, n_sub=1):
 
     return x
 
-def solve_equilibrium(M_matrix):
+
+def solve_equilibrium(m_matrix):
     """
     Solve for the equilibrium population densities given the right hand side of
     the linear system of the rate equations dx/dt as a matrix dx/dt = A.x
     where M_matrix = A in the case of this function. The first row of the A
     is replaces by the conservation equation.
 
-    :param matrix_like M_matrix: The right hand side matrix of the rate
+    :param matrix_like m_matrix: The right hand side matrix of the rate
     equation as/home/carla an n x n matrix.
     :return: The population densities as a column vector. 
     """
 
-    sz = M_matrix.shape[0]
+    sz = m_matrix.shape[0]
 
     #
     # set to zero rates that could be problematic while solving the system
@@ -489,11 +517,11 @@ def solve_equilibrium(M_matrix):
     # i.e the sum of the independent variable is 1, i.e the sum of the
     # population levels is
     dxdt = zeros((sz, 1), 'f8')
-    M_matrix[0, :], dxdt[0] = 1.0, 1.0
+    m_matrix[0, :], dxdt[0] = 1.0, 1.0
 
     # solving the system A.x = b
     # before solving, we will divide each row by the diagonal
-    A, b = M_matrix, dxdt
+    A, b = m_matrix, dxdt
 
     # ============ condition the linear system ========================
     #
@@ -586,8 +614,8 @@ def solve_svd_mp(A, b):
 
 
 def compute_transition_rate_matrix(data_set,
-                                   T_kin,
-                                   T_rad,
+                                   t_kin,
+                                   t_rad,
                                    collider_density):
     """
     compute the matrix M that can be used to compute the dn/dt
@@ -595,62 +623,59 @@ def compute_transition_rate_matrix(data_set,
     The rates dn/dt can be computed from M by multiplying it by the abundances
     :math:`dn/dt = M.n`
 
-    :param DataSetBase: The data of the species
-    :param Quantity T_kin: The kinetic temperature at which the steady state
+    :param frigus.readers.dataset.DataSetBase: The data of the species
+    :param Quantity t_kin: The kinetic temperature at which the steady state
      computation  will be done.
-    :param Quantity T_rad: The radiation temperature at which the steady state
+    :param Quantity t_rad: The radiation temperature at which the steady state
      computation will be done.
     :param Quantity collider_density: The density of the collider species.
     :return: Quantity ndarray: The M matrix as a nxn ndarray
     """
     energy_levels = data_set.energy_levels
-    A_matrix = data_set.A_matrix
-    K_dex_matrix_interpolator = data_set.K_dex_matrix_interpolator
+    a_matrix = data_set.a_matrix
+    k_dex_matrix_interpolator = data_set.k_dex_matrix_interpolator
 
     # compute the stimulated emission and absorption coefficients matrix
-    b_jnu_matrix = compute_B_J_nu_matrix_from_A_matrix(
+    b_jnu_matrix = compute_b_j_nu_matrix_from_a_matrix(
         energy_levels,
-        A_matrix,
-        T_rad
+        a_matrix,
+        t_rad
     )
 
     # get the K matrix for a certain temperature in the tabulated range
-    K_matrix = compute_K_matrix_from_K_dex_matrix(
+    k_matrix = compute_k_matrix_from_k_dex_matrix(
         energy_levels,
-        K_dex_matrix_interpolator,
-        T_kin)
+        k_dex_matrix_interpolator,
+        t_kin
+    )
 
     # compute the M matrix that can be used to compute the equilibrium state of
     # the levels (see notebook)
-    O_matrix = (A_matrix + b_jnu_matrix + K_matrix * collider_density).T
+    o_matrix = (a_matrix + b_jnu_matrix + k_matrix * collider_density).T
 
-    D_matrix = -numpy.eye(O_matrix.shape[0]) * O_matrix.sum(axis=0)
+    d_matrix = -numpy.eye(o_matrix.shape[0]) * o_matrix.sum(axis=0)
 
-    M_matrix = O_matrix + D_matrix
+    m_matrix = o_matrix + d_matrix
 
-    return M_matrix
+    return m_matrix
 
 
 def population_density_at_steady_state(data_set,
-                                       T_kin,
-                                       T_rad,
-                                       collider_density):
+                                       t_kin=None,
+                                       t_rad=None,
+                                       collider_density=None):
     """
-    Compute the population density at steady state by solving the linear
-     system. 
-
-    .. todo:: convert T_kin, T_rad, collidre_desnity to keywords and mention
-    .. todo:: if these should have units or not
+    Compute the population density at steady state by solving the linear system
 
     compute the matrix M that can be used to compute the dn/dt
 
     The rates dn/dt can be computed from M by multiplying it by the abundances
     :math:`dn/dt = M.n`
 
-    :param DataSetBase: The data of the species
-    :param Quantity T_kin: The kinetic temperature at which the steady state
+    :param frigus.readers.dataset.DataSetBase: The data set of the species
+    :param Quantity t_kin: The kinetic temperature at which the steady state
      computation  will be done.
-    :param Quantity T_rad: The radiation temperature at which the steady state
+    :param Quantity t_rad: The radiation temperature at which the steady state
      computation will be done.
     :param Quantity collider_density: The density of the collider species.
     :return: ndarray: The equilibrium population density as a column vector
@@ -658,8 +683,8 @@ def population_density_at_steady_state(data_set,
 
     m_matrix = compute_transition_rate_matrix(
         data_set,
-        T_kin,
-        T_rad,
+        t_kin,
+        t_rad,
         collider_density
     )
 
@@ -700,7 +725,7 @@ def cooling_rate_at_steady_state(data_set, t_kin, t_rad, collider_density):
     return cooling_rate(
         x_equilibrium,
         data_set.energy_levels,
-        data_set.A_matrix
+        data_set.a_matrix
     )
 
 
@@ -736,14 +761,14 @@ def cooling_rate(population_densities, energy_levels, a_matrix):
 
 
 def population_density_ratio_analytic_two_level_system(g,
-                                                       E,
-                                                       K_10,
-                                                       A_10,
+                                                       energy_levels,
+                                                       k_10,
+                                                       a_10,
                                                        n_c,
-                                                       T_kin,
-                                                       T_rad):
+                                                       t_kin,
+                                                       t_rad):
     """
-    calculate the equilibrium population density ratio of a two level system
+    Calculate the equilibrium population density ratio of a two level system
 
     The provided parameters should all the compatible dimensions wise. i.e
     no checks are done if the input arguments
@@ -755,45 +780,45 @@ def population_density_ratio_analytic_two_level_system(g,
         \\frac{n_1}{n_0} = \frac{B_{01} + K_{01}n_c}{A_{10} + B_{10} + K_{10}n_c} = \frac{M_{01}}{M_{10}}
 
     :param ndarray g: the degeneracies of the energy levels
-    :param astropy.units.quantity.Quantity E: The energy levels
-    :param astropy.units.quantity.Quantity K_10: The upper to lower
+    :param astropy.units.quantity.Quantity energy_levels: The energy levels
+    :param astropy.units.quantity.Quantity k_10: The upper to lower
      collisional coefficient
-    :param astropy.units.quantity.Quantity A_10: The upper to lower spontaneous
+    :param astropy.units.quantity.Quantity a_10: The upper to lower spontaneous
      emission rate
     :param astropy.units.quantity.Quantity n_c: The number density of the
      colliding species
-    :param astropy.units.quantity.Quantity T_kin: The kintic temperature
-    :param astropy.units.quantity.Quantity T_rad: The radiation temperature
+    :param astropy.units.quantity.Quantity t_kin: The kintic temperature
+    :param astropy.units.quantity.Quantity t_rad: The radiation temperature
     :return: float: The ratio of the upper to lower population density
     """
     g_0, g_1 = g
-    delta_E = numpy.abs(E[1] - E[0])
+    delta_e = numpy.abs(energy_levels[1] - energy_levels[0])
 
-    K_01 = (g_1 / g_0) * K_10 * exp(-delta_E / (kb*T_kin))
+    K_01 = (g_1 / g_0) * k_10 * exp(-delta_e / (kb * t_kin))
 
-    f_10 = 1.0 / (exp(delta_E / (kb*T_rad)) - 1.0)
+    f_10 = 1.0 / (exp(delta_e / (kb * t_rad)) - 1.0)
 
-    B_10 = f_10 * A_10
-    B_01 = (g_1 / g_0) * f_10 * A_10
+    b_10 = f_10 * a_10
+    b_01 = (g_1 / g_0) * f_10 * a_10
 
-    n_1_over_n_0 = (B_01 + K_01*n_c) / (A_10 + B_10 + K_10*n_c)
+    n_1_over_n_0 = (b_01 + K_01*n_c) / (a_10 + b_10 + k_10 * n_c)
 
     return n_1_over_n_0
 
 
 def population_density_ratio_analytic_three_level_system(g,
-                                                         E,
-                                                         K_10,
-                                                         K_20,
-                                                         K_21,
-                                                         A_10,
-                                                         A_20,
-                                                         A_21,
+                                                         energy_levels,
+                                                         k_10,
+                                                         k_20,
+                                                         k_21,
+                                                         a_10,
+                                                         a_20,
+                                                         a_21,
                                                          n_c,
-                                                         T_kin,
-                                                         T_rad):
+                                                         t_kin,
+                                                         t_rad):
     """
-    calculate the equilibrium population density ratio of a three level system
+    Calculate the equilibrium population density ratio of a three level system
 
     The provided parameters should all the compatible dimensions wise. i.e
     no checks are done if the input arguments
@@ -805,55 +830,52 @@ def population_density_ratio_analytic_three_level_system(g,
         \\frac{n_1}{n_0} = \frac{B_{01} + K_{01}n_c}{A_{10} + B_{10} + K_{10}n_c} = \frac{M_{01}}{M_{10}}
 
     :param ndarray g: the degeneracies of the energy levels
-    :param astropy.units.quantity.Quantity E: The energy levels
-    :param astropy.units.quantity.Quantity K_10: The upper to lower
-     collisional coefficient
-    :param astropy.units.quantity.Quantity K_10: The upper to lower
+    :param astropy.units.quantity.Quantity energy_levels: The energy levels
+    :param astropy.units.quantity.Quantity k_10: The upper to lower
      collisional coefficient from level 1 to level 0
-    :param astropy.units.quantity.Quantity K_20: The upper to lower
+    :param astropy.units.quantity.Quantity k_20: The upper to lower
      collisional coefficient from level 2 to level 0
-    :param astropy.units.quantity.Quantity K_21: The upper to lower
+    :param astropy.units.quantity.Quantity k_21: The upper to lower
      collisional coefficient from level 2 to level 1
-    :param astropy.units.quantity.Quantity A_10: The upper to lower spontaneous
+    :param astropy.units.quantity.Quantity a_10: The upper to lower spontaneous
      emission rate from level 1 to level 0
-    :param astropy.units.quantity.Quantity A_20: The upper to lower spontaneous
+    :param astropy.units.quantity.Quantity a_20: The upper to lower spontaneous
      emission rate from level 2 to level 0
-    :param astropy.units.quantity.Quantity A_21: The upper to lower spontaneous
+    :param astropy.units.quantity.Quantity a_21: The upper to lower spontaneous
      emission rate from level 2 to level 1
     :param astropy.units.quantity.Quantity n_c: The number density of the
      colliding species
-    :param astropy.units.quantity.Quantity T_kin: The kintic temperature
-    :param astropy.units.quantity.Quantity T_rad: The radiation temperature
+    :param astropy.units.quantity.Quantity t_kin: The kintic temperature
+    :param astropy.units.quantity.Quantity t_rad: The radiation temperature
     :return: float: The ratio of the upper to lower population density
     """
     g_0, g_1, g_2 = g
 
-    K_01 = (g_1 / g_0) * K_10 * exp(- numpy.abs(E[1] - E[0])/ (kb*T_kin))
-    K_02 = (g_2 / g_0) * K_20 * exp(- numpy.abs(E[2] - E[0]) / (kb * T_kin))
-    K_12 = (g_2 / g_1) * K_21 * exp(- numpy.abs(E[2] - E[1]) / (kb * T_kin))
+    k_01 = (g_1 / g_0) * k_10 * exp(- numpy.abs(energy_levels[1] - energy_levels[0]) / (kb * t_kin))
+    k_02 = (g_2 / g_0) * k_20 * exp(- numpy.abs(energy_levels[2] - energy_levels[0]) / (kb * t_kin))
+    k_12 = (g_2 / g_1) * k_21 * exp(- numpy.abs(energy_levels[2] - energy_levels[1]) / (kb * t_kin))
 
-    f_10 = 1.0 / (exp(numpy.abs(E[1] - E[0]) / (kb*T_rad)) - 1.0)
-    f_20 = 1.0 / (exp(numpy.abs(E[2] - E[0]) / (kb * T_rad)) - 1.0)
-    f_21 = 1.0 / (exp(numpy.abs(E[2] - E[1]) / (kb * T_rad)) - 1.0)
+    f_10 = 1.0 / (exp(numpy.abs(energy_levels[1] - energy_levels[0]) / (kb * t_rad)) - 1.0)
+    f_20 = 1.0 / (exp(numpy.abs(energy_levels[2] - energy_levels[0]) / (kb * t_rad)) - 1.0)
+    f_21 = 1.0 / (exp(numpy.abs(energy_levels[2] - energy_levels[1]) / (kb * t_rad)) - 1.0)
 
-    B_10 = f_10 * A_10
-    B_20 = f_20 * A_20
-    B_21 = f_21 * A_21
-    B_01 = (g_1 / g_0) * f_10 * A_10
-    B_02 = (g_2 / g_0) * f_20 * A_20
-    B_12 = (g_2 / g_1) * f_21 * A_21
+    b_10 = f_10 * a_10
+    b_20 = f_20 * a_20
+    b_21 = f_21 * a_21
+    b_01 = (g_1 / g_0) * f_10 * a_10
+    b_02 = (g_2 / g_0) * f_20 * a_20
+    b_12 = (g_2 / g_1) * f_21 * a_21
 
-    R_10 = K_10*n_c + A_10 + B_10
-    R_20 = K_20*n_c + A_20 + B_20
-    R_21 = K_21*n_c + A_21 + B_21
-    R_01 = K_01*n_c + B_01
-    R_02 = K_02*n_c + B_02
-    R_12 = K_12*n_c + B_12
+    r_10 = k_10 * n_c + a_10 + b_10
+    r_20 = k_20 * n_c + a_20 + b_20
+    r_21 = k_21 * n_c + a_21 + b_21
+    r_01 = k_01*n_c + b_01
+    r_02 = k_02*n_c + b_02
+    r_12 = k_12*n_c + b_12
 
-    n_1_over_n_0 = ((R_01*R_20 + R_01*R_21 + R_21*R_02) /
-                    (R_10*R_20 + R_10*R_21 + R_12*R_20))
-    n_2_over_n_0 = ((R_02*R_10 + R_02*R_12 + R_12*R_01) /
-                    (R_10*R_20 + R_10*R_21 + R_12*R_20))
+    n_1_over_n_0 = ((r_01*r_20 + r_01*r_21 + r_21*r_02) /
+                    (r_10*r_20 + r_10*r_21 + r_12*r_20))
+    n_2_over_n_0 = ((r_02*r_10 + r_02*r_12 + r_12*r_01) /
+                    (r_10*r_20 + r_10*r_21 + r_12*r_20))
 
     return n_1_over_n_0, n_2_over_n_0
-

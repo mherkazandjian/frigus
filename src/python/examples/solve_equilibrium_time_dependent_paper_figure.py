@@ -32,20 +32,20 @@ t_f = 1e10
 dt = 1e5
 
 # the environment parameters
-nc_H = 1e8 * u.meter ** -3
-T_kin = 2000.0 * u.Kelvin
-T_rad = 2.73 * u.Kelvin
+nc_h = 1e8 * u.meter ** -3
+t_kin = 2000.0 * u.Kelvin
+t_rad = 2.73 * u.Kelvin
 
 # the rates matrix (that is fixed if the environemnt params above are fixed)
 # so it is computed once
-M_matrix = compute_transition_rate_matrix(species_data, T_kin, T_rad, nc_H)
+m_matrix = compute_transition_rate_matrix(species_data, t_kin, t_rad, nc_h)
 
 
 def ode_rhs(_, y):
     """
     define the function that computes the rhs of dy/dt
     """
-    return numpy.dot(M_matrix, y)
+    return numpy.dot(m_matrix, y)
 
 
 # set the initial abundances for t = 0
@@ -112,11 +112,10 @@ linestyles = [
 # get the equilibrium solution and plot them as crosses at t = t_f
 pop_dens_eq = population_density_at_steady_state(
     species_data,
-    T_kin,
-    T_rad,
-    nc_H)
+    t_kin,
+    t_rad,
+    nc_h)
 
-#for level_index in range(n_levels):
 for level_index in [0, 1, 2]:
 
     x = t_all
@@ -133,11 +132,6 @@ for level_index in [0, 1, 2]:
 axs.set_xlabel('t [s]')
 axs.set_ylabel('relative difference')
 plt.legend()
-
-#for level_index in range(n_levels):
-#    axs.loglog(
-#        t_all[-1], pop_dens_eq[level_index], colors.values()[level_index]
-#    )
 
 plt.ion()
 plt.show()
