@@ -54,7 +54,7 @@ class DataSetRawBase(object):
         """The A transition rates"""
 
         self.a_info_nnz = None
-        """The non zero info of self.A"""
+        """The non zero info of self.a"""
 
         self.collision_rates = None
         """The collision rates"""
@@ -74,7 +74,7 @@ class DataSetBase(object):
     """
     def __init__(self):
         """
-        constructor
+        Constructor
         """
         self.energy_levels = None
         """The energy levels object"""
@@ -90,12 +90,12 @@ class DataSetBase(object):
         """the raw data from which the 2D matrices are computed"""
 
     def read_raw_data(self):
-        """populate the self.raw_data object"""
+        """Populate the self.raw_data object"""
         raise NotImplementedError("this method should be implemented by "
                                   "the subclass")
 
     def reduce_raw_data(self):
-        """use the raw data to produce the 2D matrices"""
+        """Use the raw data to produce the 2D matrices"""
         raise NotImplementedError("this method should be implemented by "
                                   "the subclass")
 
@@ -115,14 +115,14 @@ class DataSetH2Lique(DataSetBase):
     """
     def __init__(self):
         """
-        constructor
+        Constructor
         """
         super(DataSetH2Lique, self).__init__()
         self.read_raw_data()
         self.reduce_raw_data()
 
     def read_raw_data(self):
-        """read the raw H2 data"""
+        """Read the raw H2 data"""
         #
         # read the energy levels (v, j, energy)
         #
@@ -152,7 +152,7 @@ class DataSetH2Lique(DataSetBase):
 
     def reduce_raw_data(self):
         """
-        use the raw data in self.raw_data to populate the A and K_dex matrices
+        Use the raw data in self.raw_data to populate the A and K_dex matrices
         """
 
         # find the maximum v and j from the Einstein and collisional rates data
@@ -204,14 +204,14 @@ class DataSetH2Wrathmall(DataSetBase):
     """
     def __init__(self):
         """
-        constructor
+        Constructor
         """
         super(DataSetH2Wrathmall, self).__init__()
         self.read_raw_data()
         self.reduce_raw_data()
 
     def read_raw_data(self):
-        """read the raw H2 data"""
+        """Read the raw H2 data"""
 
         #
         # read the energy levels (v, j, energy)
@@ -246,7 +246,7 @@ class DataSetH2Wrathmall(DataSetBase):
 
     def reduce_raw_data(self):
         """
-        use the raw data in self.raw_data to populate the A and K_dex matrices
+        Use the raw data in self.raw_data to populate the A and K_dex matrices
         """
 
         # find the maximum v and j from the Einstein and collisional rates data
@@ -321,8 +321,8 @@ class DataSetH2Glover(DataSetBase):
         #
         # read the einstein coefficients for the H2 transitions
         #
-        A, a_info_nnz = read_einstein_coefficient.read_einstein_simbotin()
-        self.raw_data.a = A
+        a, a_info_nnz = read_einstein_coefficient.read_einstein_simbotin()
+        self.raw_data.a = a
         self.raw_data.a_info_nnz = a_info_nnz
 
         #

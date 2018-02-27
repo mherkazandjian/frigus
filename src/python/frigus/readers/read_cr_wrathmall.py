@@ -123,10 +123,10 @@ class Reader(object):
         """
         lines = iter(block.split('\n'))
         # get the temperature
-        T = lines.next()
-        assert 'K' in T
-        tkin = T.replace('K','')
-        print(T, tkin)
+        t_kin = lines.next()
+        assert 'K' in t_kin
+        tkin = t_kin.replace('K', '')
+        print(t_kin, tkin)
 
         # get the header (levels)
         levels = lines.next().replace(
@@ -146,11 +146,11 @@ class Reader(object):
         cr = zeros((int(len(v)), int(len(j)), int(len(v)), int(len(j))), 'f8')
         for initial, line in enumerate(lines):
             if len(line.strip()) > 0:
-               data = numpy.float64(line.replace('D','E').strip().split())    
-               for final, (vp, jp) in enumerate(zip(v,j)):
-                   cr[v[initial], j[initial], vp, jp] = data[final]
+                data = numpy.float64(line.replace('D', 'E').strip().split())
+                for final, (vp, jp) in enumerate(zip(v, j)):
+                    cr[v[initial], j[initial], vp, jp] = data[final]
                      
-               print(data[0])
+                print(data[0])
 
         return ini, fin, tkin, cr
     
@@ -197,7 +197,7 @@ class Reader(object):
 
         # populating the data
         for i, item in enumerate(en_cs):
-            self.data[ self.ef[i], self.v[i], self.j[i] ] = item 
+            self.data[self.ef[i], self.v[i], self.j[i]] = item
             # print item[0][0],item[1][0]
             # conversion energy units cm-1 -> Hz
             # item[:] = [x*29979245852.398716 for x in item[0]]
@@ -211,7 +211,7 @@ class Reader(object):
             pylab.xlabel('energies [Hz]')
             pylab.ylabel('cross-sections [m**2]')
             pylab.show()
-            '''            
+            '''
    
     def info(self):
         """Print a summary of the read info"""
@@ -250,5 +250,3 @@ class Reader(object):
         # pylab.xlabel('v')
         # pylab.ylabel('j')
         # pylab.show()
-
-
