@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Dalculate equilibrium population of species and the cooling function using
+Calculate equilibrium population of species and the cooling function using
 the Lipovka data
 """
 from __future__ import print_function
