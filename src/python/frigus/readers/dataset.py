@@ -65,6 +65,18 @@ class DataSetRawBase(object):
         self.collision_rates_info_nnz = None
         """The non zero info of the collision rates"""
 
+    def read_energy_levels(self):
+        """Energy levels reader of the raw data"""
+        raise NotImplementedError('to be implemented by subclass')
+
+    def read_eintien_coefficients(self):
+        """Read the raw einstien coefficients data"""
+        raise NotImplementedError('to be implemented by subclass')
+
+    def read_collisional_coefficients(self):
+        """Read the raw collisional coefficients"""
+        raise NotImplementedError('to be implemented by subclass')
+
 
 class DataSetBase(object):
     """
