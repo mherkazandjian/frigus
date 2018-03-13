@@ -585,27 +585,28 @@ class DataLoader(object):
     """
     def __init__(self):
         """
-
+        Constructor
         """
-        pass
+        self.availabe_datasets = {
+            'H2_lique': DataSetH2Lique(),
+            'HD_lipovka': DataSetHDLipovka(),
+            'H2_wrathmall': DataSetH2Wrathmall(),
+            'H2_low_energy_levels': DataSetH2Glover(),
+            'two_level_1': DataSetTwoLevel_1(),
+            'three_level_1': DataSetThreeLevel_1()
+        }
 
     def load(self, name):
         """
+        Load a dataset
+
         :param string name: The name of the data set to be loaded
         :return:
         """
-        if name == 'H2_lique':
-            return DataSetH2Lique()
-        elif name == 'HD_lipovka':
-            return DataSetHDLipovka()
-        elif name == 'H2_wrathmall':
-            return DataSetH2Wrathmall()
-        elif name == 'H2_low_energy_levels':
-            return DataSetH2Glover()
-        elif name == 'two_level_1':
-            return DataSetTwoLevel_1()
-        elif name == 'three_level_1':
-            return DataSetThreeLevel_1()
-        else:
+        retval = self.availabe_datasets.get(name)
+        if retval is None:
             msg = 'not data loader defined for {}'.format(name)
             raise ValueError(msg)
+        else:
+            return retval
+
