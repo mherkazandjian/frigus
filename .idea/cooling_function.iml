@@ -7,6 +7,7 @@
       <excludeFolder url="file://$MODULE_DIR$/doc/.ipynb_checkpoints" />
       <excludeFolder url="file://$MODULE_DIR$/fortran/Read" />
       <excludeFolder url="file://$MODULE_DIR$/src/python/.cache" />
+      <excludeFolder url="file://$MODULE_DIR$/src/python/examples/.ipynb_checkpoints" />
       <excludeFolder url="file://$MODULE_DIR$/src/python/htmlcov" />
     </content>
     <orderEntry type="jdk" jdkName="frigus" jdkType="Python SDK" />
