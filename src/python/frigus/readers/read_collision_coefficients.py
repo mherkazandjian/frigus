@@ -243,7 +243,7 @@ def read_collision_coefficients_lipovka(fname):
             self.read_data()
 
         def read_data(self):
-            """read all the data to temporary storage in self.data"""
+            """Read all the data to temporary storage in self.data"""
             with open(self.fname) as fobj:
                 linesold = fobj.readlines()
                 lines = []
