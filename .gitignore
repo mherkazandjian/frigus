@@ -55,3 +55,4 @@ frigus.egg-info
 frigus.egg-info
 .pytest_cache
 .tox
+.idea/markdown*
