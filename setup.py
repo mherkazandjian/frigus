@@ -268,7 +268,8 @@ setup_dict = dict(
     packages=[
         'frigus',
         'frigus.readers',
-        'frigus.cooling_function'
+        'frigus.cooling_function',
+        'frigus.solvers',
     ],
     package_dir={'frigus': os.path.join('src', 'python', 'frigus')},
     package_data={
