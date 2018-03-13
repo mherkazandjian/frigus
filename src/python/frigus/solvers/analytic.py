@@ -140,3 +140,32 @@ def population_density_ratio_analytic_three_level_system(g,
                     (r_10*r_20 + r_10*r_21 + r_12*r_20))
 
     return n_1_over_n_0, n_2_over_n_0
+
+
+def population_denisty_ratio_two_level_no_radiation(
+        species_data,
+        t_kin,
+        n_collider):
+    """
+    Compute the analytic population density ration for a two level system
+
+    The system is assumed to have no radiation field
+
+    :param DataSetBase species_data: The dataset of a two level system
+    :param t_kin: The kinetic temperature
+    :param n_collider: The density of the colliding species
+    :return: fractional population densities of the levels
+    """
+    a_10 = species_data.a_matrix[1, 0]
+    k_10 = species_data.k_dex_matrix_interpolator(t_kin)[1, 0]
+    n_c = n_collider
+    g_0, g_1 = species_data.energy_levels.data['g']
+    en_0, en_1 = species_data.energy_levels.data['E']
+
+    k_01 = (g_1/g_0)*k_10*exp(-fabs(en_1 - en_0) / (kb * t_kin))
+
+    r = n_c * k_01 / (n_c * k_10 + a_10)
+    x_0 = 1.0 / (1.0 + r)
+    x_1 = r / (1.0 + r)
+
+    return x_0, x_1
