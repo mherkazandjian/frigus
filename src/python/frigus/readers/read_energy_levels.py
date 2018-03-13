@@ -24,103 +24,11 @@ from __future__ import print_function
 import numpy
 from numpy import loadtxt
 
-from astropy.table import QTable
 from astropy import units as u
 from astropy import constants
 
+from frigus.species import EnergyLevelsMolecule, EnergyLevelsOnDegreeOfFreedom
 from frigus.utils import linear_2d_index
-
-
-class EnergyLevelsSpeciesBase(object):
-    """
-    Container class that holds energy levels data.
-    """
-    def __init__(self, n_levels=None, energy_unit=None, level_names=None,
-                 *args, **kwargs):
-        """
-        Constructor
-        """
-        self.data = None
-        """
-        the astropy table that holds the levels data
-        """
-
-    def set_labels(self):
-        """
-        Set the field self.data['label']. This method modifies
-        self.data['label'].
-        """
-        pass
-
-
-class EnergyLevelsOnDegreeOfFreedom(EnergyLevelsSpeciesBase):
-    """
-    Energy levels of a one degree of freedom systems
-    """
-    def __init__(self,
-                 n_levels=None,
-                 energy_unit=None,
-                 level_name='j',
-                 *args, **kwargs):
-        """
-        Constructor
-        """
-        super(EnergyLevelsOnDegreeOfFreedom, self).__init__(*args, **kwargs)
-
-        table_type = {
-            level_name: numpy.zeros(n_levels, 'i4'),
-            'g': numpy.zeros(n_levels, 'i4'),
-            'label': numpy.zeros(n_levels, 'i4'),
-            'E': numpy.zeros(n_levels, 'f8') * energy_unit
-        }
-        self.data = QTable(dict(**table_type))
-        """the astropy table that holds the levels data"""
-
-
-class EnergyLevelsMolecule(EnergyLevelsSpeciesBase):
-    """
-    Container class that holds energy levels data. This supports two quantum
-    numbers of the molecule, vibrations and rotations.
-
-    .. todo:: rename this class to EnergyLevelsTwoDegreesOfFreedom
-    """
-    def __init__(self, n_levels, energy_unit=None, *args, **kwargs):
-        """
-        Constructor
-        """
-        super(EnergyLevelsMolecule, self).__init__(n_levels, *args, **kwargs)
-
-        table_type = {
-            'v': numpy.zeros(n_levels, 'i4'),
-            'j': numpy.zeros(n_levels, 'i4'),
-            'g': numpy.zeros(n_levels, 'i4'),
-            'label': numpy.zeros(n_levels, 'i4'),
-            'E': numpy.zeros(n_levels, 'f8') * energy_unit
-        }
-        self.data = QTable(dict(**table_type))
-        """the astropy table that holds the levels data"""
-
-        self.v_max_allowed = None
-        """The maximum value of v that is allowed. This could be higher or
-        lower than the values in self.data['v']"""
-
-        self.j_max_allowed = None
-        """The maximum value of j that is allowed. This could be higher or
-        lower than the values in self.data['j']"""
-
-    def set_labels(self, v_max=None):
-        """
-        set the field self.data['label']. This method modifies
-        self.data['label'] and self.v_max_allowed
-
-        :param v_max: The maximum value of v to be used in computing and
-         setting the labels.
-        """
-        if v_max is not None:
-            self.v_max_allowed = v_max
-        self.data['label'] = linear_2d_index(self.data['v'],
-                                             self.data['j'],
-                                             n_i=v_max)
 
 
 def read_levels(fname):
@@ -161,7 +69,7 @@ def read_levels(fname):
     v, j = numpy.int32(v), numpy.int32(j)
 
     # conversion of the energies from cm-1 -> Joule
-    energies *= 1.98630e-23
+    energies *= 1.98630e-23  # .. todo:: do this conversion with astropy
 
     nv_max, nj_max = v.max(), j.max()
 
@@ -184,7 +92,7 @@ def read_levels(fname):
 
 def read_levels_lique(fname):
     """
-    read the energy levels from the file "H2Xvjlevels_francois_mod.cs" that is
+    Read the energy levels from the file "H2Xvjlevels_francois_mod.cs" that is
     recovered from ABC. The file has (should have) the following format.
 
       ----------------------------------------------------------------------
@@ -326,8 +234,10 @@ def read_levels_two_levels_test_1(fname):
 
     j, g, energies = data_read[inds, :].T
 
-    energy_levels = EnergyLevelsOnDegreeOfFreedom(n_levels=inds.size,
-                                                  energy_unit=u.eV)
+    energy_levels = EnergyLevelsOnDegreeOfFreedom(
+        n_levels=inds.size,
+        energy_unit=u.eV
+    )
 
     energy_levels.data['j'] = j
     energy_levels.data['g'] = g
