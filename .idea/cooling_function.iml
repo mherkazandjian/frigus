@@ -3,12 +3,22 @@
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src/python" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/.cache" />
+      <excludeFolder url="file://$MODULE_DIR$/.pytest_cache" />
+      <excludeFolder url="file://$MODULE_DIR$/build" />
       <excludeFolder url="file://$MODULE_DIR$/cooling_function/Read" />
+      <excludeFolder url="file://$MODULE_DIR$/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/doc" />
       <excludeFolder url="file://$MODULE_DIR$/doc/.ipynb_checkpoints" />
       <excludeFolder url="file://$MODULE_DIR$/fortran/Read" />
+      <excludeFolder url="file://$MODULE_DIR$/frigus.egg-info" />
+      <excludeFolder url="file://$MODULE_DIR$/src/fortran" />
+      <excludeFolder url="file://$MODULE_DIR$/src/matlab" />
       <excludeFolder url="file://$MODULE_DIR$/src/python/.cache" />
       <excludeFolder url="file://$MODULE_DIR$/src/python/examples/.ipynb_checkpoints" />
       <excludeFolder url="file://$MODULE_DIR$/src/python/htmlcov" />
+      <excludeFolder url="file://$MODULE_DIR$/src/python/tests/.cache" />
+      <excludeFolder url="file://$MODULE_DIR$/src/python/tests/htmlcov" />
     </content>
     <orderEntry type="jdk" jdkName="frigus" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
