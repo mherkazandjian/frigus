@@ -44,7 +44,7 @@ class DataSetRawBase(object):
     """
     def __init__(self):
         """
-        constructor
+        Constructor
         """
 
         self.energy_levels = None
@@ -499,7 +499,7 @@ class DataSetHDLipovka(DataSetBase):
     """
     def __init__(self):
         """
-        constructor
+        Constructor
         """
         super(DataSetHDLipovka, self).__init__()
         self.read_raw_data()
