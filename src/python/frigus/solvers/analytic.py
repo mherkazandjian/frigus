@@ -21,13 +21,13 @@ from numpy import exp, abs
 from astropy.constants import k_B as kb
 
 
-def population_density_ratio_analytic_two_level_system(g,
-                                                       energy_levels,
-                                                       k_10,
-                                                       a_10,
-                                                       n_c,
-                                                       t_kin,
-                                                       t_rad):
+def population_density_ratio_two_level(g,
+                                       energy_levels,
+                                       k_10,
+                                       a_10,
+                                       n_c,
+                                       t_kin,
+                                       t_rad):
     """
     Calculate the equilibrium population density ratio of a two level system
 
@@ -67,17 +67,17 @@ def population_density_ratio_analytic_two_level_system(g,
     return n_1_over_n_0
 
 
-def population_density_ratio_analytic_three_level_system(g,
-                                                         energy_levels,
-                                                         k_10,
-                                                         k_20,
-                                                         k_21,
-                                                         a_10,
-                                                         a_20,
-                                                         a_21,
-                                                         n_c,
-                                                         t_kin,
-                                                         t_rad):
+def population_density_ratio_three_level(g,
+                                         energy_levels,
+                                         k_10,
+                                         k_20,
+                                         k_21,
+                                         a_10,
+                                         a_20,
+                                         a_21,
+                                         n_c,
+                                         t_kin,
+                                         t_rad):
     """
     Calculate the equilibrium population density ratio of a three level system
 

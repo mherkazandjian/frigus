@@ -39,7 +39,7 @@ def test_that_two_level_population_density_ratios_agree_with_analytic_solution()
         pop_dens_eq_ratio_numeric = pop_dens_eq_numeric[1] / pop_dens_eq_numeric[0]
         ratio_numeric_vs_t_kin.append(pop_dens_eq_ratio_numeric)
 
-        pop_dens_eq_ratio_analytic = analytic.population_density_ratio_analytic_two_level_system(
+        pop_dens_eq_ratio_analytic = analytic.population_density_ratio_two_level(
             species_data.energy_levels.data['g'],
             species_data.energy_levels.data['E'],
             species_data.k_dex_matrix_interpolator(t_kin)[1, 0],
