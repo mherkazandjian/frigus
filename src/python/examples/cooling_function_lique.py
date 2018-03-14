@@ -56,7 +56,7 @@ for nc_index, nc_h in enumerate(nc_h_rng):
     )
 
 axs.set_xlabel('T$_\mathrm{kin}$ [K]')
-axs.set_ylabel('cooling function [Joule s$^{-1}$]')
+axs.set_ylabel('cooling function [J $\cdot$ s$^{-1}$]')
 
 lambda_vs_t_kin_glover = u.Quantity(
     [fit_glover(_t_kin) for _t_kin in t_rng.value]
