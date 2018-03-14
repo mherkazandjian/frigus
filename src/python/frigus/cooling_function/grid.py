@@ -1,38 +1,67 @@
 import numpy
 from numpy import isscalar
 
+from astropy import units as u
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
 from frigus.population import cooling_rate_at_steady_state
+from frigus.cooling_function.fits import fit_lipovka
 
 
 class CoolingFunctionGrid(object):
+    """
+    Compute the cooling function over a grid of densities and temperatures
+    """
     def __init__(self):
+        """
+        Constructor
+        """
+
         self.species = None
+        """the specieis with the radiative and collisional data"""
+
         self.n = None
+        """the gas density mesh points"""
+
         self.t_kin = None
+        """the kinetic temperature mesh points"""
+
         self.t_rad = None
+        """the radiation temperature mesh point"""
+
         self.n_grid = None
+        """the gas density grid"""
+
         self.t_kin_grid = None
+        """the kinetic temperature grid"""
+
         self.t_rad_grid = None
+        """The radiation temperature grid"""
+
         self.cooling_function = None
+        """The cooling function grid"""
 
     def set_species(self, species):
+        """setter for the speicies object"""
         self.species = species
 
     def set_density(self, density):
+        """setter for the gas density"""
         self.n = density
 
     def set_t_kin(self, t_kin):
+        """setter for the kinetic temperature"""
         self.t_kin = t_kin
 
     def set_t_rad(self, t_rad):
+        """setter for the radiation temperature"""
         self.t_rad = t_rad
 
-
     def _compute_mesh(self):
-
+        """
+        Compute the 3D grid where the cooling function will be computed
+        """
         n_grid, t_kin_grid, t_rad_grid = numpy.meshgrid(
             self.n,
             self.t_kin,
@@ -61,6 +90,11 @@ class CoolingFunctionGrid(object):
         assert len(self.t_rad_grid.shape) == 2, msg
 
     def compute(self):
+        """
+        Compute the cooling function for the specified grid
+
+        :return: ndarray
+        """
 
         self._compute_mesh()
 
@@ -81,11 +115,25 @@ class CoolingFunctionGrid(object):
         return cooling_rate_grid
 
     def _determine_x_y_quantities(self, x, y):
+        """
+        Get the attribute values by specifiying the quantity names
+
+        :param str x: the x attribute
+        :param str y: the y attribute
+        :return: tuple: the grid value of x and y
+        """
         xval = getattr(self, '{}_grid'.format(x))
         yval = getattr(self, '{}_grid'.format(y))
         return xval, yval
 
-    def plot(self, x='n', y='t_kin', show=True):
+    def plot_3d(self, x='n', y='t_kin', show=True):
+        """
+        Plot the cooling function in 3d
+
+        :param str x: the quantity of the x axis
+        :param str y: the quantity of the y axis
+        :param bool show: display the plot if True
+        """
 
         if self.cooling_function is None:
             self.compute()
@@ -110,6 +158,46 @@ class CoolingFunctionGrid(object):
             'ylabel', 'log10(density n [cm-3])'
         )
         ax.set_zlabel('log10(cooling function [cgs])')
+
+        if show is True:
+            plt.show()
+
+    def plot_2d(self, x='n', y='t_kin', show=True):
+        """
+        Plot the cooling function in 2d
+
+        :param str x: the quantity of the x axis
+        :param str y: the quantity of the y axis
+        :param bool show: display the plot if True
+        """
+        if self.cooling_function is None:
+            self.compute()
+
+        xval, yval = self._determine_x_y_quantities(x, y)
+
+        plt.ion()
+        fig, axs = plt.subplots(figsize=(8, 8))
+
+        plot_markers = [(2 + i // 2, 1 + i % 2, 0) for i in range(16)]
+
+        lambda_vs_t_kin = u.Quantity(self.cooling_function)
+
+        lambda_vs_t_kin_lipovka = fit_lipovka(yval[:], xval[:])
+
+        for nc_index, nc_h in enumerate(x):
+
+            axs.loglog(
+                yval.value, lambda_vs_t_kin.cgs.value,
+                '-x', color='black', marker=plot_markers[nc_index], label=nc_h
+            )
+
+            axs.loglog(
+                yval.value, lambda_vs_t_kin_lipovka.cgs.value,
+                'r--', color='black', label=''
+            )
+
+        axs.set_xlabel('T$_\mathrm{kin}$ [K]')
+        axs.set_ylabel('cooling function [erg s$^{-1}$]')
 
         if show is True:
             plt.show()
