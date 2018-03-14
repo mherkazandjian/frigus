@@ -154,10 +154,10 @@ class CoolingFunctionGrid(object):
 
         plt.setp(
             ax,
-            'xlabel', 'log10(T_kin [K])',
-            'ylabel', 'log10(density n [cm-3])'
+            'xlabel', 'log$_{10}$(density n [m$^{-3}$])',
+            'ylabel', 'log$_{10}$(T$_{kin}$ [K])'
         )
-        ax.set_zlabel('log10(cooling function [cgs])')
+        ax.set_zlabel('log$_{10}$(cooling function [cgs])')
 
         if show is True:
             plt.show()

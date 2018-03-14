@@ -13,6 +13,8 @@ from frigus.cooling_function.fits import fit_glover
 from frigus.population import cooling_rate_at_steady_state
 from frigus.readers.dataset import DataLoader
 
+from decimal import Decimal
+
 species_data = DataLoader().load('H2_lique')
 
 plt.ion()
@@ -49,11 +51,12 @@ for nc_index, nc_h in enumerate(nc_h_rng):
 
     axs.loglog(
         t_rng.value, lambda_vs_t_kin.to(u.Joule / u.second).value,
-        '-x', color='black', marker=plot_markers[nc_index], label=nc_h
+        '-x', color='black', marker=plot_markers[nc_index],
+              label=':.2E' % Decimal(nc_h.value)+' m$^{-3}$'
     )
 
 axs.set_xlabel('T$_\mathrm{kin}$ [K]')
-axs.set_ylabel('cooling function [erg s$^{-1}$]')
+axs.set_ylabel('cooling function [J $\cdot$ s$^{-1}$]')
 
 lambda_vs_t_kin_glover = u.Quantity(
     [fit_glover(_t_kin) for _t_kin in t_rng.value]
@@ -61,10 +64,10 @@ lambda_vs_t_kin_glover = u.Quantity(
 
 axs.loglog(
     t_rng.value, lambda_vs_t_kin_glover.to(u.Joule / u.second).value,
-    'r--', color='black', label='cooling H2 glover'
+    'r--', color='black', label='cooling H$_2$ Glover'
 )
 
-plt.legend()
+plt.legend(loc='upper left', prop={'size': 8})
 plt.show()
 
 print('done')
