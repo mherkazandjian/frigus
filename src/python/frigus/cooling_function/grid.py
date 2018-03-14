@@ -10,31 +10,58 @@ from frigus.cooling_function.fits import fit_lipovka
 
 
 class CoolingFunctionGrid(object):
+    """
+    Compute the cooling function over a grid of densities and temperatures
+    """
     def __init__(self):
+        """
+        Constructor
+        """
+
         self.species = None
+        """the specieis with the radiative and collisional data"""
+
         self.n = None
+        """the gas density mesh points"""
+
         self.t_kin = None
+        """the kinetic temperature mesh points"""
+
         self.t_rad = None
+        """the radiation temperature mesh point"""
+
         self.n_grid = None
+        """the gas density grid"""
+
         self.t_kin_grid = None
+        """the kinetic temperature grid"""
+
         self.t_rad_grid = None
+        """The radiation temperature grid"""
+
         self.cooling_function = None
+        """The cooling function grid"""
 
     def set_species(self, species):
+        """setter for the speicies object"""
         self.species = species
 
     def set_density(self, density):
+        """setter for the gas density"""
         self.n = density
 
     def set_t_kin(self, t_kin):
+        """setter for the kinetic temperature"""
         self.t_kin = t_kin
 
     def set_t_rad(self, t_rad):
+        """setter for the radiation temperature"""
         self.t_rad = t_rad
 
-
     def _compute_mesh(self):
-
+        """
+        Compute the 3D grid where the cooling function will be computed
+        """
         n_grid, t_kin_grid, t_rad_grid = numpy.meshgrid(
             self.n,
             self.t_kin,
@@ -63,6 +90,11 @@ class CoolingFunctionGrid(object):
         assert len(self.t_rad_grid.shape) == 2, msg
 
     def compute(self):
+        """
+        Compute the cooling function for the specified grid
+
+        :return: ndarray
+        """
 
         self._compute_mesh()
 
@@ -83,11 +115,25 @@ class CoolingFunctionGrid(object):
         return cooling_rate_grid
 
     def _determine_x_y_quantities(self, x, y):
+        """
+        Get the attribute values by specifiying the quantity names
+
+        :param str x: the x attribute
+        :param str y: the y attribute
+        :return: tuple: the grid value of x and y
+        """
         xval = getattr(self, '{}_grid'.format(x))
         yval = getattr(self, '{}_grid'.format(y))
         return xval, yval
 
     def plot_3d(self, x='n', y='t_kin', show=True):
+        """
+        Plot the cooling function in 3d
+
+        :param str x: the quantity of the x axis
+        :param str y: the quantity of the y axis
+        :param bool show: display the plot if True
+        """
 
         if self.cooling_function is None:
             self.compute()
@@ -117,7 +163,13 @@ class CoolingFunctionGrid(object):
             plt.show()
 
     def plot_2d(self, x='n', y='t_kin', show=True):
+        """
+        Plot the cooling function in 2d
 
+        :param str x: the quantity of the x axis
+        :param str y: the quantity of the y axis
+        :param bool show: display the plot if True
+        """
         if self.cooling_function is None:
             self.compute()
 
