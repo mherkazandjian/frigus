@@ -52,7 +52,7 @@ for nc_index, nc_h in enumerate(nc_h_rng):
 
     axs.loglog(
         t_rng.value, lambda_vs_t_kin.cgs.value,
-        '-x', color='black', marker=plot_markers[nc_index], label=nc_h
+        '-x', color='black', marker=plot_markers[nc_index], label=''
     )
 
     axs.loglog(
