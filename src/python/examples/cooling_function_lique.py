@@ -52,7 +52,7 @@ for nc_index, nc_h in enumerate(nc_h_rng):
     axs.loglog(
         t_rng.value, lambda_vs_t_kin.to(u.Joule / u.second).value,
         '-x', color='black', marker=plot_markers[nc_index],
-              label='%.2E' % Decimal(nc_h.value)+' m$^{-3}$'
+              label=':.2E' % Decimal(nc_h.value)+' m$^{-3}$'
     )
 
 axs.set_xlabel('T$_\mathrm{kin}$ [K]')
