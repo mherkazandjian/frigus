@@ -16,6 +16,7 @@ from frigus.readers.dataset import DataLoader
 from decimal import Decimal
 
 species_data = DataLoader().load('H2_lique')
+species_data_wrathmall = DataLoader().load('H2_wrathmall')
 
 plt.ion()
 fig, axs = plt.subplots(figsize=(8, 8))
@@ -26,7 +27,7 @@ nc_h_rng = [
            ] * u.meter ** -3
 t_rad = 0.0 * u.Kelvin
 
-t_rng = numpy.logspace(2, 3.2, 10) * u.Kelvin
+t_rng = numpy.logspace(2, 3.6, 10) * u.Kelvin
 # T_rng = species_data.raw_data.collision_rates_T_range
 
 plot_markers = [(2 + i//2, 1 + i % 2, 0) for i in range(16)]
@@ -34,6 +35,7 @@ plot_markers = [(2 + i//2, 1 + i % 2, 0) for i in range(16)]
 for nc_index, nc_h in enumerate(nc_h_rng):
 
     lambda_vs_t_kin = []
+    lambda_vs_t_kin_wrathmall = []
     pop_dens_vs_t_kin = []
 
     for t_kin in t_rng:
@@ -47,12 +49,25 @@ for nc_index, nc_h in enumerate(nc_h_rng):
                 nc_h)
         ]
 
+        lambda_vs_t_kin_wrathmall += [
+            cooling_rate_at_steady_state(
+                species_data_wrathmall,
+                t_kin,
+                t_rad,
+                nc_h)
+        ]
+
     lambda_vs_t_kin = u.Quantity(lambda_vs_t_kin)
+    lambda_vs_t_kin_wrathmall = u.Quantity(lambda_vs_t_kin_wrathmall)
 
     axs.loglog(
         t_rng.value, lambda_vs_t_kin.to(u.Joule / u.second).value,
-        '-x', color='black', marker=plot_markers[nc_index],
-              label=':.2E' % Decimal(nc_h.value)+' m$^{-3}$'
+        '-x', color='black', marker=plot_markers[nc_index]
+    )
+
+    axs.loglog(
+        t_rng.value, lambda_vs_t_kin_wrathmall.to(u.Joule / u.second).value,
+        '-.', color='green', marker=plot_markers[nc_index]
     )
 
 axs.set_xlabel('T$_\mathrm{kin}$ [K]')
@@ -64,10 +79,10 @@ lambda_vs_t_kin_glover = u.Quantity(
 
 axs.loglog(
     t_rng.value, lambda_vs_t_kin_glover.to(u.Joule / u.second).value,
-    'r--', color='black', label='cooling H$_2$ Glover'
+    'r--', color='blue'
 )
 
-plt.legend(loc='upper left', prop={'size': 8})
+plt.legend()
 plt.show()
 
 print('done')
