@@ -1,4 +1,4 @@
-[![build status](https://travis-ci.org/mherkazandjian/frigus.svg?branch=master)](https://github.com/mherkazandjian/frigus/tree/master)
+[![Build Status](https://travis-ci.org/mherkazandjian/frigus.svg?branch=master)](https://travis-ci.org/mherkazandjian/frigus)
 
 FRIGUS
 ======
