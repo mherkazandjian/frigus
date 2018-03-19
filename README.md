@@ -32,7 +32,7 @@ is to install ``Frigus`` through ``pip`` via:
 
 or using pip and directly from github
 
-    pip install https://github.com/mherkazandjian/nbodyswissknife/archive/master.zip --force --upgrade
+    pip install https://github.com/mherkazandjian/frigus/archive/master.zip --force --upgrade
 
 Tests
 -----
