@@ -3,15 +3,24 @@
 FRIGUS
 ======
 
-Package for computing the equilibrium and time-dependent level populations of
-species. The level populations are used to compute the cooling function that
-are parametrized in terms of the gas density and the kinetic and radiation
-temperatures.
+Frigus is a package for computing the equilibrium and time-dependent level
+populations of species. The level populations are used to compute the cooling
+function that are parametrized in terms of the gas density and the kinetic and
+radiation temperatures.
 
 Obtaining
 ---------
 
-https://github.com/mherkazandjian/frigus
+The official source code repository is
+
+   https://github.com/mherkazandjian/frigus
+
+The source code can also be obtained from
+
+   https://pypi.org/project/frigus/
+
+or as wheels also from pypi.
+
 
 Installation
 ------------
@@ -21,6 +30,9 @@ is to install ``Frigus`` through ``pip`` via:
 
     pip install frigus
 
+or using pip and directly from github
+
+    pip install https://github.com/mherkazandjian/nbodyswissknife/archive/master.zip --force --upgrade
 
 Tests
 -----

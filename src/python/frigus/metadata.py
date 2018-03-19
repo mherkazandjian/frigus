@@ -27,7 +27,7 @@ Information describing the project.
 package = 'frigus'
 project = "level population and cooling function computation."
 project_no_spaces = project.replace(' ', '')
-version = '4.0.1'
+version = '4.0.2.dev'
 description = (
     'Compute equilibrium and time-dependent popluation level densities\n'
     'for multi-level species. The level populations can be used to compute\n'
