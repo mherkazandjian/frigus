@@ -246,6 +246,14 @@ setup_dict = dict(
     maintainer_email=metadata.emails[0],
     url=metadata.url,
     download_url=metadata.download_url,
+    keywords=[
+        'physics',
+        'ism',
+        'radiative transfer',
+        'cooling',
+        'heating',
+        'collisional reaction rates'
+    ],
     description=metadata.description,
     long_description=read('README.rst'),
     # Find a list of classifiers here:
@@ -257,9 +265,9 @@ setup_dict = dict(
         'License :: OSI Approved :: MIT License',
         'Natural Language :: English',
         'Operating System :: OS Independent',
-        'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: Implementation :: PyPy',
         'Topic :: Documentation',
         'Topic :: Software Development :: Libraries :: Python Modules',
