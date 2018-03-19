@@ -14,9 +14,11 @@
       <excludeFolder url="file://$MODULE_DIR$/fortran/Read" />
       <excludeFolder url="file://$MODULE_DIR$/frigus.egg-info" />
       <excludeFolder url="file://$MODULE_DIR$/src/fortran" />
+      <excludeFolder url="file://$MODULE_DIR$/src/frigus" />
       <excludeFolder url="file://$MODULE_DIR$/src/matlab" />
       <excludeFolder url="file://$MODULE_DIR$/src/python/.cache" />
       <excludeFolder url="file://$MODULE_DIR$/src/python/examples/.ipynb_checkpoints" />
+      <excludeFolder url="file://$MODULE_DIR$/src/python/frigus/data" />
       <excludeFolder url="file://$MODULE_DIR$/src/python/htmlcov" />
       <excludeFolder url="file://$MODULE_DIR$/src/python/tests/.cache" />
       <excludeFolder url="file://$MODULE_DIR$/src/python/tests/htmlcov" />
