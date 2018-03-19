@@ -35,9 +35,9 @@ description = (
     'parameterized by gas density, kinetic temperature and radiation\n'
     'temperatures.'
 )
-authors = ['Carla Maria Coppola', 'Mher Kazandjian']
+authors = ['Mher Kazandjian', 'Carla Maria Coppola']
 authors_string = ', '.join(authors)
-emails = ['carla.coppola@uniba.it', 'mherkazandjian@gmail.com']
+emails = ['mherkazandjian@gmail.com', 'carla.coppola@uniba.it']
 license = 'GLP-3.0'
 copyright = '2018 ' + authors_string
 url = 'https://github.com/mherkazandjian/frigus'
