@@ -182,23 +182,22 @@ def _test():
 
 
 def find_all_files_in_datadir():
-    data_files = []
+    """
+    Find all the files recursively in the datadir
 
-    # files under data/*
-    data_files.append(
-        (
-            'data',
-            list(filter(os.path.isfile, glob.glob('data/*')))
-        )
-    )
+    This function exists for backwards compatibility, in py3 this can be
+    acheived through glob.glob('data/*/**')
+    :return:
+    """
+    root_dir = 'data'
+    look_for = '*'
 
-    # subdirs with their files under data/**/*
-    directories = list(filter(os.path.isdir, glob.glob('data/*')))
-    for directory in directories:
-        files = glob.glob(os.path.join(directory, '*'))
-        data_files.append((directory, files))
+    matches = []
+    for root, dirnames, filenames in os.walk(root_dir):
+        for filename in fnmatch.filter(filenames, look_for):
+            matches.append(os.path.join(root, filename))
 
-    return data_files
+    return matches
 
 
 def _test_all():
@@ -280,11 +279,13 @@ setup_dict = dict(
         'frigus.cooling_function',
         'frigus.solvers',
     ],
-    package_dir={'frigus': os.path.join('src', 'python', 'frigus')},
-    package_data={
-        'frigus': glob.glob(os.path.join('src', 'python', 'frigus', '*.py')),
+    package_dir={
+        'frigus': os.path.join('src', 'frigus'),
     },
-    data_files=find_all_files_in_datadir(),
+    package_data={
+        'frigus': find_all_files_in_datadir(),
+    },
+    include_package_data=True,
     install_requires=[
         # your module dependencies
     ] + python_version_specific_requires,
