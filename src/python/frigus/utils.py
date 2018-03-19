@@ -32,7 +32,15 @@ def datadir_path():
     else:
         retval = None
 
+        datadir = join(dirname(frigus.__file__), 'data')
+        if isdir(datadir):
+            retval = datadir
+
         datadir = join(dirname(frigus.__file__), '..', 'data')
+        if isdir(datadir):
+            retval = datadir
+
+        datadir = join(dirname(frigus.__file__), '..', '..', 'data')
         if isdir(datadir):
             retval = datadir
 
