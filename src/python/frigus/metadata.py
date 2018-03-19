@@ -27,11 +27,18 @@ Information describing the project.
 package = 'frigus'
 project = "level population and cooling function computation."
 project_no_spaces = project.replace(' ', '')
-version = '0.0.1'
-description = '.. todo:: long description here.'
+version = '4.0.1'
+description = (
+    'Compute equilibrium and time-dependent popluation level densities\n'
+    'for multi-level species. The level populations can be used to compute\n'
+    'cooling function. Frigus allow for computing cooling functions\n'
+    'parameterized by gas density, kinetic temperature and radiation\n'
+    'temperatures.'
+)
 authors = ['Carla Maria Coppola', 'Mher Kazandjian']
 authors_string = ', '.join(authors)
 emails = ['carla.coppola@uniba.it', 'mherkazandjian@gmail.com']
 license = 'GLP-3.0'
-copyright = '2017 ' + authors_string
+copyright = '2018 ' + authors_string
 url = 'https://github.com/mherkazandjian/frigus'
+download_url = 'https://github.com/mherkazandjian/frigus/archive/master.zip'

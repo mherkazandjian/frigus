@@ -245,6 +245,7 @@ setup_dict = dict(
     maintainer=metadata.authors[0],
     maintainer_email=metadata.emails[0],
     url=metadata.url,
+    download_url=metadata.download_url,
     description=metadata.description,
     long_description=read('README.rst'),
     # Find a list of classifiers here:
@@ -281,9 +282,6 @@ setup_dict = dict(
     ] + python_version_specific_requires,
     # Allow tests to be run with `python setup.py test'.
     tests_require=[
-        'pytest==2.5.1',
-        'mock==1.0.1',
-        'flake8==2.1.0',
     ],
     cmdclass={'test': TestAllCommand},
     zip_safe=False,  # don't use eggs
