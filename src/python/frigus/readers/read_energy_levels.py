@@ -63,34 +63,100 @@ def read_levels(fname):
        14   2  0.42998862E-03  0.94371580E+02
        14   3  0.22670691E-03  0.49756409E+02
     """
+    data_read = numpy.loadtxt(fname, skiprows=10)
 
-    v, j, a, energies = loadtxt(fname, unpack=True)
+#    v, j, a, energies = loadtxt(fname, unpack=True)
 
-    v, j = numpy.int32(v), numpy.int32(j)
+#    v, j = numpy.int32(v), numpy.int32(j)
 
-    # conversion of the energies from cm-1 -> Joule
-    energies *= 1.98630e-23  # .. todo:: do this conversion with astropy
+#    # conversion of the energies from cm-1 -> Joule
+#    energies *= 1.98630e-23  # .. todo:: do this conversion with astropy
 
-    nv_max, nj_max = v.max(), j.max()
+#    nv_max, nj_max = v.max(), j.max()
 
-    enh2 = numpy.zeros((nv_max+1, nj_max+1), 'f8')
+#    enh2 = numpy.zeros((nv_max+1, nj_max+1), 'f8')
 
-    # having v=0 as 0 for the energies, the bottom of the well
-    # is at -2179.0 cm-1 + convention into Joule
-    # bottom = 2179.0*1.98630e-23
+#    # having v=0 as 0 for the energies, the bottom of the well
+#    # is at -2179.0 cm-1 + convention into Joule
+#    # bottom = 2179.0*1.98630e-23
 
-    # filling the matrix enh2 with the values read from the text file
-    for i in range(len(v)):
-        vi, ji = v[i], j[i]
-        enh2[vi, ji] = energies[i]
+#    # filling the matrix enh2 with the values read from the text file
+#    for i in range(len(v)):
+#        vi, ji = v[i], j[i]
+#        enh2[vi, ji] = energies[i]
 
-        # depth = enh2[0,0] + bottom
-        # enh2[vi,ji]  =  enh2[vi,ji] - depth
+#        # depth = enh2[0,0] + bottom
+#        # enh2[vi,ji]  =  enh2[vi,ji] - depth
 
-    return enh2
+    # get the sorting indices list from the last column (energy)
+    inds = numpy.argsort(data_read[:, -1])
+
+    inds_limited = inds[::-1][0:58]
+
+    v, j, energies = data_read[inds_limited, 0],\
+                     data_read[inds_limited, 1],\
+                     data_read[inds_limited, 3]
+
+    energy_levels = EnergyLevelsMolecule(inds_limited.size, energy_unit = u.cm**-1)
+
+    # conversion cm-1 -> eV
+    from astropy.constants import (c, h)
+    energies *= u.cm**-1
+    conversion_factor = (h * c).to(u.cm * u.eV)
+
+    energy_levels.data['v'] = v
+    energy_levels.data['j'] = j
+    energy_levels.data['g'] = 2*j + 1
+    energy_levels.data['E'] = (conversion_factor * energies)
+    energy_levels.data['label'] = linear_2d_index(v, j)
+
+    return energy_levels
 
 
 def read_levels_lique(fname):
+    """
+    Read the energy levels from the file "H2Xvjlevels_francois_mod.cs" that is
+    recovered from ABC. The file has (should have) the following format.
+
+      ----------------------------------------------------------------------
+      Channel   a       v       j       k       Energy (eV)
+      ----------------------------------------------------------------------
+       92       2       0       0       0         0.27034
+       93       2       0       1       0         0.28504
+
+    :param fname: The paths to the ascii file containing the levels
+     information.
+    :return: numpy array array of N rows, the v and j levels and their
+     corresponding energy. The elements of the array are stored in increasing
+     order in the energy.
+
+    .. code-block:: python
+
+        levels = read_levels_lique('/path/to/H2Xvjlevels_francois_mod.cs')
+
+        print('{:3}{:3}{:10}'.format('v', 'j', 'E(eV)'))
+        for level in levels:
+           print('{:3}{:3}{:10}'.format(level['v'], level['j'], level['E']))
+    """
+    data_read = numpy.loadtxt(fname, skiprows=3)
+
+    # get the sorting indices list from the last column (energy)
+    inds = numpy.argsort(data_read[:, -1])
+
+    v, j, energies = data_read[inds, 2], data_read[inds, 3], data_read[inds, 5]
+
+    energy_levels = EnergyLevelsMolecule(inds.size, energy_unit=u.eV)
+
+    energy_levels.data['v'] = v
+    energy_levels.data['j'] = j
+    energy_levels.data['g'] = 2*j + 1
+    energy_levels.data['E'] = energies * u.eV
+    energy_levels.data['label'] = linear_2d_index(v, j)
+
+    return energy_levels
+
+
+def read_levels_lique_abc(fname):
     """
     Read the energy levels from the file "H2Xvjlevels_francois_mod.cs" that is
     recovered from ABC. The file has (should have) the following format.
