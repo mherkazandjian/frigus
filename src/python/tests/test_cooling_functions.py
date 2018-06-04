@@ -47,7 +47,6 @@ def test_that_the_lique_cooling_function_is_computed_correctly():
     nc_h = 1e6 * u.m ** -3
 
     species_data = DataLoader().load('H2_lique')
-    # energy levels updated according to stancil and not abc
 
     t_array = u.Quantity([100.0, 500.0, 1000.0, 2000.0, 5000.0]) * u.K
     cooling_rate_expected = u.Quantity(
