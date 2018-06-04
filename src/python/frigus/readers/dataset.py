@@ -138,8 +138,8 @@ class DataSetH2Lique(DataSetBase):
         #
         # read the energy levels (v, j, energy)
         #
-        energy_levels = read_energy_levels.read_levels_lique(
-            os.path.join(DATADIR, 'H2Xvjlevels_francois_mod.cs')
+        energy_levels = read_energy_levels.read_levels(
+            os.path.join(DATADIR, 'H2Xvjlevels.cs')
         )
 
         self.raw_data.energy_levels = energy_levels
