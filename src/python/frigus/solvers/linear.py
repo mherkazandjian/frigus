@@ -101,7 +101,8 @@ def solve_equilibrium(m_matrix):
     # ============ done conditioning the linear system ===============
 
     try:
-        x = solve_linear_system_two_step(A, b, n_sub=1)
+        x = solve_lu_mp(A, b)
+        #solve_linear_system_two_step(A, b, n_sub=1)
     except scipy.linalg.LinAlgError as exc:
         print('solving the linear system with conditioning failed')
         print('due an singular matrix exception')
