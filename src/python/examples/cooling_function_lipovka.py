@@ -61,7 +61,7 @@ for nc_index, nc_h in enumerate(nc_h_rng):
     )
 
     axs.set_xlabel('T$_\mathrm{kin}$ [K]')
-    axs.set_ylabel('cooling function [erg s$^{-1}$]')
+    axs.set_ylabel('cooling function [eV s$^{-1}$]')
 
 plt.legend()
 plt.show()
