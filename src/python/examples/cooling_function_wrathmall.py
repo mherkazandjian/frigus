@@ -20,7 +20,7 @@ from frigus.readers.dataset import DataLoader
 species_data = DataLoader().load('H2_wrathmall')
 
 # density of the colliding species, in m^3
-nc_h = 1e14 * u.meter ** -3
+nc_h = 1e6 * u.meter ** -3
 t_rad = 0.0 * u.Kelvin
 
 lambda_vs_t_kin = []
@@ -40,15 +40,29 @@ for i, t_kin in enumerate(t_rng):
     ]
 
     print(t_kin,
-           pop_dens_vs_t_kin[i][1],
-           pop_dens_vs_t_kin[i][3],
-           pop_dens_vs_t_kin[i][5],
-           pop_dens_vs_t_kin[i][7],
-           pop_dens_vs_t_kin[i][9],
-           pop_dens_vs_t_kin[i][11],
-           pop_dens_vs_t_kin[i][13],
-           pop_dens_vs_t_kin[i][15],
-           pop_dens_vs_t_kin[i][17]
+          pop_dens_vs_t_kin[i][0],
+          pop_dens_vs_t_kin[i][2],
+          pop_dens_vs_t_kin[i][4],
+          pop_dens_vs_t_kin[i][6],
+          pop_dens_vs_t_kin[i][8],
+          pop_dens_vs_t_kin[i][10],
+          pop_dens_vs_t_kin[i][12],
+          pop_dens_vs_t_kin[i][14],
+          pop_dens_vs_t_kin[i][16],
+          t_kin,
+          pop_dens_vs_t_kin[i][1],
+          pop_dens_vs_t_kin[i][3],
+          pop_dens_vs_t_kin[i][5],
+          pop_dens_vs_t_kin[i][7],
+          pop_dens_vs_t_kin[i][9],
+          pop_dens_vs_t_kin[i][11],
+          pop_dens_vs_t_kin[i][13],
+          pop_dens_vs_t_kin[i][15],
+          pop_dens_vs_t_kin[i][17],
+          pop_dens_vs_t_kin[i][19],
+          pop_dens_vs_t_kin[i][21],
+          pop_dens_vs_t_kin[i][23],
+          pop_dens_vs_t_kin[i][25]
           )
 
 lambda_vs_t_kin = u.Quantity(lambda_vs_t_kin)

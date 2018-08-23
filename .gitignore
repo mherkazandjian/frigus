@@ -1,6 +1,7 @@
 *.out
 *~
-.idea/workspace.xml
+src/python/.idea/*.xml
+.idea/*.xml
 *.pyc
 *.pdf
 .ropeproject
@@ -56,3 +57,6 @@ frigus.egg-info
 .pytest_cache
 .tox
 .idea/markdown*
+data/HeH2_tvjwk.res
+src/python/frigus/.idea/
+
