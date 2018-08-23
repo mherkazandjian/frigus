@@ -597,7 +597,7 @@ def cooling_rate(population_densities, energy_levels, a_matrix):
     Compute the cooling rate due to the spontaneous transitions.
 
     :param array_like population_densities: A column vector of the population
-     densities. This is a dimensionless vector of shape nx1, where n is the 
+     densities. This is a dimensionless vector of shape n x 1, where n is the
      number of energy levels.
     :param read_energy_levels.EnergyLevelsBase energy_levels: The energy levels
      object or a subclass of it that has the energies defined in the attribute
@@ -612,6 +612,13 @@ def cooling_rate(population_densities, energy_levels, a_matrix):
     :return: scalar astropy.units.quantity.Quantity: The cooling rate due to
      all the transitions in units of A_matrix.unit * energy_levels['E'].units. 
     """
+    if population_densities.ndim != 2:
+        msg = ('column vector expected for the population_densities\n'
+               'passed value has the shape {}').format(
+            population_densities.shape
+        )
+        raise ValueError(msg)
+
     energy_levels_unit = energy_levels.data['E'].unit
     a_matrix_unit = a_matrix.unit
 
