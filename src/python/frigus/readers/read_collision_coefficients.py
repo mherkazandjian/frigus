@@ -363,7 +363,6 @@ def read_collision_coefficients_lipovka(fname):
 
     return data_with_units, t_values, (ini, fin, unique_levels, cr_with_units)
 
-
 def read_collision_coefficients_esposito_h2_he(fname):
     """
     Parse the collisional data by Fabrizio Esposito.
@@ -403,6 +402,7 @@ def read_collision_coefficients_esposito_h2_he(fname):
 
     :param string fname: The path to the ascii data.
     :return: a tuple of 3 elements.
+
       The first element is a 5D array that holds all the rate coefficients.
       K[v, j, v', j', T_index] ( in m3/s)
 
@@ -467,7 +467,6 @@ def read_collision_coefficients_esposito_h2_he(fname):
         #
         #     assert _t_vals is not None
         #     return numpy.array(_t_vals) * u.Kelvin
-
         def read_data(self):
             with open(self.fname) as fobj:
                 linesold = fobj.readlines()
@@ -497,7 +496,8 @@ def read_collision_coefficients_esposito_h2_he(fname):
                             if 1 <= line_no <= 38:
                                 temp = float(line.split(sep=' ')[0])
                                 _t_vals.append(temp)
-                        raw_data = ''.join(lines)
+
+                raw_data = ''.join(lines)
                 _v = numpy.array(_v)
                 _j = numpy.array(_j)
                 _vp = numpy.array(_vp)
@@ -581,7 +581,5 @@ def read_collision_coefficients_esposito_h2_he(fname):
     # convert the units to m^3/s
     data_with_units = data_with_units.to(u.m**3 / u.second)
     cr_with_units = cr_with_units.to(u.m**3 / u.second)
-
-    import pdb; pdb.set_trace()
 
     return data_with_units, t_values, (ini, fin, unique_levels, cr_with_units)
