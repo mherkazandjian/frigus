@@ -145,6 +145,13 @@ class DataSetH2Lique(DataSetBase):
         energy_levels = read_energy_levels.read_levels(
             os.path.join(DATADIR, 'H2Xvjlevels.cs')
         )
+        raise NotImplementedError(
+            'make sure that all the energy levels of H2 are read\n'
+            'and that this does no affect the constricution of the M\n'
+            'matrix (before adding this note)\n'
+            'inds_limited = inds[::-1][0:58]\n'
+            'was used in read_levels'
+        )
 
         self.raw_data.energy_levels = energy_levels
 
@@ -713,26 +720,26 @@ class DataSetHeH2(DataSetBase):
         self.reduce_raw_data()
 
     def read_raw_data(self):
-        """Read the raw HD data"""
+        """Read the raw H2 data"""
 
         #
         # read the energy levels (v, j, energy)
         #
-        # energy_levels = read_energy_levels.read_levels_lipovka(
-        #     os.path.join(DATADIR, 'lipovka', 'flower_roueff_data.dat')
-        # )
+        energy_levels = read_energy_levels.read_levels(
+            os.path.join(DATADIR, 'H2Xvjlevels.cs')
+        )
 
-        # self.raw_data.energy_levels = energy_levels
-
-        #
-        # read the einstein coefficients for the HD transitions
-        #
-        # a, a_info_nnz = read_einstein_coefficient.read_einstein_coppola()
-        # self.raw_data.a = a
-        # self.raw_data.a_info_nnz = a_info_nnz
+        self.raw_data.energy_levels = energy_levels
 
         #
-        # read the collisional rates for HD with H
+        # read the einstein coefficients for the H2 transitions
+        #
+        a, a_info_nnz = read_einstein_coefficient.read_einstein_simbotin()
+        self.raw_data.a = a
+        self.raw_data.a_info_nnz = a_info_nnz
+
+        #
+        # read the collisional rates for H2 with He
         #
         collision_rates, t_rng, collision_rates_info_nnz = \
             read_collision_coefficients_esposito_h2_he(
@@ -754,7 +761,8 @@ class DataSetHeH2(DataSetBase):
         # sets and adjust the labels of the energy levels according to that
         v_max_data, j_max_data = population.find_v_max_j_max_from_data(
             self.raw_data.a_info_nnz,
-            self.raw_data.collision_rates_info_nnz)
+            self.raw_data.collision_rates_info_nnz
+        )
 
         self.energy_levels = self.raw_data.energy_levels
         self.energy_levels.set_labels(v_max=v_max_data + 1)
@@ -766,8 +774,9 @@ class DataSetHeH2(DataSetBase):
         #                                 self.raw_data.A_info_nnz,
         #                                 self.energy_levels)
         a_matrix = population.reduce_einstein_coefficients(
-                          self.raw_data.a,
-                          self.energy_levels)
+            self.raw_data.a,
+            self.energy_levels
+        )
         self.a_matrix = a_matrix
 
         # getting the collisional de-excitation matrix (K_dex) (for all

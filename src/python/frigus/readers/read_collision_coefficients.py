@@ -363,6 +363,7 @@ def read_collision_coefficients_lipovka(fname):
 
     return data_with_units, t_values, (ini, fin, unique_levels, cr_with_units)
 
+
 def read_collision_coefficients_esposito_h2_he(fname):
     """
     Parse the collisional data by Fabrizio Esposito.
@@ -512,7 +513,6 @@ def read_collision_coefficients_esposito_h2_he(fname):
             data = zeros((_t_vals.size, nv_max, nj_max, nv_max, nj_max), 'f8')
             cr = zeros((_t_vals.size, len(_v)), 'f8')
 
-
             self.ini = _ini
             self.fin = _fin
             self.tkin = _t_vals
@@ -536,7 +536,6 @@ def read_collision_coefficients_esposito_h2_he(fname):
                 cr_block[ntemp] = line.split()[1]
 
             return cr_block
-
 
         def parse_data(self, cr, data, raw_data):
             """
@@ -564,14 +563,16 @@ def read_collision_coefficients_esposito_h2_he(fname):
 
     reader = Reader(fname)
 
-    t_values = reader.tkin
-
     ini = reader.ini.T
     fin = reader.fin.T
 
     # find the unique levels from from the transitions
-    unique_levels = unique_level_pairs(hstack((unique_level_pairs(ini),
-                                               unique_level_pairs(fin))))
+    unique_levels = unique_level_pairs(
+        hstack(
+            (unique_level_pairs(ini),
+            unique_level_pairs(fin))
+        )
+    )
 
     # set the units of the data to be returned
     data_with_units = reader.data * (u.cm**3 / u.second)
