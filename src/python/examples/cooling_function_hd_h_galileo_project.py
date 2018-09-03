@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 
 from astropy import units as u
 
-from frigus.cooling_function.fits import fit_lipovka
+from frigus.cooling_function.fits import fit_lipovka, fit_flower
 from frigus.population import cooling_rate_at_steady_state
 from frigus.readers.dataset import DataLoader
 
@@ -24,7 +24,7 @@ species_data_old = DataLoader().load('HD_lipovka')
 #               1.e6, 1.e7, 1.e8, 1.e9, 1.e10, 1.e11, 1.e12, 1.e13, 1.e14
 #           ] * u.meter ** -3
 nc_h_rng = [
-               1.e6
+               1.e24
            ] * u.meter ** -3
 t_rad = 0.0 * u.Kelvin
 
@@ -69,17 +69,26 @@ for nc_index, nc_h in enumerate(nc_h_rng):
 
     lambda_vs_t_kin_lipovka = fit_lipovka(t_rng, nc_h)
 
+    lambda_vs_t_kin_flower = fit_flower(nc_h, t_rng)
+
+    lambda_vs_t_kin_flower = lambda_vs_t_kin_flower.to(u.eV / u.second)
+
     axs.set_yscale('linear')
     axs.set_xscale('linear')
 
     axs.plot(
         t_rng.value, lambda_vs_t_kin.value,
-        '-x', color='black', marker=plot_markers[nc_index], label=''
+        'o', color='black', label=''
     )
     axs.plot(
         t_rng.value, lambda_vs_t_kin_old.value,
-        '-x', color='red', marker=plot_markers[nc_index], label=''
+        '-.x', color='red', marker=plot_markers[nc_index], label=''
     )
+    axs.plot(
+        t_rng.value, lambda_vs_t_kin_flower.value,
+        'r--', color='green', marker=plot_markers[nc_index], label=''
+    )
+
 
 
 #    axs.loglog(

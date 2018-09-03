@@ -7,7 +7,7 @@
 
 #    Frigus is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, version 3 of the License.    
+#    the Free Software Foundation, version 3 of the License.
 #
 #    Frigus is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -162,7 +162,7 @@ def fit_coppola(t_kin, n_hd):
      quantity (in K)
     :param u.quantity.Quantity n_hd: The density of HD as an astropy quantity
     :return: u.quantity.Quantity: The cooling function in erg / s for the
-     inpute T values
+     input T values
 
     """
     #
@@ -209,5 +209,44 @@ def fit_coppola(t_kin, n_hd):
                    + 2.36722261e0 * lt_kin ** 4 * ln_hd ** 2
                    - 4.37732460e-1 * lt_kin ** 4 * ln_hd ** 3
                    + 2.44900752e-2 * lt_kin ** 4 * ln_hd ** 4)
+
+    return retval * u.erg * u.s**-1
+
+
+def fit_flower(density, t_kin):
+    """
+    Compute the cooling function by Flower et at for HD colliding with H
+    as reported in the subroutine
+    reference: http://massey.dur.ac.uk/drf/cooling_by_HD/W_HD.f
+
+    The cooling rate is computed in units of erg / s^-1
+
+    :param u.quantity.Quantity t_kin: temperature range as an astropy
+           quantity (in K)
+    :param u.quantity.Quantity density: density as an astropy quantity (in cm-3)
+    :return: ndarray|float the cooling rate
+    """
+
+    assert isinstance(t_kin, u.quantity.Quantity)
+    assert isinstance(density, u.quantity.Quantity)
+
+    aa = -26.2982
+    bb = -0.215807
+    omeg = 2.03657
+    phi = 4.63258
+    c1 = 0.283978
+    c2 = -1.27333
+    d1 = -2.08189
+    d2 = 4.66288
+
+    y = numpy.log10(density.cgs.value)
+    x = numpy.log10(t_kin.si.value)
+
+    w = 0.5 * y + aa * x**bb - \
+        numpy.sqrt(
+            0.25 * y*y + (c1*y+c2) * numpy.sin(omeg*x+phi) + (d1*y+d2)
+        )
+
+    retval = 10.0**w
 
     return retval * u.erg * u.s**-1
