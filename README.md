@@ -48,7 +48,7 @@ Input data
 
 The species data are located in the ``data`` directory. Each subdirectory
 correspends to a certain set of data. The sub-directories ``data/two_levels_1``
-and ``data/three_levels_1`` can be used as tempates to construct datasets for
+and ``data/three_levels_1`` can be used as templates to construct datasets for
 sophisticated species.
 
 

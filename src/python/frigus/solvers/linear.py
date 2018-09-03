@@ -112,7 +112,7 @@ def solve_equilibrium(m_matrix):
         print('caution: this might take very long')
         x = solve_lu_mp(A, b)
 
-    if x.any() < 0.0:
+    if (x < 0.0).any():
         print(
             'WARNING: found negative population densities\n'
             'accurary of the solution is not guaranteed.\n'
