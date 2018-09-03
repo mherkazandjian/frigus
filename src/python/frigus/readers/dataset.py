@@ -649,7 +649,7 @@ class DataSetHDGalileoProject(DataSetBase):
         collision_rates, t_rng, collision_rates_info_nnz = \
             read_collision_coefficients_lique_and_wrathmall(
                 os.path.join(
-                    DATADIR, 'lipovka', 'rates_hd_h_abc.out'
+                    DATADIR, 'lipovka', 'rates_hd_h_abc_galileo_project.out'
                 )
             )
 
