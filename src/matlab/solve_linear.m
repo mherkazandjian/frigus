@@ -1,22 +1,51 @@
-A = importdata('A.txt');
+% A0 original matrix
+% As scaled matrix by column, the diagonal elements have been recomputed, 
+%    after adding the normalization line the first row is scaled by the
+%    maximum elements
+% Ar scaled by row
+% A   scaled by column
+%
+A0 = importdata('A.txt'); 
+A = A0;
 [m, m] = size(A);
 b = zeros(m, 1);
+d = (diag(A));
 
-b(1) = 1;
-A(1,:) = 1;
+
+As=A;
+for i = 1:m    
+    As(i,i) = -sum(sort(A([1:i-1,i+1:m],i)));
+end
+
+ds = (diag(As));
+d = (diag(A));
+
+Ar=A;
+Ar(1,:)=1;
+br = zeros(m, 1); br(1)=1;
 
 for i = 1:m
-    A(i,:) = A(i,:) / A(i,i);
+    As(:,i) = As(:,i) / As(i,i);
+    A(:,i) = A(:,i) / A(i,i);
+    Ar(i,:)=Ar(i,:) /Ar(i,i);
 end
+
+
+dmaxI=max(ds);
+b(1) = dmaxI;
+As(1,:) = dmaxI./ds;
+
+
 
 n = 1;
 
-C11 = A(1:n, 1:n);
-C12 = A(1:n, n+1:m);
-A22 = A(n+1:m, n+1:m);
-A21 = A(n+1:m, 1:n);
+C11 = As(1:n, 1:n);
+C12 = As(1:n, n+1:m);
+A22 = As(n+1:m, n+1:m);
+A21 = As(n+1:m, 1:n);
 
 C21 = linsolve(A22, A21);
+
 
 CD = C11 - C12 * C21;
 
@@ -24,5 +53,15 @@ CD = C11 - C12 * C21;
 x1 = linsolve(CD, b(1:n));
 x2 = - C21 * x1;
 
-x = [x1', x2'];
-x = x';
+y = [x1', x2']';
+x = diag(1./ds)*y;
+
+yf=As\b;
+xf = diag(1./ds)*yf;
+
+
+xrf=Ar\br;
+disp('Condition number of A22, Ar and As')
+disp([cond(A22) cond(Ar) cond(As)])
+disp('First two components of x, xrf and xf')
+disp([x(1:2)  xrf(1:2) xf(1:2)])
