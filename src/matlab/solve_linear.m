@@ -5,7 +5,8 @@
 % Ar scaled by row
 % A   scaled by column
 %
-A0 = importdata('A.txt'); 
+clc; clear;
+A0 = importdata('../../data/matlab_dev_matrices/A.txt'); 
 A = A0;
 [m, m] = size(A);
 b = zeros(m, 1);
@@ -37,7 +38,7 @@ As(1,:) = dmaxI./ds;
 
 
 
-n = 1;
+n = 4;
 
 C11 = As(1:n, 1:n);
 C12 = As(1:n, n+1:m);
