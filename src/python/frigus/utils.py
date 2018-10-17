@@ -173,3 +173,23 @@ def find_matching_indices(v1, v2, check=True):
     inds_v1_of_v2_in_v1 = inds_rec_v1[inds_v1_of_v2u_in_v1]
 
     return inds_v1_of_v2_in_v1
+
+
+def kahan_sum(a, axis=0):
+    """
+    Perform Kahan summation on an array.
+
+    Copied and modified from https://github.com/numpy/numpy/issues/8786
+    :param a:
+    :return: the sum of array
+    """
+    s = numpy.zeros(a.shape[:axis] + a.shape[axis+1:])
+    c = numpy.zeros(s.shape)
+    for i in range(a.shape[axis]):
+        # http://stackoverflow.com/a/42817610/353337
+        y = a[(slice(None),) * axis + (i,)] - c
+        t = s + y
+        c = (t - s) - y
+        s = t.copy()
+
+    return s

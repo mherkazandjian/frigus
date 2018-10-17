@@ -33,7 +33,7 @@ from astropy.constants import h as h_planck
 from astropy.constants import k_B as kb
 from astropy.modeling.blackbody import blackbody_nu as B_nu
 
-from frigus.utils import linear_2d_index, find_matching_indices
+from frigus.utils import linear_2d_index, find_matching_indices, kahan_sum
 from frigus.solvers.linear import solve_equilibrium
 
 
@@ -516,7 +516,8 @@ def compute_transition_rate_matrix(data_set,
     # the levels (see notebook)
     o_matrix = (a_matrix + b_jnu_matrix + k_matrix * collider_density).T
 
-    d_matrix = -numpy.eye(o_matrix.shape[0]) * o_matrix.sum(axis=0)
+    # d_matrix = -numpy.eye(o_matrix.shape[0]) * o_matrix.sum(axis=0)
+    d_matrix = -numpy.eye(o_matrix.shape[0]) * kahan_sum(o_matrix, axis=0)
 
     m_matrix = o_matrix + d_matrix
 
