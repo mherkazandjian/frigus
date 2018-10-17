@@ -41,7 +41,7 @@ module collisions
                  !   print*, 'temperature', i, rr%temp(i)
                  !enddo
 
-                 open (21, file='../../data/read/Rates_H_H2.dat', status = 'unknown')                 
+                 open (21, file='../../data/Rates_H_H2.dat', status = 'unknown')                 
 
                 !print*, 'ilique_flag in collisions file:', ilique_flag
                 !print*, 'ilipovka_flag in collisions file:', ilipovka_flag
@@ -124,8 +124,8 @@ module collisions
                  !   print*, 'temperature', i, rr%temp(i)
                  !enddo
 
-                 open (19, file='../../data/read/wrathmall/Rates_H_H2_flower_new.dat', status = 'unknown')                 
-                 open (20, file='../../data/read/wrathmall/Rates_H_H2_flower_new_downwards.dat', status = 'unknown')
+                 open (19, file='../../data/wrathmall/Rates_H_H2_flower_new.dat', status = 'unknown')                 
+                 open (20, file='../../data/wrathmall/Rates_H_H2_flower_new_downwards.dat', status = 'unknown')
 
                  !print*, 'ilique_flag in collisions file:', ilique_flag
                  !print*, 'ilipovka_flag in collisions file:', ilipovka_flag
