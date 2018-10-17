@@ -19,7 +19,9 @@ module matrix_construction
                  type(radiative_coeffs)   :: rad
                  type(collisional_coeffs) :: rr, rr21, rr12
                  type(reaction_matrix)    :: coll_rad_matrix
-                 real*8, dimension(1:nlev_lique) :: temp
+                 !real*8, dimension(1:nlev_lique) :: temp
+                 real*8, dimension(1:nlev_flower) :: temp
+                 
 
                  coll_rad_matrix%M = 0.d0 ! full matrix
                  coll_rad_matrix%O = 0.d0 ! off-diagonal terms
