@@ -26,6 +26,7 @@ from numpy import loadtxt
 
 from astropy import units as u
 from astropy import constants
+from astropy.constants import c, h
 
 from frigus.species import EnergyLevelsMolecule, EnergyLevelsOnDegreeOfFreedom
 from frigus.utils import linear_2d_index
@@ -33,7 +34,7 @@ from frigus.utils import linear_2d_index
 
 def read_levels(fname):
     """
-    Parse the  data of
+    Parse the energy levels data by Stancil
 
     :param fname: The name of the ascii file containing the levels information.
      (see below for an example of the content of the file). The file can be
@@ -65,42 +66,21 @@ def read_levels(fname):
     """
     data_read = numpy.loadtxt(fname, skiprows=10)
 
-#    v, j, a, energies = loadtxt(fname, unpack=True)
-
-#    v, j = numpy.int32(v), numpy.int32(j)
-
-#    # conversion of the energies from cm-1 -> Joule
-#    energies *= 1.98630e-23  # .. todo:: do this conversion with astropy
-
-#    nv_max, nj_max = v.max(), j.max()
-
-#    enh2 = numpy.zeros((nv_max+1, nj_max+1), 'f8')
-
-#    # having v=0 as 0 for the energies, the bottom of the well
-#    # is at -2179.0 cm-1 + convention into Joule
-#    # bottom = 2179.0*1.98630e-23
-
-#    # filling the matrix enh2 with the values read from the text file
-#    for i in range(len(v)):
-#        vi, ji = v[i], j[i]
-#        enh2[vi, ji] = energies[i]
-
-#        # depth = enh2[0,0] + bottom
-#        # enh2[vi,ji]  =  enh2[vi,ji] - depth
-
     # get the sorting indices list from the last column (energy)
     inds = numpy.argsort(data_read[:, -1])
 
-    inds_limited = inds[::-1][0:58]
+    inds_limited = inds[::-1]
 
-    v, j, energies = data_read[inds_limited, 0],\
-                     data_read[inds_limited, 1],\
+    v, j, energies = data_read[inds_limited, 0].astype('i4'),\
+                     data_read[inds_limited, 1].astype('i4'),\
                      data_read[inds_limited, 3]
 
-    energy_levels = EnergyLevelsMolecule(inds_limited.size, energy_unit = u.cm**-1)
+    energy_levels = EnergyLevelsMolecule(
+        inds_limited.size,
+        energy_unit=u.cm**-1
+    )
 
     # conversion cm-1 -> eV
-    from astropy.constants import (c, h)
     energies *= u.cm**-1
     conversion_factor = (h * c).to(u.cm * u.eV)
 

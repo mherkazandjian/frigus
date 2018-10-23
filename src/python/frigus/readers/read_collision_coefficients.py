@@ -362,3 +362,225 @@ def read_collision_coefficients_lipovka(fname):
     cr_with_units = cr_with_units.to(u.m**3 / u.second)
 
     return data_with_units, t_values, (ini, fin, unique_levels, cr_with_units)
+
+
+def read_collision_coefficients_esposito_h2_he(fname):
+    """
+    Parse the collisional data by Fabrizio Esposito.
+
+    These are the coefficient rates K_ij and K_ji (so these fill the lower and
+    upper triangular K matrix). However, only the downwards coefficients are
+    accurate; the upwards must be found with detailed balance.
+
+    As in the format used in the convention tvjwk (file HeH2_tvjwk.res)
+
+    The table contains the H2-He collisional rate coefficients
+    index v j v' j'
+
+    index : counter for the transition, starting from 0
+    v, v' : initial and final vibrational state
+    j, j' : initial and final rotational state
+
+    T [K]      k(cm3 s-1)
+    T from 100 K to 1000K by steps of 100K, from 1000 K to 10000 K by step of
+    500 K, from 10000 K to 20000 K by step of 1000 K
+
+    Each transition is a block like:
+
+    0 0 0 0 0
+    100 2.8454E-009
+    200 3.6106E-009
+    300 3.8642E-009
+    400 3.9323E-009
+    ........
+    ........
+    18000 6.0465E-009
+    19000 6.1032E-009
+    20000 6.1530E-009
+
+
+    followed by 2 empty lines.
+
+    :param string fname: The path to the ascii data.
+    :return: a tuple of 3 elements.
+
+      The first element is a 5D array that holds all the rate coefficients.
+      K[v, j, v', j', T_index] ( in m3/s)
+
+      The second element is a 1D temperature array (T) corresponding to the
+      rate coefficients in the 5D array. This array has the same size as the
+      last dimension of K (i.e K[0,0,0,0,:].size = T.size
+
+      The third element is a tuple of 4 elements:
+
+         - The first element is a 2D array of shape (2, n_transitions) (ini).
+           The columns of this array (v, j = ini) are the initial v and j of
+           the transitions for a certain T section. i.e. the number of non-zero
+           elements in K for a certain temperature is equal to the number of
+           elements in the v or j columns.
+           v.size = j.size = where(K[..., 0] > 0)[0].size
+
+         - The second element is the same of the first element but for the
+           final transitions (v', j' = fin)
+
+         - The third element is a 2D array of shape (2, n_unique_transitions)
+           that are the unique levels involved in all the transitions.
+
+         - The last element is an array of shape (T.size, n_transitions)
+           which are the collisional coefficient rates with non-zero values
+           for each value of temperature in the T array.
+    """
+
+    class Reader(object):
+        """
+        Parse the  data by Fabrizio Esposito
+
+        """
+        def __init__(self, fname, tiny=1e-70):
+            """Constructor"""
+
+            self.fname = fname
+            self.data = None
+            self.cr = None
+            """
+            the collision rates for all the transitions for all the tempratures
+            """
+            self.ini = None   #: the initial v,j of all the transitions
+            self.fin = None   #: the final v,j of all the transitions
+            self.tkin = None
+            """the temperatures at which the collisional data are given"""
+
+            self.read_data()
+
+
+        # def find_temperature_array(self):
+        #     """
+        #     Parse the first block in the data file and return the range of
+        #     temperatures used.
+        #     """
+        #     _t_vals = None
+        #     with open(self.fname) as fobj:
+        #         _t_vals = []
+        #         for line_num, line in enumerate(fobj):
+        #             if 1 <= line_num <= 38:
+        #                 temp = float(line.split(sep=' ')[0])
+        #                 _t_vals.append(temp)
+        #
+        #     assert _t_vals is not None
+        #     return numpy.array(_t_vals) * u.Kelvin
+        def read_data(self):
+            with open(self.fname) as fobj:
+                linesold = fobj.readlines()
+                lines = []
+                _v = []
+                _j = []
+                _vp = []
+                _jp = []
+                _ini = []
+                _fin = []
+                _t_vals = []
+                for line_no, line in enumerate(linesold):
+                    if line.isspace() is False:
+                        if len(line.split()) > 2:
+                            lines.append('block ' + line)
+                            (
+                            _index_read, _v_read, _j_read, _vp_read, _jp_read) = \
+                                line.split()
+                            _v.append(int(_v_read))
+                            _j.append(int(_j_read))
+                            _vp.append(int(_vp_read))
+                            _jp.append(int(_jp_read))
+                            _ini.append([int(_v_read), int(_j_read)])
+                            _fin.append([int(_vp_read),int(_jp_read)])
+                        else:
+                            lines.append(line)
+                            if 1 <= line_no <= 38:
+                                temp = float(line.split(sep=' ')[0])
+                                _t_vals.append(temp)
+
+                raw_data = ''.join(lines)
+                _v = numpy.array(_v)
+                _j = numpy.array(_j)
+                _vp = numpy.array(_vp)
+                _jp = numpy.array(_jp)
+                _ini = numpy.array(_ini)
+                _fin = numpy.array(_fin)
+                _t_vals = numpy.array(_t_vals)
+
+            # declare the array where the data will be stored in a tensor
+            nv, nj, nvp, njp = _v.max() + 1, _j.max() + 1, _vp.max() + 1, _jp.max() + 1
+            nv_max, nj_max = max(nv, nvp), max(nj, njp)
+            data = zeros((_t_vals.size, nv_max, nj_max, nv_max, nj_max), 'f8')
+            cr = zeros((_t_vals.size, len(_v)), 'f8')
+
+            self.ini = _ini
+            self.fin = _fin
+            self.tkin = _t_vals
+
+            data, cr = self.parse_data(cr, data, raw_data)
+
+            self.data = data
+
+        def parse_block(self, block):
+            """
+            Parse a block of data and return the transition, the levels and
+            the collision rates.
+            It returns an array of floats corresponding to the reaction rates
+            for each temperature of the temperature array
+            """
+            lines = list(filter(lambda x: len(x) > 0, block.split('\n')))
+
+            cr_block = zeros(self.tkin.size, 'f8')
+
+            for ntemp, line in enumerate(lines[1:]):
+                cr_block[ntemp] = line.split()[1]
+
+            return cr_block
+
+        def parse_data(self, cr, data, raw_data):
+            """
+            Parses the read data into blocks, one block for each transition
+            """
+            # split the raw data into blocks
+            blocks = raw_data.split('block')[1:]
+            blocks = numpy.array(blocks)
+
+            for ib, block in enumerate(blocks):
+                cr_block = self.parse_block(block)
+                # assign the reaction rates for all the temperatures
+                # for the ib-th transition
+                cr[:, ib] = cr_block[:]
+
+                # assign the data for the multidimensional transition tensor
+                v_ini, j_ini = self.ini[ib]
+                v_fin, j_fin = self.fin[ib]
+                data[:, v_ini, j_ini, v_fin, j_fin] = cr[:, ib]
+
+            self.data = data
+            self.cr = cr
+
+            return data, cr
+
+    reader = Reader(fname)
+
+    ini = reader.ini.T
+    fin = reader.fin.T
+
+    # find the unique levels from from the transitions
+    unique_levels = unique_level_pairs(
+        hstack(
+            (unique_level_pairs(ini),
+            unique_level_pairs(fin))
+        )
+    )
+
+    # set the units of the data to be returned
+    data_with_units = reader.data * (u.cm**3 / u.second)
+    cr_with_units = reader.cr * (u.cm**3 / u.second)
+    t_values = reader.tkin * u.K
+
+    # convert the units to m^3/s
+    data_with_units = data_with_units.to(u.m**3 / u.second)
+    cr_with_units = cr_with_units.to(u.m**3 / u.second)
+
+    return data_with_units, t_values, (ini, fin, unique_levels, cr_with_units)

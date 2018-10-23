@@ -27,9 +27,9 @@ lambda_vs_t_kin = []
 pop_dens_vs_t_kin = []
 
 t_rng = species_data.raw_data.collision_rates_t_range
-for t_kin in t_rng:
+for i, t_kin in enumerate(t_rng):
 
-    print(t_kin)
+    #print(t_kin)
 
     pop_dens_vs_t_kin += [
         population_density_at_steady_state(species_data, t_kin, t_rad, nc_h)
@@ -38,6 +38,54 @@ for t_kin in t_rng:
     lambda_vs_t_kin += [
         cooling_rate_at_steady_state(species_data, t_kin, t_rad, nc_h)
     ]
+
+    # print(t_kin,
+    #       pop_dens_vs_t_kin[i][0],
+    #       pop_dens_vs_t_kin[i][2],
+    #       pop_dens_vs_t_kin[i][4],
+    #       pop_dens_vs_t_kin[i][6],
+    #       pop_dens_vs_t_kin[i][8],
+    #       pop_dens_vs_t_kin[i][10],
+    #       pop_dens_vs_t_kin[i][12],
+    #       pop_dens_vs_t_kin[i][14],
+    #       pop_dens_vs_t_kin[i][16],
+    #       t_kin,
+    #       pop_dens_vs_t_kin[i][1],
+    #       pop_dens_vs_t_kin[i][3],
+    #       pop_dens_vs_t_kin[i][5],
+    #       pop_dens_vs_t_kin[i][7],
+    #       pop_dens_vs_t_kin[i][9],
+    #       pop_dens_vs_t_kin[i][11],
+    #       pop_dens_vs_t_kin[i][13],
+    #       pop_dens_vs_t_kin[i][15],
+    #       pop_dens_vs_t_kin[i][17],
+    #       pop_dens_vs_t_kin[i][19],
+    #       pop_dens_vs_t_kin[i][21],
+    #       pop_dens_vs_t_kin[i][23],
+    #       pop_dens_vs_t_kin[i][25]
+    #       )
+
+    print(t_kin,
+           pop_dens_vs_t_kin[i][0],
+           pop_dens_vs_t_kin[i][1],
+           pop_dens_vs_t_kin[i][2],
+           pop_dens_vs_t_kin[i][3],
+           pop_dens_vs_t_kin[i][4],
+           pop_dens_vs_t_kin[i][5],
+           pop_dens_vs_t_kin[i][6],
+           pop_dens_vs_t_kin[i][7],
+           pop_dens_vs_t_kin[i][8],
+           pop_dens_vs_t_kin[i][9],
+           pop_dens_vs_t_kin[i][10],
+           pop_dens_vs_t_kin[i][11],
+           pop_dens_vs_t_kin[i][12],
+           pop_dens_vs_t_kin[i][13],
+           pop_dens_vs_t_kin[i][14],
+           pop_dens_vs_t_kin[i][15],
+           pop_dens_vs_t_kin[i][16]
+           )
+
+
 
 lambda_vs_t_kin = u.Quantity(lambda_vs_t_kin)
 lambda_vs_t_kin_glover = u.Quantity(
@@ -65,6 +113,10 @@ axs[1].plot(
     t_rng.value,
     pop_dens_vs_t_kin[:, 0] / pop_dens_vs_t_kin[:, 1],
     '--', label='x_v_0_j_0 / x_v_0_j_1')
+
+
+
+
 
 plt.legend()
 plt.show()

@@ -13,7 +13,8 @@ from frigus.cooling_function.fits import fit_lipovka
 from frigus.population import cooling_rate_at_steady_state
 from frigus.readers.dataset import DataLoader
 
-species_data = DataLoader().load('HD_lipovka')
+species_data = DataLoader().load('HeH2')
+
 
 plt.ion()
 fig, axs = plt.subplots(figsize=(8, 8))
