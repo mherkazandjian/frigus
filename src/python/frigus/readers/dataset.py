@@ -142,15 +142,8 @@ class DataSetH2Lique(DataSetBase):
         #
         # read the energy levels (v, j, energy)
         #
-        energy_levels = read_energy_levels.read_levels(
+        energy_levels = read_energy_levels.read_levels_stancil(
             os.path.join(DATADIR, 'H2Xvjlevels.cs')
-        )
-        raise NotImplementedError(
-            'make sure that all the energy levels of H2 are read\n'
-            'and that this does no affect the constricution of the M\n'
-            'matrix (before adding this note)\n'
-            'inds_limited = inds[::-1][0:58]\n'
-            'was used in read_levels'
         )
 
         self.raw_data.energy_levels = energy_levels
@@ -700,16 +693,12 @@ class DataSetHDGalileoProject(DataSetBase):
 
 class DataSetHeH2(DataSetBase):
     """
-    Data of H2 colliding with H using collisional data use by Lipovka.
+    Data of H2 colliding with He using collisional data use by Esposito.
 
-      - energy levels of HD (only rotational for v = 0)
-      - collisional coefficients of HD with H (K_ij)
-      - radiative coefficients (A_ij, B_ij, B_ji)
-
-    Limitations
-
-      - The smallest data set of (A, B, K) determines the number of states to
-       be inserted in the model.
+      - energy levels of H2 by Stancil
+      - collisional coefficients of H2 with He (K_ij)
+      - radiative coefficients (A_ij, B_ij, B_ji) by Wolniewicz, Simbotin and
+        Dalgarno.
     """
     def __init__(self):
         """
@@ -725,7 +714,7 @@ class DataSetHeH2(DataSetBase):
         #
         # read the energy levels (v, j, energy)
         #
-        energy_levels = read_energy_levels.read_levels(
+        energy_levels = read_energy_levels.read_levels_stancil(
             os.path.join(DATADIR, 'H2Xvjlevels.cs')
         )
 
