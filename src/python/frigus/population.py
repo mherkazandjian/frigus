@@ -37,12 +37,15 @@ from frigus.utils import linear_2d_index, find_matching_indices
 from frigus.solvers.linear import solve_equilibrium
 
 
-def find_v_max_j_max_from_data(a_einstein_nnz, cr_coefficients_nnz):
+def find_v_max_j_max_from_data(a_einstein_nnz,
+                               cr_coefficients_nnz,
+                               energy_levels):
     """
     Find the v_max and j_max from the Einstien and collisional coefficients data
 
     The coeffients are for a two quantum number system (v,j).
 
+    :param energy_levels: the energy levels object
     :param tuple a_einstein_nnz: The Einstien coefficients for the transitions
      provided as numpy arrays. (See DataSetRaw.A_info_nnz)
     :param tuple cr_coefficients_nnz: The collisional coeffieints for the
@@ -64,7 +67,14 @@ def find_v_max_j_max_from_data(a_einstein_nnz, cr_coefficients_nnz):
     j_max_cr = max(j_nnz.max(), jp_nnz.max())
     # print('DEBUG: (v_max_cr, j_max_cr) = ', v_max_cr, j_max_cr)
 
-    return max(v_max_a, v_max_cr), max(j_max_a, j_max_cr)
+    # find the max v and j of the available energy levels
+    v_max_en = energy_levels.data['v'].max()
+    j_max_en = energy_levels.data['j'].max()
+
+    return (
+        numpy.max([v_max_a, v_max_cr, v_max_en]),
+        numpy.max([j_max_a, j_max_cr, j_max_en])
+    )
 
 
 def check_self_transitions_in_einstien_nnz_data(a_info_nnz):
