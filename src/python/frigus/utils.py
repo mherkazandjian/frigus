@@ -20,6 +20,7 @@
 import os
 from os.path import join, dirname, isdir
 import numpy
+from matplotlib import pyplot
 import frigus
 
 
@@ -173,3 +174,12 @@ def find_matching_indices(v1, v2, check=True):
     inds_v1_of_v2_in_v1 = inds_rec_v1[inds_v1_of_v2u_in_v1]
 
     return inds_v1_of_v2_in_v1
+
+
+def display_matrix(mat, levels):
+    x = mat.copy()
+    x[x > 0.0] = numpy.log10(x[x > 0.0])
+    x[x == 0] = numpy.nan
+    pyplot.pcolor(x[::-1])
+    pyplot.colorbar()
+    pyplot.show()
