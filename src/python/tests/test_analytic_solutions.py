@@ -126,4 +126,4 @@ def test_that_three_level_analytic_pop_dens_ratios_are_computed_correctly():
     )
 
     assert relative_error.max() < 5.0e-15
-    assert relative_error.std() < 5.0e-16
+    assert relative_error.std() < 6.0e-16
