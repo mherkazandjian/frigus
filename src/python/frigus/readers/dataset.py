@@ -190,10 +190,24 @@ class DataSetH2Lique(DataSetBase):
         #                                 self.energy_levels)
         a_matrix = population.reduce_einstein_coefficients(
                           self.raw_data.a,
-                          self.energy_levels)
+                          self.energy_levels
+        )
+
+        # check that the upper triangular elements are zero. If not, issue a
+        # warning and set them to zero. This check has been introduced because
+        # for H2 the data by Simbotin has non-zero values in the uppter tri
+        # part that are identified with the - sign in the paper
+        if (a_matrix[numpy.triu_indices(a_matrix.shape[0])] != 0.0).any():
+            print('warning: non-zero elements found in the reduced upper ')
+            print('warning: triangular part of the A matrix, set them to zero.')
+            a_matrix[numpy.triu_indices(a_matrix.shape[0])] = 0.0
+
         self.a_matrix = a_matrix
 
-        # getting the collisional de-excitation matrix (K_dex) (for all
+        # DEBUG
+        # utils.display_matrix(a_matrix.value, None)
+
+        # get the collisional de-excitation matrix (K_dex) (for all
         # tabulated values)  [n_level, n_level, n_T_kin_values]
         k_dex_matrix = population.reduce_collisional_coefficients_slow(
             self.raw_data.collision_rates_info_nnz,
