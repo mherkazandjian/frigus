@@ -32,13 +32,14 @@ from frigus.species import EnergyLevelsMolecule, EnergyLevelsOnDegreeOfFreedom
 from frigus.utils import linear_2d_index
 
 
-def read_levels(fname):
+def read_levels_stancil(fname, upto=None):
     """
     Parse the energy levels data by Stancil
 
     :param fname: The name of the ascii file containing the levels information.
      (see below for an example of the content of the file). The file can be
      found at http://www.physast.uga.edu/ugamop/energies/H2Xvjlevels
+    :param upto: when passed, levels only from 0 -> upto are returned
     :return: A numpy matrix of shape (vmax + 1, jmax + 1) where vmax and jmax
       are the maximum vibrational and rotational transition quantum numbers
       mentioned in the file "fname".
@@ -69,7 +70,10 @@ def read_levels(fname):
     # get the sorting indices list from the last column (energy)
     inds = numpy.argsort(data_read[:, -1])
 
-    inds_limited = inds[::-1]
+    if upto is None:
+        inds_limited = inds[::-1]
+    else:
+        inds_limited = inds[::-1][0:upto]
 
     v, j, energies = data_read[inds_limited, 0].astype('i4'),\
                      data_read[inds_limited, 1].astype('i4'),\

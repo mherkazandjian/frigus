@@ -51,11 +51,11 @@ def test_that_the_lique_cooling_function_is_computed_correctly():
     t_array = u.Quantity([100.0, 500.0, 1000.0, 2000.0, 5000.0]) * u.K
     cooling_rate_expected = u.Quantity(
         [
-            1.095262e-28,  # T=100K
-            2.675404e-26,  # T=500K
-            6.646842e-25,  # T=1000K
-            8.354147e-24,  # T=2000K
-            1.009190e-22,  # T=5000K
+            1.09526153e-28,   # T=100K
+            2.67540424e-26,   # T=500K
+            6.64684189e-25,   # T=1000K
+            8.35387575e-24,   # T=2000K
+            1.00510330e-22    # T=5000K
         ]
     ) * u.erg / u.s
 
@@ -72,6 +72,7 @@ def test_that_the_lique_cooling_function_is_computed_correctly():
     )
 
     assert_allclose(
-        cooling_rate_for_t_array.cgs.value, cooling_rate_expected.cgs.value,
+        cooling_rate_for_t_array.cgs.value,
+        cooling_rate_expected.cgs.value,
         rtol=1e-6, atol=0.0
     )

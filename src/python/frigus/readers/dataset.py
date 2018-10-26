@@ -106,7 +106,9 @@ class DataSetBase(object):
         """the raw data from which the 2D matrices are computed"""
 
     def read_raw_data(self):
-        """Populate the self.raw_data object"""
+        """
+        Populate the self.raw_data object
+        """
         raise NotImplementedError("this method should be implemented by "
                                   "the subclass")
 
@@ -140,10 +142,12 @@ class DataSetH2Lique(DataSetBase):
     def read_raw_data(self):
         """Read the raw H2 data"""
         #
-        # read the energy levels (v, j, energy)
-        #
+        # read the energy levels (v, j, energy). Keep levels up to 55 only
+        # since these levels would be the ones among which both collisional and
+        # radiative data are available
         energy_levels = read_energy_levels.read_levels_stancil(
-            os.path.join(DATADIR, 'H2Xvjlevels.cs')
+            os.path.join(DATADIR, 'H2Xvjlevels.cs'),
+            upto=55
         )
 
         self.raw_data.energy_levels = energy_levels
@@ -182,7 +186,6 @@ class DataSetH2Lique(DataSetBase):
 
         self.energy_levels.set_labels(v_max=v_max_data + 1)
 
-        #
         # reduce the Einstein coefficients to a 2D matrix (construct the A
         # matrix) [n_levels, n_levels]
         # A_reduced_slow = population.reduce_einstein_coefficients_slow(
@@ -290,13 +293,16 @@ class DataSetH2Wrathmall(DataSetBase):
         Use the raw data in self.raw_data to populate the A and K_dex matrices
         """
 
+        self.energy_levels = self.raw_data.energy_levels
+
         # find the maximum v and j from the Einstein and collisional rates data
         # sets and adjust the labels of the energy levels according to that
         v_max_data, j_max_data = population.find_v_max_j_max_from_data(
             self.raw_data.a_info_nnz,
-            self.raw_data.collision_rates_info_nnz)
+            self.raw_data.collision_rates_info_nnz,
+            self.energy_levels
+        )
 
-        self.energy_levels = self.raw_data.energy_levels
         self.energy_levels.set_labels(v_max=v_max_data + 1)
 
         #
@@ -588,15 +594,17 @@ class DataSetHDLipovka(DataSetBase):
         Use the raw data in self.raw_data to populate the A and K_dex matrices
         """
 
+        self.energy_levels = self.raw_data.energy_levels
+
         # find the maximum v and j from the Einstein and collisional rates data
         # sets and adjust the labels of the energy levels according to that
         v_max_data, j_max_data = population.find_v_max_j_max_from_data(
             self.raw_data.a_info_nnz,
-            self.raw_data.collision_rates_info_nnz)
+            self.raw_data.collision_rates_info_nnz,
+            self.energy_levels
+        )
 
-        self.energy_levels = self.raw_data.energy_levels
         self.energy_levels.set_labels(v_max=v_max_data + 1)
-
         #
         # reduce the Einstein coefficients to a 2D matrix (construct the A
         # matrix) [n_levels, n_levels]
