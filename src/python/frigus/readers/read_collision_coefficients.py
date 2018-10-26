@@ -80,8 +80,9 @@ def read_collision_coefficients_lique_and_wrathmall(fname):
 
     :param string fname: The path to the ascii data.
     :return: a tuple of 3 elements.
+
       The first element is a 5D array that holds all the rate coefficients.
-      K[v, j, v', j', T_index] ( in m3/s)
+      K[T_index, v, j, v', j'] ( in m3/s)
 
       The second element is a 1D temperature array (T) corresponding to the
       rate coefficients in the 5D array. This array has the same size as the
@@ -99,7 +100,7 @@ def read_collision_coefficients_lique_and_wrathmall(fname):
          - The second element is the same of the first element but for the
            final transitions (v', j' = fin)
 
-         - The third element is a 2D array of shape (2, n_unique_transitions)
+         - The third element is a 2D array of shape (2, n_unique_levels)
            that are the unique levels involved in all the transitions.
 
          - The last element is an array of shape (T.size, n_transitions)
@@ -142,8 +143,10 @@ def read_collision_coefficients_lique_and_wrathmall(fname):
         fin[:, i] = vp[i], jp[i]
 
     # find the unique levels from from the transitions
-    unique_levels = unique_level_pairs(hstack((unique_level_pairs(ini),
-                                               unique_level_pairs(fin))))
+    unique_levels = unique_level_pairs(
+        hstack((unique_level_pairs(ini),
+                unique_level_pairs(fin)))
+    )
 
     # set the units of the data to be returned
     data_with_units = data * (u.cm**3 / u.second)

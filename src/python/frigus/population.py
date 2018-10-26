@@ -33,7 +33,7 @@ from astropy.constants import h as h_planck
 from astropy.constants import k_B as kb
 from astropy.modeling.blackbody import blackbody_nu as B_nu
 
-from frigus.utils import linear_2d_index, find_matching_indices
+from frigus.utils import linear_2d_index, find_matching_indices, display_matrix
 from frigus.solvers.linear import solve_equilibrium
 
 
@@ -168,8 +168,7 @@ def reduce_einstein_coefficients(a_mat, energy_levels):
      final levels.
     :param EnergyLevelsSpeciesBase energy_levels: numpy array array of N rows,
      the v and j levels and their corresponding energy. The elements of the
-     array are stored in increasing order in the energy. This array can be
-     obtained e.g. from read_levels.read_levels_lique() .. todo:: check lique!!
+     array are stored in increasing order in the energy.
     :return: A_reduced that is a square matrix of shape
      (energy_levels.size, energy_levels.size) with the nonzero values of A
      mapped to the indices of the levels in the array energy_levels.
@@ -202,10 +201,7 @@ def reduce_einstein_coefficients(a_mat, energy_levels):
     a_reduced[inds_ini, inds_fin] = a_nnz
 
     # DEBUG
-    # A_reduced[A_reduced > 0.0] = numpy.log10(A_reduced[A_reduced > 0.0])
-    # pylab.imshow(A_reduced, interpolation='none')
-    # pylab.colorbar()
-    # pylab.show()
+    # display_matrix(a_reduced.value)
 
     return a_reduced
 

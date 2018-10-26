@@ -219,7 +219,16 @@ class DataSetH2Lique(DataSetBase):
         k_dex_matrix_interpolator = population.compute_k_dex_matrix_interpolator(
             k_dex_matrix, self.raw_data.collision_rates_t_range)
         self.k_dex_matrix_interpolator = k_dex_matrix_interpolator
-
+        # DEBUG
+        # utils.display_matrix(k_dex_matrix[:, :, 0].value, None)
+        # a = a_matrix.value
+        # b = k_dex_matrix[:, :, 0].value
+        # check overlap of available data
+        # c = numpy.zeros_like(a)
+        # c[a > 0.0] = 1
+        # c[b > 0.0] = 2
+        # c[(a > 0.0)*(b > 0.0)] = 3
+        # utils.display_matrix(c, None, log=False)
 
 class DataSetH2Wrathmall(DataSetBase):
     """
@@ -500,6 +509,9 @@ class DataSetThreeLevel_1(DataSetBase):
         a_matrix = a_matrix / u.second
         self.a_matrix = a_matrix
         self.raw_data.a = self.a_matrix / u.second
+
+        # DEBUG
+        # utils.display_matrix(a_matrix.value, None)
 
         #
         # read the collisional rates
