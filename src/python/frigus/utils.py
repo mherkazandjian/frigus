@@ -176,10 +176,24 @@ def find_matching_indices(v1, v2, check=True):
     return inds_v1_of_v2_in_v1
 
 
-def display_matrix(mat, levels):
+def display_matrix(mat, levels, log=True):
+    """
+    Display a square matrix
+
+    :param mat: the matrix to be displayed
+    :param levels: not used (yet) .. todo:: make use of this in the axes
+    :param log: Use the log of the matrix values
+    """
     x = mat.copy()
-    x[x > 0.0] = numpy.log10(x[x > 0.0])
-    x[x == 0] = numpy.nan
-    pyplot.pcolor(x[::-1])
+    if log:
+        x[x > 0.0] = numpy.log10(x[x > 0.0])
+        x[x == 0] = numpy.nan
+
+    n, m = x.shape
+    assert n == m
+
+    ii, jj = numpy.meshgrid(numpy.arange(0, n), numpy.arange(0, n))
+    pyplot.pcolor(ii, jj, x)
+    pyplot.gca().invert_yaxis()
     pyplot.colorbar()
     pyplot.show()
