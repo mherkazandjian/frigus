@@ -781,15 +781,16 @@ class DataSetHeH2(DataSetBase):
         """
         Use the raw data in self.raw_data to populate the A and K_dex matrices
         """
+        self.energy_levels = self.raw_data.energy_levels
 
         # find the maximum v and j from the Einstein and collisional rates data
         # sets and adjust the labels of the energy levels according to that
         v_max_data, j_max_data = population.find_v_max_j_max_from_data(
             self.raw_data.a_info_nnz,
-            self.raw_data.collision_rates_info_nnz
+            self.raw_data.collision_rates_info_nnz,
+            self.energy_levels
         )
 
-        self.energy_levels = self.raw_data.energy_levels
         self.energy_levels.set_labels(v_max=v_max_data + 1)
 
         #
