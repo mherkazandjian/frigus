@@ -379,21 +379,19 @@ def reduce_collisional_coefficients_slow(
 
     k_dex_reduced = zeros((n_levels, n_levels, n_T), 'f8') * cr_nnz.unit
 
-    for i, cr_i in enumerate(cr_nnz.T):
-
-        # print('{:4}/{:4}'.format(i+1, len(A_nnz)))
-
-        # get the indices based on v,j, jp, jp comparisons
-        #     v, j, vp, jp = v_nnz[i], j_nnz[i], vp_nnz[i], jp_nnz[i]
-        #     ind_ini = where((levels['v'] == v)*(levels['j'] == j))[0]
-        #     ind_fin = where((levels['v'] == vp)*(levels['j'] == jp))[0]
+    # set the collision rates as a function of temperature (one transition at
+    # a time) in the reduced matrix. For each transition, get the collision
+    # rates as a function of temperature and set it in the reduced matrix.
+    # if the transition label exits in the energy labels, set it, otherwise
+    # ignore it
+    for transition_index, cr_transition_vs_temp in enumerate(cr_nnz.T):
 
         # get the indices based on label comparisons
-        ind_ini = where(labels == labels_ini[i])[0]
-        ind_fin = where(labels == labels_fin[i])[0]
+        ind_ini = where(labels == labels_ini[transition_index])[0]
+        ind_fin = where(labels == labels_fin[transition_index])[0]
 
         if ind_ini.size != 0 or ind_fin.size != 0:
-            k_dex_reduced[ind_ini, ind_fin, :] = cr_i
+            k_dex_reduced[ind_ini, ind_fin, :] = cr_transition_vs_temp
         else:
             continue
 
