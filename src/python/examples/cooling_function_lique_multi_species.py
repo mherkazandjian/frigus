@@ -86,7 +86,7 @@ for nc_index, nc_h in enumerate(nc_h_rng):
             species_data_h2_hp_zero_a,
             t_kin,
             t_rad,
-            nc_h * 2.e-4)
+            nc_h * 2.e-1)
 
         m = m_h2_h + m_h2_he_without_a + m_h2_hp_without_a
 

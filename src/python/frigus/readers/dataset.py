@@ -921,11 +921,11 @@ class DataSetHpH2(DataSetBase):
             k_dex_matrix, self.raw_data.collision_rates_t_range)
 
         def k_dex_matrix_interpolator_and_extrapolator(t_kin):
-            if 10.0 <= t_kin <= 500.0:
+            if 10.0 <= t_kin.value <= 500.0:
                 return k_dex_matrix_interpolator(t_kin)
-            elif t_kin < 10.0:
+            elif t_kin.value < 10.0:
                 return k_dex_matrix_interpolator(10.0)
-            elif t_kin > 500.0:
+            elif t_kin.value > 500.0:
                 return k_dex_matrix_interpolator(500.0)
             else:
                 raise ValueError('should not get here')
