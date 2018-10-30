@@ -912,7 +912,7 @@ class DataSetHpH2(DataSetBase):
             self.raw_data.collision_rates_info_nnz,
             self.energy_levels,
             set_inelastic_coefficient_to_zero=True,
-            set_excitation_coefficients_to_zero=False,
+            set_excitation_coefficients_to_zero=True,
             reduced_data_is_upper_to_lower_only=False,
         )
 
