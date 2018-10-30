@@ -822,6 +822,7 @@ class DataSetHeH2(DataSetBase):
             k_dex_matrix, self.raw_data.collision_rates_t_range)
         self.k_dex_matrix_interpolator = k_dex_matrix_interpolator
 
+
 class DataSetHpH2(DataSetBase):
     """
     Data of H2 colliding with H+ using collisional data use by Gerlich:
@@ -911,15 +912,34 @@ class DataSetHpH2(DataSetBase):
             self.raw_data.collision_rates_info_nnz,
             self.energy_levels,
             set_inelastic_coefficient_to_zero=True,
-            set_excitation_coefficients_to_zero=True,
+            set_excitation_coefficients_to_zero=False,
             reduced_data_is_upper_to_lower_only=False,
         )
 
         # compute the interpolator that produces K_dex at a certain temperature
         k_dex_matrix_interpolator = population.compute_k_dex_matrix_interpolator(
             k_dex_matrix, self.raw_data.collision_rates_t_range)
-        self.k_dex_matrix_interpolator = k_dex_matrix_interpolator
 
+        def k_dex_matrix_interpolator_and_extrapolator(t_kin):
+            if 10.0 <= t_kin <= 500.0:
+                return k_dex_matrix_interpolator(t_kin)
+            elif t_kin < 10.0:
+                return k_dex_matrix_interpolator(10.0)
+            elif t_kin > 500.0:
+                return k_dex_matrix_interpolator(500.0)
+            else:
+                raise ValueError('should not get here')
+
+        # DEBUG
+        # x = numpy.linspace(10.0, 500.0, 25)
+        # y = []
+        # for _x in x:
+        #     y.append(k_dex_matrix_interpolator(_x)[0, 1].value)
+        # import pylab
+        # pylab.ion()
+        # pylab.plot(50.0/x, numpy.log(y))
+        # pylab.show()
+        self.k_dex_matrix_interpolator = k_dex_matrix_interpolator_and_extrapolator
 
 
 class DataLoader(object):

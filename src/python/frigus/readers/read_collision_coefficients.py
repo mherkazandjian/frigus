@@ -610,16 +610,17 @@ def compute_collision_coefficients_gerlich_h2_hp(fname1, fname2):
      - first table: k0 (units: 10**-10 cm3/s)
      - second table: Delta_E0 (units: meV)
 
-    # indices: (initial,final)
-    #   final 0     1       2      3      4      5      6     7
-    #0
-    #1
-    #2
-    #3
-    #4
-    #5
-    #6
-    #7
+    # indices: (initial,final for j, v=0 for all)
+    #   j'  0     1       2      3      4      5      6     7
+    # j
+    # 0
+    # 1
+    # 2
+    # 3
+    # 4
+    # 5
+    # 6
+    # 7
 
     The temperature range in which these fits are valid is:
 
@@ -677,64 +678,45 @@ def compute_collision_coefficients_gerlich_h2_hp(fname1, fname2):
             self.read_data()
 
         def read_data(self):
-            ini = []
-            fin = []
-
-            k0 = []
-            with open(self.fname1,
-                      'r') as fobj1:
-                for line in fobj1:
-                    k0.append(list(map(float, line.split())))
-
-            delta_E0 = []
-            with open(self.fname2,
-                    'r') as fobj2:
-                for line in fobj2:
-                    delta_E0.append(list(map(float, line.split())))
-
-            k0 *= 1e-10 * u.cm ** 3 / u.s
-            delta_E0 *= u.meV
-
+            k0 = numpy.loadtxt(self.fname1) * 1e-10 * u.cm ** 3 / u.s
+            delta_E0 = numpy.loadtxt(self.fname2) * u.meV
             _t_vals = numpy.logspace(1., 2.7, 22)
 
             K_gerlich = []
             for itemp, t_kin in enumerate(_t_vals):
                 t_kin *= u.K
-                K_gerlich_array = k0 * \
-                                   numpy.exp(
-                                       -1. * delta_E0.to(u.J) / k_B / t_kin)
-
+                K_gerlich_array = k0 * numpy.exp(
+                    -1. * delta_E0.to(u.J) / k_B / t_kin
+                )
                 K_gerlich.append(K_gerlich_array)
 
             n_transitions = len(K_gerlich[:][0])**2
 
-            ini = (numpy.array(n_transitions * [0]).T,
-                   numpy.array(
-                       len(K_gerlich[:][0]) *
-                        [0, 1, 2, 3, 4, 5, 6, 7]).T
-                   )
-            fin = (numpy.array(n_transitions * [0]).T,
-                   numpy.array(
-                       len(K_gerlich[:][0]) *
-                        [0, 1, 2, 3, 4, 5, 6, 7]).T
-                   )
-            ini = numpy.vstack(ini)
-            fin = numpy.vstack(fin)
-            '''
-            - initialize to zero a matrix that has the same dimension of nlevels
-              (radiative + collisional)
-            - implement the fit for the involved levels
-                    K_j_j'(T) = k0_j_j' * exp(-Delta_E0_j_j'/k/T)
-            - compute the j'_j transitions with the detailed balance            
-            '''
+            ini = numpy.vstack(
+                (
+                    numpy.zeros(n_transitions),  # all the v's are zero
+                    numpy.repeat([0, 1, 2, 3, 4, 5, 6, 7], len(K_gerlich[:][0]))
+                )
+            ).astype('i')
 
+            fin = numpy.vstack(
+                (
+                    numpy.zeros(n_transitions),  # all the v's are zero
+                    numpy.tile([0, 1, 2, 3, 4, 5, 6, 7], len(K_gerlich[:][0]))
+                )
+            ).astype('i')
+
+            # DEBUG
+            # for i, f in zip(ini[1], fin[1]):
+            #     print(i, f, delta_E0[i, f], k0[i, f])
 
             # declare the array where the data will be stored in a tensor
             nv, nj, nvp, njp = \
                 0 + 1, len(K_gerlich[:][0]), 0 + 1, len(K_gerlich[:][0])
+
             nv_max, nj_max = max(nv, nvp), max(nj, njp)
             data = zeros((_t_vals.size, nv_max, nj_max, nv_max, nj_max), 'f8')
-            #cr = zeros((_t_vals.size, len(_v)), 'f8')
+            # cr = zeros((_t_vals.size, len(_v)), 'f8')
             cr = zeros((_t_vals.size, n_transitions), 'f8')
 
             for itemp, _ in enumerate(_t_vals):

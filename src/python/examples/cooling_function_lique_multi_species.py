@@ -24,24 +24,27 @@ from decimal import Decimal
 
 species_data_h2_h = DataLoader().load('H2_lique')
 
+# load the data of He + H2 w/wo  radiative data
 species_data_h2_he = DataLoader().load('HeH2')
 species_data_h2_he_zero_a = DataLoader().load('HeH2')
 species_data_h2_he_zero_a.a_matrix *= 0.0
 species_data_h2_he_zero_a.raw_data.a *= 0.0
-species_data_h2_he_zero_a.raw_data.a_info_nnz = \
-    list(species_data_h2_he_zero_a.raw_data.a_info_nnz)
+species_data_h2_he_zero_a.raw_data.a_info_nnz = list(
+    species_data_h2_he_zero_a.raw_data.a_info_nnz
+)
 species_data_h2_he_zero_a.raw_data.a_info_nnz[4] *= 0.0
 
+# load the data of H+ + H2 w/wo  radiative data
 species_data_h2_hp = DataLoader().load('HpH2')
 species_data_h2_hp_zero_a = DataLoader().load('HpH2')
 species_data_h2_hp_zero_a.a_matrix *= 0.0
 species_data_h2_hp_zero_a.raw_data.a *= 0.0
-species_data_h2_hp_zero_a.raw_data.a_info_nnz = \
-     list(species_data_h2_hp_zero_a.raw_data.a_info_nnz)
+species_data_h2_hp_zero_a.raw_data.a_info_nnz = list(
+    species_data_h2_hp_zero_a.raw_data.a_info_nnz
+)
 species_data_h2_hp_zero_a.raw_data.a_info_nnz[4] *= 0.0
 
-#species_data_wrathmall = DataLoader().load('H2_wrathmall')
-
+# species_data_wrathmall = DataLoader().load('H2_wrathmall')
 
 plt.ion()
 fig, axs = plt.subplots(figsize=(8, 8))
