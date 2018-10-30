@@ -86,7 +86,7 @@ for nc_index, nc_h in enumerate(nc_h_rng):
             species_data_h2_hp_zero_a,
             t_kin,
             t_rad,
-            nc_h * 2.e-1)
+            nc_h * 2.e-4)
 
         m = m_h2_h + m_h2_he_without_a + m_h2_hp_without_a
 
@@ -123,6 +123,7 @@ axs.loglog(
     'r--', color='blue'
 )
 
+import pdb; pdb.set_trace()
 axs.set_yticks([1e-36, 2e-36, 3e-36, 4e-36, 5e-36, 6e-36, 7e-36, 8e-36, 9e-36,
                  1e-35, 2e-35, 3e-35, 4e-35, 5e-35, 6e-35, 7e-35, 8e-35, 9e-35,
                  1e-34, 2e-34, 3e-34, 4e-34, 5e-34, 6e-34, 7e-34, 8e-34, 9e-34,
