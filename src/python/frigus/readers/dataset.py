@@ -35,7 +35,8 @@ from frigus.readers import read_energy_levels, read_einstein_coefficient
 from frigus.readers.read_collision_coefficients import (
     read_collision_coefficients_lique_and_wrathmall,
     read_collision_coefficients_lipovka,
-    read_collision_coefficients_esposito_h2_he
+    read_collision_coefficients_esposito_h2_he,
+    compute_collision_coefficients_gerlich_h2_hp
 )
 
 
@@ -751,7 +752,8 @@ class DataSetHeH2(DataSetBase):
         # read the energy levels (v, j, energy)
         #
         energy_levels = read_energy_levels.read_levels_stancil(
-            os.path.join(DATADIR, 'H2Xvjlevels.cs')
+            os.path.join(DATADIR, 'H2Xvjlevels.cs'),
+            upto=55
         )
 
         self.raw_data.energy_levels = energy_levels
@@ -820,6 +822,105 @@ class DataSetHeH2(DataSetBase):
             k_dex_matrix, self.raw_data.collision_rates_t_range)
         self.k_dex_matrix_interpolator = k_dex_matrix_interpolator
 
+class DataSetHpH2(DataSetBase):
+    """
+    Data of H2 colliding with H+ using collisional data use by Gerlich:
+    https://aip.scitation.org/doi/pdf/10.1063/1.457980
+
+      - energy levels of H2 by Stancil
+      - collisional coefficients of H2 with H+ (K_ij)
+      - radiative coefficients (A_ij, B_ij, B_ji) by Wolniewicz, Simbotin and
+        Dalgarno.
+    """
+    def __init__(self):
+        """
+        Constructor
+        """
+        super(DataSetHpH2, self).__init__()
+        self.read_raw_data()
+        self.reduce_raw_data()
+
+    def read_raw_data(self):
+        """Read the raw H2 data"""
+
+        #
+        # read the energy levels (v, j, energy)
+        #
+        energy_levels = read_energy_levels.read_levels_stancil(
+            os.path.join(DATADIR, 'H2Xvjlevels.cs'),
+            upto=55
+        )
+
+        self.raw_data.energy_levels = energy_levels
+
+        #
+        # read the einstein coefficients for the H2 transitions
+        #
+        a, a_info_nnz = read_einstein_coefficient.read_einstein_simbotin()
+        self.raw_data.a = a
+        self.raw_data.a_info_nnz = a_info_nnz
+
+        #
+        # read the collisional rates for H2 with H+
+        #
+        collision_rates, t_rng, collision_rates_info_nnz = \
+            compute_collision_coefficients_gerlich_h2_hp(
+                os.path.join(
+                    DATADIR, 'k0.txt'
+                ),
+                os.path.join(
+                    DATADIR, 'delta_E0.txt'
+                )
+            )
+
+        self.raw_data.collision_rates = collision_rates
+        self.raw_data.collision_rates_t_range = t_rng
+        self.raw_data.collision_rates_info_nnz = collision_rates_info_nnz
+
+    def reduce_raw_data(self):
+        """
+        Use the raw data in self.raw_data to populate the A and K_dex matrices
+        """
+        self.energy_levels = self.raw_data.energy_levels
+
+        # find the maximum v and j from the Einstein and collisional rates data
+        # sets and adjust the labels of the energy levels according to that
+        v_max_data, j_max_data = population.find_v_max_j_max_from_data(
+            self.raw_data.a_info_nnz,
+            self.raw_data.collision_rates_info_nnz,
+            self.energy_levels
+        )
+
+        self.energy_levels.set_labels(v_max=v_max_data + 1)
+
+        #
+        # reduce the Einstein coefficients to a 2D matrix (construct the A
+        # matrix) [n_levels, n_levels]
+        # A_reduced_slow = population.reduce_einstein_coefficients_slow(
+        #                                 self.raw_data.A_info_nnz,
+        #                                 self.energy_levels)
+        a_matrix = population.reduce_einstein_coefficients(
+            self.raw_data.a,
+            self.energy_levels
+        )
+        self.a_matrix = a_matrix
+
+        # getting the collisional de-excitation matrix (K_dex) (for all
+        # tabulated values)  [n_level, n_level, n_T_kin_values]
+        k_dex_matrix = population.reduce_collisional_coefficients_slow(
+            self.raw_data.collision_rates_info_nnz,
+            self.energy_levels,
+            set_inelastic_coefficient_to_zero=True,
+            set_excitation_coefficients_to_zero=True,
+            reduced_data_is_upper_to_lower_only=False,
+        )
+
+        # compute the interpolator that produces K_dex at a certain temperature
+        k_dex_matrix_interpolator = population.compute_k_dex_matrix_interpolator(
+            k_dex_matrix, self.raw_data.collision_rates_t_range)
+        self.k_dex_matrix_interpolator = k_dex_matrix_interpolator
+
+
 
 class DataLoader(object):
     """
@@ -829,7 +930,7 @@ class DataLoader(object):
         """
         Constructor
         """
-        self.availabe_datasets = {
+        self.available_datasets = {
             'H2_lique': DataSetH2Lique,
             'HD_lipovka': DataSetHDLipovka,
             'H2_wrathmall': DataSetH2Wrathmall,
@@ -837,7 +938,8 @@ class DataLoader(object):
             'two_level_1': DataSetTwoLevel_1,
             'three_level_1': DataSetThreeLevel_1,
             'HD_galileo_project': DataSetHDGalileoProject,
-            'HeH2': DataSetHeH2
+            'HeH2': DataSetHeH2,
+            'HpH2': DataSetHpH2
         }
 
     def load(self, name):
@@ -847,7 +949,7 @@ class DataLoader(object):
         :param str name: The name of the data set to be loaded
         :return: DatasetBase
         """
-        retval = self.availabe_datasets.get(name)()
+        retval = self.available_datasets.get(name)()
         if retval is None:
             msg = 'not data loader defined for {}'.format(name)
             raise ValueError(msg)

@@ -30,6 +30,7 @@ from numpy import (loadtxt, int32, zeros, unique, void,
                    ascontiguousarray, dtype, hstack)
 
 from astropy import units as u
+from astropy.constants import k_B
 
 
 def unique_level_pairs(vj):
@@ -574,6 +575,195 @@ def read_collision_coefficients_esposito_h2_he(fname):
         hstack(
             (unique_level_pairs(ini),
             unique_level_pairs(fin))
+        )
+    )
+
+    # set the units of the data to be returned
+    data_with_units = reader.data * (u.cm**3 / u.second)
+    cr_with_units = reader.cr * (u.cm**3 / u.second)
+    t_values = reader.tkin * u.K
+
+    # convert the units to m^3/s
+    data_with_units = data_with_units.to(u.m**3 / u.second)
+    cr_with_units = cr_with_units.to(u.m**3 / u.second)
+
+    return data_with_units, t_values, (ini, fin, unique_levels, cr_with_units)
+
+def compute_collision_coefficients_gerlich_h2_hp(fname1, fname2):
+    """
+    Parse the coefficients k0 and Delta_E0 provided by Gerlich in
+
+    https://aip.scitation.org/doi/pdf/10.1063/1.457980
+
+    to compute the reaction rates for the process:
+    H+ + H2(j) -> H+ + H2(j')
+    The data are fully provided for the transitions up to j = 7.
+
+    These are the coefficient rates K_ij; K_ji (upwards transitions)
+    must be found with detailed balance.
+
+    The thermal reactions can be calculated as:
+
+    K_j_j'(T) = k0_j_j' * exp(-Delta_E0_j_j'/k/T)
+
+    In the read file there are 2 tables:
+     - first table: k0 (units: 10**-10 cm3/s)
+     - second table: Delta_E0 (units: meV)
+
+    # indices: (initial,final)
+    #   final 0     1       2      3      4      5      6     7
+    #0
+    #1
+    #2
+    #3
+    #4
+    #5
+    #6
+    #7
+
+    The temperature range in which these fits are valid is:
+
+    t_kin in [10, 500] K
+
+    :param string fname: The path to the ascii data.
+    :return: a tuple of 3 elements.
+
+      The first element is a 5D array that holds all the rate coefficients.
+      K[v, j, v', j', T_index] ( in m3/s)
+
+      The second element is a 1D temperature array (T) corresponding to the
+      rate coefficients in the 5D array. This array has the same size as the
+      last dimension of K (i.e K[0,0,0,0,:].size = T.size
+
+      The third element is a tuple of 4 elements:
+
+         - The first element is a 2D array of shape (2, n_transitions) (ini).
+           The columns of this array (v, j = ini) are the initial v and j of
+           the transitions for a certain T section. i.e. the number of non-zero
+           elements in K for a certain temperature is equal to the number of
+           elements in the v or j columns.
+           v.size = j.size = where(K[..., 0] > 0)[0].size
+
+         - The second element is the same of the first element but for the
+           final transitions (v', j' = fin)
+
+         - The third element is a 2D array of shape (2, n_unique_transitions)
+           that are the unique levels involved in all the transitions.
+
+         - The last element is an array of shape (T.size, n_transitions)
+           which are the collisional coefficient rates with non-zero values
+           for each value of temperature in the T array.
+    """
+
+    class Reader(object):
+        """
+        Parse the data by Gerlic
+        """
+        def __init__(self, fname, tiny=1e-70):
+            """Constructor"""
+
+            self.fname1 = fname1
+            self.fname2 = fname2
+            self.data = None
+            self.cr = None
+            """
+            the collision rates for all the transitions for all the temperatures
+            """
+            self.ini = None   #: the initial v,j of all the transitions
+            self.fin = None   #: the final v,j of all the transitions
+            self.tkin = None
+            """the temperatures at which the collisional data are given"""
+
+            self.read_data()
+
+        def read_data(self):
+            ini = []
+            fin = []
+
+            k0 = []
+            with open(self.fname1,
+                      'r') as fobj1:
+                for line in fobj1:
+                    k0.append(list(map(float, line.split())))
+
+            delta_E0 = []
+            with open(self.fname2,
+                    'r') as fobj2:
+                for line in fobj2:
+                    delta_E0.append(list(map(float, line.split())))
+
+            k0 *= 1e-10 * u.cm ** 3 / u.s
+            delta_E0 *= u.meV
+
+            _t_vals = numpy.logspace(1., 2.7, 22)
+
+            K_gerlich = []
+            for itemp, t_kin in enumerate(_t_vals):
+                t_kin *= u.K
+                K_gerlich_array = k0 * \
+                                   numpy.exp(
+                                       -1. * delta_E0.to(u.J) / k_B / t_kin)
+
+                K_gerlich.append(K_gerlich_array)
+
+            n_transitions = len(K_gerlich[:][0])**2
+
+            ini = (numpy.array(n_transitions * [0]).T,
+                   numpy.array(
+                       len(K_gerlich[:][0]) *
+                        [0, 1, 2, 3, 4, 5, 6, 7]).T
+                   )
+            fin = (numpy.array(n_transitions * [0]).T,
+                   numpy.array(
+                       len(K_gerlich[:][0]) *
+                        [0, 1, 2, 3, 4, 5, 6, 7]).T
+                   )
+            ini = numpy.vstack(ini)
+            fin = numpy.vstack(fin)
+            '''
+            - initialize to zero a matrix that has the same dimension of nlevels
+              (radiative + collisional)
+            - implement the fit for the involved levels
+                    K_j_j'(T) = k0_j_j' * exp(-Delta_E0_j_j'/k/T)
+            - compute the j'_j transitions with the detailed balance            
+            '''
+
+
+            # declare the array where the data will be stored in a tensor
+            nv, nj, nvp, njp = \
+                0 + 1, len(K_gerlich[:][0]), 0 + 1, len(K_gerlich[:][0])
+            nv_max, nj_max = max(nv, nvp), max(nj, njp)
+            data = zeros((_t_vals.size, nv_max, nj_max, nv_max, nj_max), 'f8')
+            #cr = zeros((_t_vals.size, len(_v)), 'f8')
+            cr = zeros((_t_vals.size, n_transitions), 'f8')
+
+            for itemp, _ in enumerate(_t_vals):
+                for j in numpy.arange(len(K_gerlich[:][0])):
+                    for jp in numpy.arange(len(K_gerlich[:][0])):
+                        data[itemp, 0, j, 0, jp] = K_gerlich[itemp][j][jp].value
+                        # assign the reaction rates for all the temperatures
+                        # for the ib-th transition
+                        cr[itemp, j*len(K_gerlich[:][0])+jp] =\
+                            K_gerlich[itemp][j][jp].value
+
+            self.ini = ini
+            self.fin = fin
+            self.tkin = _t_vals
+            self.data = data
+            self.cr = cr
+
+            return data, cr
+
+    reader = Reader(fname1, fname2)
+
+    ini = reader.ini
+    fin = reader.fin
+
+    # find the unique levels from from the transitions
+    unique_levels = unique_level_pairs(
+        hstack(
+            (unique_level_pairs(ini),
+             unique_level_pairs(fin))
         )
     )
 
