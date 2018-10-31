@@ -82,7 +82,10 @@ def solve_equilibrium(m_matrix):
     # i.e the sum of the independent variable is 1, i.e the sum of the
     # population levels is
     #dxdt = numpy.zeros((sz, 1), 'f8')
-    dxdt = -1e-25*numpy.ones((sz, 1), 'f8')
+    dxdt = -1e-29*numpy.ones((sz, 1), 'f8') # 10**-29 correponding to intermediate
+                                            # temperatures
+                                            # and freeze-out value for the fractional
+                                            # abundances of H and H-
     m_matrix[0, :], dxdt[0] = 1.0, 1.0
 
     # solving the system A.x = b
