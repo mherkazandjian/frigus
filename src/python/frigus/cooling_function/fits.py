@@ -250,3 +250,25 @@ def fit_flower(density, t_kin):
     retval = 10.0**w
 
     return retval * u.erg * u.s**-1
+
+
+def fit_associative_detachment(t_kin):
+    """
+    Compute the reaction rate by Coppola et al 2007 for H-/H associative
+    detachment
+
+    The reaction rate is computed in units of m**3 s**-1
+
+    :param u.quantity.Quantity t_kin: temperature range as an astropy
+           quantity (in K)
+    :return: u.quantity |float the reaction rate
+    """
+
+    # nc_hm = nc_h * 1e-10
+    rr_coppola2007 = 3.67e-5 \
+                 * (t_kin.value ** (-2.28)) \
+                 * numpy.exp(-47172. / t_kin.value)
+
+    # m_h_hm = rr_coppola2007 * nc_h * nc_hm * numpy.ones(55) /55.
+
+    return rr_coppola2007 * u.m ** 3 * u.s ** -1
