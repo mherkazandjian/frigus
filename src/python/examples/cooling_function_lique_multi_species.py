@@ -16,9 +16,12 @@ from frigus.population import (cooling_rate_at_steady_state,
 from frigus.solvers.linear import solve_equilibrium
 from frigus.readers.dataset import DataLoader
 from frigus.utils import display_matrix
+from frigus.cooling_function.fits import fit_coppola
 
 import matplotlib
 from matplotlib.ticker import ScalarFormatter
+
+from multivariate_fit import fit_lambda, func
 
 from decimal import Decimal
 
@@ -63,6 +66,10 @@ t_rng = numpy.logspace(2, 3.6, 10) * u.Kelvin
 
 plot_markers = [(2 + i // 2, 1 + i % 2, 0) for i in range(16)]
 
+x_fit = []
+y_fit = []
+lambda_fit = []
+
 for nc_index, nc_h in enumerate(nc_h_rng):
 
     lambda_vs_t_kin = []
@@ -92,6 +99,12 @@ for nc_index, nc_h in enumerate(nc_h_rng):
 
         x_equilibrium = solve_equilibrium(m.si.value)
 
+        sca = cooling_rate(
+            x_equilibrium,
+            species_data_h2_h.energy_levels,
+            species_data_h2_h.a_matrix
+        )
+
         lambda_vs_t_kin += [cooling_rate(
             x_equilibrium,
             species_data_h2_h.energy_levels,
@@ -99,20 +112,33 @@ for nc_index, nc_h in enumerate(nc_h_rng):
             )
         ]
 
+        x_fit.append(t_kin.value)
+        y_fit.append(nc_h.cgs.value)
+        lambda_fit.append(sca.to(u.erg/u.s).value)
+
     lambda_vs_t_kin = u.Quantity(lambda_vs_t_kin)
+
+    lambda_vs_t_kin_lique = fit_coppola(t_rng, nc_h)
 
     axs.loglog(
         t_rng.value, lambda_vs_t_kin.to(u.erg / u.second).value,
-        '-x', color='black', marker=plot_markers[nc_index]
+        '-x', color='black', marker=plot_markers[nc_index], label=''
     )
 
+    axs.loglog(
+        t_rng.value, lambda_vs_t_kin_lique.value,
+        'r--', color='green', label=''
+    )
+
+    axs.set_xlabel('T$_\mathrm{kin}$ [K]')
+    axs.set_ylabel('cooling function [erg $\cdot$ s$^{-1}$]')
 # axs.loglog(
 #        t_rng.value, lambda_vs_t_kin_wrathmall.to(u.Joule / u.second).value,
 #         '-.', color='green', marker=plot_markers[nc_index]
 # )
 
-axs.set_xlabel('T$_\mathrm{kin}$ [K]')
-axs.set_ylabel('cooling function [erg $\cdot$ s$^{-1}$]')
+popt, pcov = fit_lambda(x_fit, y_fit, lambda_fit)
+
 
 lambda_vs_t_kin_glover = u.Quantity(
     [fit_glover(_t_kin) for _t_kin in t_rng.value]
@@ -124,18 +150,15 @@ axs.loglog(
 )
 
 #import pdb; pdb.set_trace()
-# axs.set_yticks([1e-36, 2e-36, 3e-36, 4e-36, 5e-36, 6e-36, 7e-36, 8e-36, 9e-36,
-#                  1e-35, 2e-35, 3e-35, 4e-35, 5e-35, 6e-35, 7e-35, 8e-35, 9e-35,
-#                  1e-34, 2e-34, 3e-34, 4e-34, 5e-34, 6e-34, 7e-34, 8e-34, 9e-34,
-#                  1e-33, 2e-33, 3e-33, 4e-33, 5e-33, 6e-33, 7e-33, 8e-33, 9e-33,
-#                  1e-32, 2e-32, 3e-32, 4e-32, 5e-32, 6e-32, 7e-32, 8e-32, 9e-32,
-#                  1e-31, 2e-31, 3e-31, 4e-31, 5e-31, 6e-31, 7e-31, 8e-31, 9e-31,
-#                  1e-30, 2e-30, 3e-30, 4e-30, 5e-30, 6e-30, 7e-30, 8e-30, 9e-30,
-#                  1e-29, 2e-29, 3e-29, 4e-29, 5e-29, 6e-29, 7e-29, 8e-29, 9e-29,
-#                  1e-28, 2e-28, 3e-28, 4e-28, 5e-28, 6e-28, 7e-28, 8e-28, 9e-28,
-#                  1e-27, 2e-27, 3e-27, 4e-27, 5e-27, 6e-27, 7e-27, 8e-27, 9e-27,
-#                  1e-26, 2e-26, 3e-26])
-
+axs.set_yticks([1e-27, 2e-27, 3e-27, 4e-27, 5e-27, 6e-27, 7e-27, 8e-27, 9e-27,
+                1e-26, 2e-26, 3e-26, 4e-26, 5e-26, 6e-26, 7e-26, 8e-26, 9e-26,
+                1e-25, 2e-25, 3e-25, 4e-25, 5e-25, 6e-25, 7e-25, 8e-25, 9e-25,
+                1e-24, 2e-24, 3e-24, 4e-24, 5e-24, 6e-24, 7e-24, 8e-24, 9e-24,
+                1e-23, 2e-23, 3e-23, 4e-23, 5e-23, 6e-23, 7e-23, 8e-23, 9e-23,
+                1e-22, 2e-22, 3e-22, 4e-22, 5e-22, 6e-22, 7e-22, 8e-22, 9e-22,
+                1e-21, 2e-21, 3e-21, 4e-21, 5e-21, 6e-21, 7e-21, 8e-21, 9e-21,
+                1e-20, 2e-20, 3e-20, 4e-20, 5e-20, 6e-20, 7e-20, 8e-20, 9e-20
+            ])
 # matplotlib.pyplot.ylim(ymin=3e-36, ymax=3e-26)
 
 axs.get_yaxis().set_minor_formatter(matplotlib.ticker.ScalarFormatter())
