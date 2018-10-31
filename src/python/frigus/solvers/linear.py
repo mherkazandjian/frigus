@@ -81,7 +81,8 @@ def solve_equilibrium(m_matrix):
     # solving directly. replacing the first row with the conservation equation
     # i.e the sum of the independent variable is 1, i.e the sum of the
     # population levels is
-    dxdt = numpy.zeros((sz, 1), 'f8')
+    #dxdt = numpy.zeros((sz, 1), 'f8')
+    dxdt = -1e-25*numpy.ones((sz, 1), 'f8')
     m_matrix[0, :], dxdt[0] = 1.0, 1.0
 
     # solving the system A.x = b
