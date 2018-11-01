@@ -8,7 +8,6 @@ from astropy import units as u
 from frigus.readers.dataset import DataLoader
 from frigus.cooling_function.grid import CoolingFunctionGrid
 
-
 grid = CoolingFunctionGrid()
 
 grid.set_species(DataLoader().load('HD_lipovka'))

@@ -3,6 +3,7 @@ from numpy import isscalar
 
 from astropy import units as u
 import matplotlib.pyplot as plt
+from matplotlib import cm
 from mpl_toolkits.mplot3d import Axes3D
 
 from frigus.population import cooling_rate_at_steady_state
@@ -146,11 +147,14 @@ class CoolingFunctionGrid(object):
         fig = plt.figure()
         ax = fig.gca(projection='3d')
 
-        ax.plot_surface(
-            numpy.log10(xval.value),
-            numpy.log10(yval.value),
-            numpy.log10(zval)
-        )
+        X = numpy.log10(xval.value)
+        Y = numpy.log10(yval.value)
+        Z = numpy.log10(zval)
+
+        ax.plot_surface(X, Y, Z, cmap=cm.coolwarm)
+        _ = ax.contour(X, Y, Z, zdir='z', cmap=cm.coolwarm, offset=Z.min() - 1)
+        _ = ax.contour(X, Y, Z, zdir='x', cmap=cm.coolwarm, offset=X.min() - 1)
+        _ = ax.contour(X, Y, Z, zdir='y', cmap=cm.coolwarm, offset=Y.max() + 1)
 
         plt.setp(
             ax,
@@ -158,6 +162,9 @@ class CoolingFunctionGrid(object):
             'ylabel', 'log$_{10}$(T$_{kin}$ [K])'
         )
         ax.set_zlabel('log$_{10}$(cooling function [cgs])')
+        ax.set_xlim(X.min() - 1, X.max() + 1)
+        ax.set_ylim(Y.min() - 1, Y.max() + 1)
+        ax.set_zlim(Z.min() - 1, Z.max() + 1)
 
         if show is True:
             plt.show()
