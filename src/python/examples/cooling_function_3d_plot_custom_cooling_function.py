@@ -4,6 +4,15 @@ density and plot them in 3D
 """
 from __future__ import print_function
 import numpy as np
+
+import matplotlib.pyplot as plt
+import matplotlib
+
+plt.rc('font', family='serif')
+plt.rc('xtick', labelsize='small')
+plt.rc('ytick', labelsize='small')
+plt.rc('text', usetex=True)
+
 from astropy import units as u
 from frigus.readers.dataset import DataLoader
 from frigus.cooling_function.grid import CoolingFunctionGrid
@@ -84,7 +93,7 @@ grid = CoolingFunctionGridMultiSpecies()
 
 grid.set_species(DataLoader().load('HD_lipovka'))
 
-grid.set_density(np.logspace(6, 14, 35) * u.m ** -3)
+grid.set_density(np.logspace(2, 14, 35) * u.m ** -3)
 grid.set_t_kin(np.logspace(2, 3.2, 35) * u.Kelvin)
 grid.set_t_rad(0.0 * u.Kelvin)
 

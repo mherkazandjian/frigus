@@ -144,7 +144,7 @@ class CoolingFunctionGrid(object):
 
         zval = self.cooling_function
 
-        fig = plt.figure()
+        fig = plt.figure(figsize=(4, 4))
         ax = fig.gca(projection='3d')
 
         X = numpy.log10(xval.value)
@@ -158,8 +158,8 @@ class CoolingFunctionGrid(object):
 
         plt.setp(
             ax,
-            'xlabel', 'log$_{10}$(density n [m$^{-3}$])',
-            'ylabel', 'log$_{10}$(T$_{kin}$ [K])'
+            'xlabel', 'log$_{10}$($n$ [m$^{-3}$])',
+            'ylabel', 'log$_{10}$(T$_{\rm kin}$ [K])'
         )
         ax.set_zlabel('log$_{10}$(cooling function [cgs])')
         ax.set_xlim(X.min() - 1, X.max() + 1)
