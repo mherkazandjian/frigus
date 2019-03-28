@@ -174,7 +174,7 @@ def fit_coppola(t_kin, n_hd):
 
     assert t_kin.min() >= 100.0 * u.K
     assert t_kin.max() <= 5000.0 * u.K
-    assert n_hd.min() >= 1e6 * u.m**-3
+    assert n_hd.min() >= 1e2 * u.m**-3
     assert n_hd.max() <= 1e14 * u.m**-3
 
     lt_kin = numpy.log10(t_kin.value)
@@ -210,35 +210,66 @@ def fit_coppola(t_kin, n_hd):
     #                - 4.37732460e-1 * lt_kin ** 4 * ln_hd ** 3
     #                + 2.44900752e-2 * lt_kin ** 4 * ln_hd ** 4)
 
-    retval = 10.**(  -9.30186394e+01 * lt_kin ** 0 * ln_hd ** 0
-                     -4.59042326e+00* lt_kin ** 0 * ln_hd ** 1
-                     -2.39644612e+00* lt_kin ** 0 * ln_hd ** 2
-                     +5.33417509e-01* lt_kin ** 0 * ln_hd ** 3
-                     -2.37275024e-02* lt_kin ** 0 * ln_hd ** 4
+    # retval = 10.**(  -9.30186394e+01 * lt_kin ** 0 * ln_hd ** 0
+    #                  -4.59042326e+00* lt_kin ** 0 * ln_hd ** 1
+    #                  -2.39644612e+00* lt_kin ** 0 * ln_hd ** 2
+    #                  +5.33417509e-01* lt_kin ** 0 * ln_hd ** 3
+    #                  -2.37275024e-02* lt_kin ** 0 * ln_hd ** 4
+    # 
+    #                  +9.53790916e+01 * lt_kin ** 1 * ln_hd ** 0
+    #                  +1.21991916e+01* lt_kin ** 1 * ln_hd ** 1
+    #                  +2.84793324e-01* lt_kin ** 1 * ln_hd ** 2
+    #                  -1.79478025e-01* lt_kin ** 1 * ln_hd ** 3
+    #                  -5.06173402e-04* lt_kin ** 1 * ln_hd ** 4
+    # 
+    #                  -5.29347560e+01* lt_kin ** 2 * ln_hd ** 0
+    #                  -8.19882323e+00* lt_kin ** 2 * ln_hd ** 1
+    #                  +1.18055362e+00* lt_kin ** 2 * ln_hd ** 2
+    #                  -1.88445938e-01* lt_kin ** 2 * ln_hd ** 3
+    #                  +1.82380851e-02* lt_kin ** 2 * ln_hd ** 4
+    # 
+    #                  +1.32856875e+01* lt_kin ** 3 * ln_hd ** 0
+    #                  +2.20881654e+00* lt_kin ** 3 * ln_hd ** 1
+    #                  -5.29631603e-01* lt_kin ** 3 * ln_hd ** 2
+    #                  +1.03933459e-01* lt_kin ** 3 * ln_hd ** 3
+    #                  -8.27289914e-03* lt_kin ** 3 * ln_hd ** 4
+    # 
+    #                  -1.22881695e+00* lt_kin ** 4 * ln_hd ** 0
+    #                  -2.10210825e-01* lt_kin ** 4 * ln_hd ** 1
+    #                  +6.52317292e-02* lt_kin ** 4 * ln_hd ** 2
+    #                  -1.39994365e-02* lt_kin ** 4 * ln_hd ** 3
+    #                  +1.06496239e-03* lt_kin ** 4 * ln_hd ** 4)
 
-                     +9.53790916e+01 * lt_kin ** 1 * ln_hd ** 0
-                     +1.21991916e+01* lt_kin ** 1 * ln_hd ** 1
-                     +2.84793324e-01* lt_kin ** 1 * ln_hd ** 2
-                     -1.79478025e-01* lt_kin ** 1 * ln_hd ** 3
-                     -5.06173402e-04* lt_kin ** 1 * ln_hd ** 4
+    retval = 10.**(  -1.07761178e+02 * lt_kin ** 0 * ln_hd ** 0
+                     +8.50704285e+00* lt_kin ** 0 * ln_hd ** 1
+                     -3.08850636e-01* lt_kin ** 0 * ln_hd ** 2
+                     -3.97357274e-01* lt_kin ** 0 * ln_hd ** 3
+                     +3.65589231e-02* lt_kin ** 0 * ln_hd ** 4
 
-                     -5.29347560e+01* lt_kin ** 2 * ln_hd ** 0
-                     -8.19882323e+00* lt_kin ** 2 * ln_hd ** 1
-                     +1.18055362e+00* lt_kin ** 2 * ln_hd ** 2
-                     -1.88445938e-01* lt_kin ** 2 * ln_hd ** 3
-                     +1.82380851e-02* lt_kin ** 2 * ln_hd ** 4
+                     +1.17901741e+02 * lt_kin ** 1 * ln_hd ** 0
+                     -1.09489742e+01* lt_kin ** 1 * ln_hd ** 1
+                     +2.51708582e-01* lt_kin ** 1 * ln_hd ** 2
+                     +5.47452438e-01* lt_kin ** 1 * ln_hd ** 3
+                     -4.89055533e-02* lt_kin ** 1 * ln_hd ** 4
 
-                     +1.32856875e+01* lt_kin ** 3 * ln_hd ** 0
-                     +2.20881654e+00* lt_kin ** 3 * ln_hd ** 1
-                     -5.29631603e-01* lt_kin ** 3 * ln_hd ** 2
-                     +1.03933459e-01* lt_kin ** 3 * ln_hd ** 3
-                     -8.27289914e-03* lt_kin ** 3 * ln_hd ** 4
+                     -6.61721218e+01* lt_kin ** 2 * ln_hd ** 0
+                     +5.95232129e+00* lt_kin ** 2 * ln_hd ** 1
+                     -1.10639748e-01* lt_kin ** 2 * ln_hd ** 2
+                     -2.92423859e-01* lt_kin ** 2 * ln_hd ** 3
+                     +2.57375696e-02* lt_kin ** 2 * ln_hd ** 4
 
-                     -1.22881695e+00* lt_kin ** 4 * ln_hd ** 0
-                     -2.10210825e-01* lt_kin ** 4 * ln_hd ** 1
-                     +6.52317292e-02* lt_kin ** 4 * ln_hd ** 2
-                     -1.39994365e-02* lt_kin ** 4 * ln_hd ** 3
-                     +1.06496239e-03* lt_kin ** 4 * ln_hd ** 4)
+                     +1.67152116e+01* lt_kin ** 3 * ln_hd ** 0
+                     -1.43513388e+00* lt_kin ** 3 * ln_hd ** 1
+                     +2.84953800e-02* lt_kin ** 3 * ln_hd ** 2
+                     +7.02040444e-02* lt_kin ** 3 * ln_hd ** 3
+                     -6.18478233e-03* lt_kin ** 3 * ln_hd ** 4
+
+                     -1.55475014e+00* lt_kin ** 4 * ln_hd ** 0
+                     +1.29639563e-01* lt_kin ** 4 * ln_hd ** 1
+                     -3.13943372e-03* lt_kin ** 4 * ln_hd ** 2
+                     -6.36261310e-03* lt_kin ** 4 * ln_hd ** 3
+                     +5.65797161e-04* lt_kin ** 4 * ln_hd ** 4)
+
 
     return retval * u.erg * u.s**-1
 
