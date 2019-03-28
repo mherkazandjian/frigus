@@ -121,22 +121,23 @@ def fit_lambda(x_fit, y_fit, data_to_fit):
         D04,  D14, D24, D34, D44
 
 
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-
-    ax.scatter(x_fit, y_fit, data_to_fit)
-
-    ax.set_xlabel('Temperature [K]')
-    ax.set_ylabel('Density')
-    ax.set_zlabel('cooling function')
-
-    plt.show()
+    # fig = plt.figure()
+    # ax = fig.add_subplot(111, projection='3d')
+    #
+    # ax.scatter(x_fit, y_fit, data_to_fit)
+    #
+    # ax.set_xlabel('Temperature [K]')
+    # ax.set_ylabel('Density')
+    # ax.set_zlabel('cooling function')
+    #
+    # plt.show()
 
     #lambda_flatten = [item for sublist in data_to_fit for item in sublist]
 
-    popt, pcov = \
-    curve_fit(func, (np.log10(x_fit), np.log10(y_fit)),
-                     np.log10(data_to_fit), D)
+    popt, pcov = curve_fit(
+        func, (np.log10(x_fit), np.log10(y_fit)),
+        np.log10(data_to_fit), D
+    )
 
     return popt, pcov
 
