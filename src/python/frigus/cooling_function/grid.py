@@ -159,7 +159,7 @@ class CoolingFunctionGrid(object):
         plt.setp(
             ax,
             'xlabel', 'log$_{10}$($n$ [m$^{-3}$])',
-            'ylabel', 'log$_{10}$(T$_{\rm kin}$ [K])'
+            'ylabel', 'log$_{10}$(T$_{\r kin}$ [K])'
         )
         ax.set_zlabel('log$_{10}$(cooling function [cgs])')
         ax.set_xlim(X.min() - 1, X.max() + 1)
