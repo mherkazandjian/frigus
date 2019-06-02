@@ -91,7 +91,7 @@ class CoolingFunctionGridMultiSpecies(CoolingFunctionGrid):
 
 grid = CoolingFunctionGridMultiSpecies()
 
-grid.set_species(DataLoader().load('HD_lipovka'))
+grid.set_species(DataLoader().load('H2_lique'))
 
 grid.set_density(np.logspace(2, 14, 35) * u.m ** -3)
 grid.set_t_kin(np.logspace(2, 3.2, 35) * u.Kelvin)
