@@ -59,5 +59,5 @@ def test_that_two_level_population_density_ratios_agree_with_analytic_solution()
             ratio_analytic_vs_t_kin)
     )
 
-    assert relative_error.max() < 1.0e-15
+    assert relative_error.max() < 1.2e-15
     assert relative_error.std() < 5.0e-16

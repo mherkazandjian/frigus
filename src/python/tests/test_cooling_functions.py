@@ -74,5 +74,5 @@ def test_that_the_lique_cooling_function_is_computed_correctly():
     assert_allclose(
         cooling_rate_for_t_array.cgs.value,
         cooling_rate_expected.cgs.value,
-        rtol=1e-6, atol=0.0
+        rtol=2e-6, atol=0.0
     )

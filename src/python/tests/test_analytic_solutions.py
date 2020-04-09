@@ -61,7 +61,7 @@ def test_that_two_level_analytic_pop_dens_ratios_are_computed_correctly():
             ratio_analytic_vs_t_kin)
     )
 
-    assert relative_error.max() < 1.0e-15
+    assert relative_error.max() < 1.2e-15
     assert relative_error.std() < 5.0e-16
 
 def test_that_three_level_analytic_pop_dens_ratios_are_computed_correctly():
