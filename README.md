@@ -37,11 +37,11 @@ or using pip and directly from github
 Tests
 -----
 
-The tests can be run by executing
+The tests can be run by executing (in the directory ``src/python``)
 
+````bash
    make test
-
-in the directory ``src/python``.
+````
 
 Input data
 ----------
