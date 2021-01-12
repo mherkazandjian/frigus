@@ -30,7 +30,7 @@ from astropy.constants import c, h
 
 from frigus.species import EnergyLevelsMolecule, EnergyLevelsOnDegreeOfFreedom
 from frigus.utils import linear_2d_index
-
+import pdb 
 
 def read_levels_stancil(fname, upto=None):
     """
@@ -293,5 +293,53 @@ def read_levels_two_levels_test_1(fname):
     energy_levels.data['g'] = g
     energy_levels.data['E'] = energies*u.eV
     energy_levels.data['label'] = j
+
+    return energy_levels
+
+def read_levels_amaral(fname):
+    """
+    read the energy levels from the file "hd_amaral_2019_linelist.dat" from the 
+    exomol database:
+    http://www.exomol.com/data/molecules/H2/1H-2H/ADJSAAM/
+    based on the paper:
+    Amaral, P. H. R., Diniz, L.G., Jones, K.A., Stanke, M., Alijah, A., Adamowicz, L., Mohallem, J.R.,    "Benchmark Rovibrational Linelists and Einstein A-coefficients for the Primordial Molecules and 
+    Isotopologues", The Astrophysical Journal 878, 95 (2019).
+    The file has (should have) the following format.
+
+
+#          v           J     Energy (cm^-1) 
+           0           0   0.0000000000000000     
+           1           0   3632.1089412567831     
+           2           0   7086.7124505368847     
+
+    :param fname: The paths to the ascii file containing the levels
+     information.
+    :return: numpy array array of N rows, the v and j levels and their
+     corresponding energy. The elements of the array are stored in increasing
+     order in the energy.
+
+    .. code-block:: python
+
+
+        print('{:3}{:3}{:10}'.format('v', 'j', 'E(eV)'))
+        for level in levels:
+           print('{:3}{:3}{:10}'.format(level['v'], level['j'], level['E']))
+    """
+    data_read = numpy.loadtxt(fname, skiprows=5)
+    # get the sorting indices list from the last column (energy)
+    inds = numpy.argsort(data_read[:, -1])
+
+    v, j, energies = data_read[inds, 0].astype('i4'), data_read[inds, 1].astype('i4'), data_read[inds, 2]
+
+    energy_levels = EnergyLevelsMolecule(inds.size, energy_unit=u.K)
+
+    energy_levels.data['v'] = v
+    energy_levels.data['j'] = j
+    energy_levels.data['g'] = 2*j + 1
+    energy_levels.data['E'] = (energies*u.cm**-1).to(
+        u.eV,
+        equivalencies=u.spectral()
+    )
+    energy_levels.data['label'] = linear_2d_index(v, j)
 
     return energy_levels

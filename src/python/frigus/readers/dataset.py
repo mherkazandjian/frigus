@@ -35,9 +35,11 @@ from frigus.readers import read_energy_levels, read_einstein_coefficient
 from frigus.readers.read_collision_coefficients import (
     read_collision_coefficients_lique_and_wrathmall,
     read_collision_coefficients_lipovka,
-    read_collision_coefficients_esposito_h2_he
+    read_collision_coefficients_esposito_h2_he,
+    read_collision_coefficients_desrousseaux
 )
 
+import pdb
 
 DATADIR = utils.datadir_path()
 
@@ -634,7 +636,7 @@ class DataSetHDLipovka(DataSetBase):
 
 class DataSetHDGalileoProject(DataSetBase):
     """
-    Data of HD colliding with H using collisional data use by Lipovka.
+    Data of HD colliding with H using collisional data use by Desrousseaux and Coppola (first paper - limited energy).
 
       - energy levels of HD (only rotational for v = 0)
       - collisional coefficients of HD with H (K_ij)
@@ -820,6 +822,102 @@ class DataSetHeH2(DataSetBase):
         self.k_dex_matrix_interpolator = k_dex_matrix_interpolator
 
 
+class DataSetHDDesrousseaux(DataSetBase):
+    """
+    Data of HD colliding with H using collisional data use by Benjamin Desrousseaux and Coppola (full dataset).
+
+      - energy levels of HD from Amaral 2019
+      - collisional coefficients of HD with H (K_ij)
+      - radiative coefficients (A_ij, B_ij, B_ji) from Amaral 2019
+
+    Limitations
+
+      - The smallest data set of (A, B, K) determines the number of states to
+       be inserted in the model.
+    """
+    def __init__(self):
+        """
+        Constructor
+        """
+        super(DataSetHDDesrousseaux, self).__init__()
+        self.read_raw_data()
+        self.reduce_raw_data()
+
+    def read_raw_data(self):
+        """Read the raw HD data"""
+
+        #
+        # read the energy levels (v, j, energy)
+        #
+        energy_levels = read_energy_levels.read_levels_amaral(
+            os.path.join(DATADIR, 'lipovka', 'hd_amaral_2019_linelist.dat')
+        )
+        self.raw_data.energy_levels = energy_levels
+
+
+        #
+        # read the einstein coefficients for the HD transitions
+        #
+        a, a_info_nnz = read_einstein_coefficient.read_einstein_amaral()
+        self.raw_data.a = a
+        self.raw_data.a_info_nnz = a_info_nnz
+
+        #
+        # read the collisional rates for HD with H
+        #
+        collision_rates, t_rng, collision_rates_info_nnz = \
+            read_collision_coefficients_desrousseaux(
+                os.path.join(
+                    DATADIR, 'lipovka', 'desrousseaux', 'HDH_ine_rates.dat'
+                )
+            )
+
+        self.raw_data.collision_rates = collision_rates
+        self.raw_data.collision_rates_t_range = t_rng
+        self.raw_data.collision_rates_info_nnz = collision_rates_info_nnz
+
+    def reduce_raw_data(self):
+        """
+        Use the raw data in self.raw_data to populate the A and K_dex matrices
+        """
+
+        # find the maximum v and j from the Einstein and collisional rates data
+        # sets and adjust the labels of the energy levels according to that
+        v_max_data, j_max_data = population.find_v_max_j_max_from_data(
+            self.raw_data.a_info_nnz,
+            self.raw_data.collision_rates_info_nnz,
+            self.raw_data.energy_levels)
+
+        self.energy_levels = self.raw_data.energy_levels
+        self.energy_levels.set_labels(v_max=v_max_data + 1)
+
+        #
+        # reduce the Einstein coefficients to a 2D matrix (construct the A
+        # matrix) [n_levels, n_levels]
+        # A_reduced_slow = population.reduce_einstein_coefficients_slow(
+        #                                 self.raw_data.A_info_nnz,
+        #                                 self.energy_levels)
+        a_matrix = population.reduce_einstein_coefficients(
+                          self.raw_data.a,
+                          self.energy_levels)
+        self.a_matrix = a_matrix
+
+        # getting the collisional de-excitation matrix (K_dex) (for all
+        # tabulated values)  [n_level, n_level, n_T_kin_values]
+        k_dex_matrix = population.reduce_collisional_coefficients_slow(
+            self.raw_data.collision_rates_info_nnz,
+            self.energy_levels,
+            set_inelastic_coefficient_to_zero=True,
+            set_excitation_coefficients_to_zero=True,
+            reduced_data_is_upper_to_lower_only=False,
+        )
+
+        # compute the interpolator that produces K_dex at a certain temperature
+        k_dex_matrix_interpolator = population.compute_k_dex_matrix_interpolator(
+            k_dex_matrix, self.raw_data.collision_rates_t_range)
+        self.k_dex_matrix_interpolator = k_dex_matrix_interpolator
+
+
 class DataLoader(object):
     """
     Load various data sets.
@@ -836,7 +934,8 @@ class DataLoader(object):
             'two_level_1': DataSetTwoLevel_1,
             'three_level_1': DataSetThreeLevel_1,
             'HD_galileo_project': DataSetHDGalileoProject,
-            'HeH2': DataSetHeH2
+            'HeH2': DataSetHeH2,
+            'HD_desrousseaux': DataSetHDDesrousseaux
         }
 
     def load(self, name):
@@ -852,4 +951,5 @@ class DataLoader(object):
             raise ValueError(msg)
         else:
             return retval
+
 

@@ -152,6 +152,7 @@ def find_matching_indices(v1, v2, check=True):
     # get the unique values in v1 along with the indices array that constructs
     # v1u from v1, i.e v1u = v1[inds_rec_v1]
     v1u, inds_rec_v1 = numpy.unique(v1, return_index=True)
+    import pdb; pdb.set_trace()
     assert v1u.size == v1.size
 
     # getting the unique elements of v2 and the array of indices to recover it

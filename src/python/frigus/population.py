@@ -36,6 +36,7 @@ from astropy.modeling.blackbody import blackbody_nu as B_nu
 from frigus.utils import linear_2d_index, find_matching_indices, display_matrix
 from frigus.solvers.linear import solve_equilibrium
 
+import pdb
 
 def find_v_max_j_max_from_data(a_einstein_nnz,
                                cr_coefficients_nnz,
@@ -173,9 +174,11 @@ def reduce_einstein_coefficients(a_mat, energy_levels):
      (energy_levels.size, energy_levels.size) with the nonzero values of A
      mapped to the indices of the levels in the array energy_levels.
     """
+    import pdb; pdb.set_trace()
     levels = energy_levels
     n_levels = len(energy_levels.data)
     labels = energy_levels.data['label']
+
 
     # find the non zeros elements and their corresponding indices in A
     (v_nnz, j_nnz, vp_nnz, jp_nnz), a_nnz = where(a_mat > 0), a_mat[a_mat > 0]
@@ -192,6 +195,7 @@ def reduce_einstein_coefficients(a_mat, energy_levels):
 
     # get the indices of the labels of the levels in the transitions (that are
     # now all a subset of the energy_levels)
+    import pdb; pdb.set_trace()
     inds_ini = find_matching_indices(labels, labels_ini)
     inds_fin = find_matching_indices(labels, labels_fin)
 

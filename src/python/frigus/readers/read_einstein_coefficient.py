@@ -28,6 +28,7 @@ from astropy import units as u
 
 from frigus import utils
 
+
 DATADIR = utils.datadir_path()
 
 
@@ -215,3 +216,80 @@ def read_einstein_coppola():
         vpp_nnz,
         jpp_nnz,
         A_nnz_with_units)
+
+
+
+
+def read_einstein_amaral():                                                     
+     """
+     Read the data provided by Amaral 2019 for transitions (v', j') -> (v'', j'')
+     with the limitation that delta j i.e |j'' - j'| = 1. Two files are provided, 
+     one for P and the other for R branch.
+ 
+     :return: A 4D matrix holding the A coefficients. A[v', j', v'', j'']
+ 
+     .. code-block:: python
+ 
+         .. todo:: add example
+     """
+ 
+     # lists that store the read data. These are the nonzero entries of A
+     # that is also returned
+     vp_nnz, jp_nnz, vpp_nnz, jpp_nnz, A_nnz = [], [], [], [], []
+     vp_nnz_p, jp_nnz_p, vpp_nnz_p, jpp_nnz_p, A_nnz_p = [], [], [], [], []
+     vp_nnz_r, jp_nnz_r, vpp_nnz_r, jpp_nnz_r, A_nnz_r = [], [], [], [], []
+ 
+     data_p = numpy.loadtxt(
+         os.path.join(DATADIR, 'lipovka', 'HD_line_list-P.txt'),
+         skiprows=3
+     )
+
+     data_r = numpy.loadtxt(
+         os.path.join(DATADIR, 'lipovka', 'HD_line_list-R.txt'),
+         skiprows=3
+     )
+ 
+
+     vp_nnz_p = data_p[:, 0].astype(numpy.int32)
+     jp_nnz_p = data_p[:, 1].astype(numpy.int32)
+     vpp_nnz_p = data_p[:, 2].astype(numpy.int32)
+     jpp_nnz_p = data_p[:, 3].astype(numpy.int32)
+     A_nnz_p = data_p[:, 4].astype(numpy.float64)
+
+
+     vp_nnz_r = data_r[:, 0].astype(numpy.int32)
+     jp_nnz_r = data_r[:, 1].astype(numpy.int32)
+     vpp_nnz_r = data_r[:, 2].astype(numpy.int32)
+     jpp_nnz_r = data_r[:, 3].astype(numpy.int32)
+     A_nnz_r = data_r[:, 4].astype(numpy.float64)
+
+     vp_nnz =  numpy.concatenate((vp_nnz_p,vp_nnz_r))
+     jp_nnz =  numpy.concatenate((jp_nnz_p,jp_nnz_r))
+     vpp_nnz = numpy.concatenate((vpp_nnz_p,vpp_nnz_r))  
+     jpp_nnz = numpy.concatenate((jpp_nnz_p,jpp_nnz_r))  
+     A_nnz =   numpy.concatenate((A_nnz_p,A_nnz_r))
+
+
+     jmax = jp_nnz.max()
+     vmax = vp_nnz.max()
+ 
+     # define the A matrix (vmax and jmax assume zero indexing that is how they
+     # they are provided in the data files)
+     A = zeros((vmax + 1, jmax + 1, vmax + 1, jmax + 1), 'f8')
+ 
+     A[vp_nnz, jp_nnz, vpp_nnz, jpp_nnz] = A_nnz
+ 
+     # .. todo:: add these tests
+     # testing.assert_approx_equal(A.sum(), 9.3724e-4, significant=4)
+     # testing.assert_approx_equal(A[7, 2, 4, 2], 4.133e-7, significant=4)
+ 
+     # setting units to the Einstein coefficients that will be returned
+     A_with_units = A / u.second
+     A_nnz_with_units = A_nnz / u.second
+
+     return A_with_units, (
+         vp_nnz,
+         jp_nnz,
+         vpp_nnz,
+         jpp_nnz,
+         A_nnz_with_units)

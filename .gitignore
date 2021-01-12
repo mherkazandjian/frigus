@@ -59,4 +59,10 @@ frigus.egg-info
 .idea/markdown*
 data/HeH2_tvjwk.res
 src/python/frigus/.idea/
+data/lipovka/desrousseaux/HDH_rea_rates.dat
+data/lipovka/desrousseaux/HDH_ine_rates.dat
+data/lipovka/HD_line_list-P.txt
+data/lipovka/HD_line_list-R.txt
+data/lipovka/hd_amaral_2019_linelist.dat
+data/lipovka/hd_amaral_2019_trans.dat
 

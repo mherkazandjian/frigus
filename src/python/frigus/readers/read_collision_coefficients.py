@@ -30,7 +30,7 @@ from numpy import (loadtxt, int32, zeros, unique, void,
                    ascontiguousarray, dtype, hstack)
 
 from astropy import units as u
-
+import pdb
 
 def unique_level_pairs(vj):
     """
@@ -581,6 +581,106 @@ def read_collision_coefficients_esposito_h2_he(fname):
     data_with_units = reader.data * (u.cm**3 / u.second)
     cr_with_units = reader.cr * (u.cm**3 / u.second)
     t_values = reader.tkin * u.K
+
+    # convert the units to m^3/s
+    data_with_units = data_with_units.to(u.m**3 / u.second)
+    cr_with_units = cr_with_units.to(u.m**3 / u.second)
+
+    return data_with_units, t_values, (ini, fin, unique_levels, cr_with_units)
+
+
+
+def read_collision_coefficients_desrousseaux(fname):
+    """
+    Parse the collisional data by Benjiamin.
+
+    These are the coefficient rates K_ij where i > j (so these fill the lower
+    triangular K matrix).
+
+    The table contains the H2-H collisional rate coefficients
+
+    v, v' : initial and final vibrational state
+    j, j' : initial and final rotational state
+
+    T
+    
+    0  1  0  0     0.3098E-21  0.1521E-18  0.1791E-16  0.3164E-15.....
+    0  2  0  0     0.6561E-13  0.7861E-13  0.9070E-13  0.1266E-12.....
+
+    :param string fname: The path to the ascii data.
+    :return: a tuple of 3 elements.
+
+      The first element is a 5D array that holds all the rate coefficients.
+      K[T_index, v, j, v', j'] ( in m3/s)
+
+      The second element is a 1D temperature array (T) corresponding to the
+      rate coefficients in the 5D array. This array has the same size as the
+      last dimension of K (i.e K[0,0,0,0,:].size = T.size
+
+      The third element is a tuple of 4 elements:
+
+         - The first element is a 2D array of shape (2, n_transitions) (ini).
+           The columns of this array (v, j = ini) are the initial v and j of
+           the transitions for a certain T section. i.e. the number of non-zero
+           elements in K for a certain temperature is equal to the number of
+           elements in the v or j columns.
+           v.size = j.size = where(K[..., 0] > 0)[0].size
+
+         - The second element is the same of the first element but for the
+           final transitions (v', j' = fin)
+
+         - The third element is a 2D array of shape (2, n_unique_levels)
+           that are the unique levels involved in all the transitions.
+
+         - The last element is an array of shape (T.size, n_transitions)
+           which are the collisional coefficient rates with non-zero values
+           for each value of temperature in the T array.
+    """
+    def find_temperature_array():
+        """
+        Search the header of the data file and return the range of
+        temperatures used. The temperature range is assumed to be on the
+        10th line of the header
+        """
+        _t_vals = None
+        with open(fname) as fobj:
+            for line_num, line in enumerate(fobj):
+                if line_num == 0:
+                    _t_vals = loadtxt(StringIO(line), delimiter='  ') * u.Kelvin
+                    break
+
+        assert _t_vals is not None
+        return _t_vals
+
+    t_values = find_temperature_array()
+
+    # pdb.set_trace()
+    # read the data from the original ascii file
+    data_read = loadtxt(fname, unpack=True, skiprows=2)
+    (v, j, vp, jp), cr = int32(data_read[0:4]), data_read[4:]
+    ini = zeros((2, v.size), 'i')
+    fin = zeros((2, v.size), 'i')
+
+    # declare the array where the data will be stored
+    nv, nj, nvp, njp = v.max()+1, j.max()+1, vp.max()+1, jp.max()+1
+    nv_max, nj_max = int(max(nv, nvp)), int(max(nj, njp))
+    data = zeros((t_values.size, nv_max, nj_max, nv_max, nj_max), 'f8')
+
+    # copy the read data into the container array
+    for i, cri in enumerate(cr.T):
+        data[:, v[i], j[i], vp[i], jp[i]] = cri
+        ini[:, i] = v[i], j[i]
+        fin[:, i] = vp[i], jp[i]
+
+    # find the unique levels from from the transitions
+    unique_levels = unique_level_pairs(
+        hstack((unique_level_pairs(ini),
+                unique_level_pairs(fin)))
+    )
+
+    # set the units of the data to be returned
+    data_with_units = data * (u.cm**3 / u.second)
+    cr_with_units = cr * (u.cm**3 / u.second)
 
     # convert the units to m^3/s
     data_with_units = data_with_units.to(u.m**3 / u.second)
