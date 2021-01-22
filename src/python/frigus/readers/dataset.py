@@ -850,7 +850,7 @@ class DataSetHDDesrousseaux(DataSetBase):
         # read the energy levels (v, j, energy)
         #
         energy_levels = read_energy_levels.read_levels_amaral(
-            os.path.join(DATADIR, 'lipovka', 'hd_amaral_2019_linelist.dat')
+            os.path.join(DATADIR, 'lipovka', 'update', 'hd_amaral_2019_linelist.dat')
         )
         self.raw_data.energy_levels = energy_levels
 
@@ -868,7 +868,7 @@ class DataSetHDDesrousseaux(DataSetBase):
         collision_rates, t_rng, collision_rates_info_nnz = \
             read_collision_coefficients_desrousseaux(
                 os.path.join(
-                    DATADIR, 'lipovka', 'desrousseaux', 'HDH_ine_rates.dat'
+                    DATADIR, 'lipovka', 'update', 'HDH_ine_rates.dat'
                 )
             )
 

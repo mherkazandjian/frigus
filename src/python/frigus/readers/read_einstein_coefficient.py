@@ -240,12 +240,12 @@ def read_einstein_amaral():
      vp_nnz_r, jp_nnz_r, vpp_nnz_r, jpp_nnz_r, A_nnz_r = [], [], [], [], []
  
      data_p = numpy.loadtxt(
-         os.path.join(DATADIR, 'lipovka', 'HD_line_list-P.txt'),
+         os.path.join(DATADIR, 'lipovka', 'update', 'HD_line_list-P.txt'),
          skiprows=3
      )
 
      data_r = numpy.loadtxt(
-         os.path.join(DATADIR, 'lipovka', 'HD_line_list-R.txt'),
+         os.path.join(DATADIR, 'lipovka', 'update', 'HD_line_list-R.txt'),
          skiprows=3
      )
  
