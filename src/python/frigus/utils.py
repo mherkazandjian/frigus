@@ -54,24 +54,58 @@ def datadir_path():
         return retval
 
 
-def linear_2d_index(i, j, n_i=None):
+def linear_2d_index(i, j, n=None):
     """
-    given two integer array returns an array of the same size mapping the
+    Convert the index of a 2D array to a linear index
+
+    The following convention is used for the indexing of the array, the element
+    of the ith row and the jth columns is: A[i,j]
+
+    +-------+-------+-------+---------+       +-------+---------+-----+------+
+    | (0,0) | (0,1) | ...   | (0,n-1) |       |   0   |   1     | ... |  n-1 |
+    +-------+-------+-------+---------+       +-------+---------+-----+------+
+    | (1,0) | (1,1) | ...   | (1,n-1) |       |   n   |  n+1    | ... | 2n-1 |
+    +-------+-------+-------+---------+  ---> +-------+---------+-----+------+
+    |   .   |   .   | (i,j) |    .    |       |   .   |     .   |  .  |  .    |
+    +-------+-------+-------+---------+       +-------+---------+-----+------+
+    | (m,0) | (m,1) | ...   | (m,n-1) |       | n(m-1)| n(m-1)+1| ... | nm-1 |
+    +-------+-------+-------+---------+       +-------+---------+-----+-------+
+
+    e.g
+
+    m, n = 2, 3
+    A = numpy.ones(m, n)
+    i, j = numpy.where(A)
+    li = linear_2d_index(i, j)
+
+               A (indices)               A (linear indices)
+    +-------+-------+-------+        +-------+-------+-------+
+    | (0,0) | (0,1) | (0,2) |        |   0   |   1   |   2   |              li
+    +-------+-------+-------+  --->  +-------+-------+-------+  ---> [0, 1, 2, 3, 4, 5]
+    | (1,0) | (1,1) | (1,2) |        |   3   |   4   |   5   |
+    +-------+-------+-------+        +-------+-------+-------+
+
+    The number of columns is by default extracted from the input arguments i,j.
+    If the column index (i) does not have all the i values from which the shape
+    of the matrix is inferred, it must be specified explicitely otherwise the
+    mapping would be done incorrectly (unless that is the intended output).
+    Given two integer array returns an array of the same size mapping the
     elements to a unique integer (assuming there are non repetitive i,j pairs.
     it is assumed that the array i and j have a range between 0 and i.max() + 1
     and j.max() + 1 respectively.
 
-    :param i: an integer array
-    :param j: an integer array
-    :param int n_i: manually set the "number" of i element along the i axis
-     otherwise the i.max() + 1 is used. (0 indexing is used)
-    :return: array give i,j pair unique integer label
+    :param i: The row index, an integer or an integer array
+    :param j: The column index, an integer or an integer array
+    :param int n: The number of column. Manually set the "number" of j elements
+     along the j axis otherwise the j.max() + 1 is used. (0 indexing is used). This is needed
+     for example if 'j' is not an array but a single value.
+    :return: the mapped linear index or indieces (depending on the input i,j shapes)
     """
 
-    if n_i is None:
-        n_i = i.max() + 1
+    if n is None:
+        n = j.max() + 1
 
-    return j*n_i + i
+    return i * n + j
 
 
 def find_matching_indices(v1, v2, check=True):
@@ -152,7 +186,7 @@ def find_matching_indices(v1, v2, check=True):
     # get the unique values in v1 along with the indices array that constructs
     # v1u from v1, i.e v1u = v1[inds_rec_v1]
     v1u, inds_rec_v1 = numpy.unique(v1, return_index=True)
-    import pdb; pdb.set_trace()
+    #import pdb; pdb.set_trace()
     assert v1u.size == v1.size
 
     # getting the unique elements of v2 and the array of indices to recover it

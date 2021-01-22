@@ -112,6 +112,6 @@ class EnergyLevelsMolecule(EnergyLevelsSpeciesBase):
         """
         if v_max is not None:
             self.v_max_allowed = v_max
-        self.data['label'] = utils.linear_2d_index(self.data['v'],
-                                                   self.data['j'],
-                                                   n_i=v_max)
+        self.data['label'] = utils.linear_2d_index(self.data['j'],
+                                                   self.data['v'],
+                                                   n=v_max)

@@ -92,7 +92,7 @@ def read_levels_stancil(fname, upto=None):
     energy_levels.data['j'] = j
     energy_levels.data['g'] = 2*j + 1
     energy_levels.data['E'] = (conversion_factor * energies)
-    energy_levels.data['label'] = linear_2d_index(v, j)
+    energy_levels.data['label'] = linear_2d_index(j, v)
 
     return energy_levels
 
@@ -135,7 +135,7 @@ def read_levels_lique(fname):
     energy_levels.data['j'] = j
     energy_levels.data['g'] = 2*j + 1
     energy_levels.data['E'] = energies * u.eV
-    energy_levels.data['label'] = linear_2d_index(v, j)
+    energy_levels.data['label'] = linear_2d_index(j, v)
 
     return energy_levels
 
@@ -178,7 +178,7 @@ def read_levels_lique_abc(fname):
     energy_levels.data['j'] = j
     energy_levels.data['g'] = 2*j + 1
     energy_levels.data['E'] = energies * u.eV
-    energy_levels.data['label'] = linear_2d_index(v, j)
+    energy_levels.data['label'] = linear_2d_index(j, v)
 
     return energy_levels
 
@@ -224,7 +224,7 @@ def read_levels_wrathmall_and_flower(fname):
         u.eV,
         equivalencies=u.temperature_energy()
     )
-    energy_levels.data['label'] = linear_2d_index(v, j)
+    energy_levels.data['label'] = linear_2d_index(j, v)
 
     return energy_levels
 
@@ -263,7 +263,7 @@ def read_levels_lipovka(fname):
     energy_levels.data['j'] = j
     energy_levels.data['g'] = 2*j + 1
     energy_levels.data['E'] = (energies * u.K * constants.k_B).to(u.eV)
-    energy_levels.data['label'] = linear_2d_index(v, j)
+    energy_levels.data['label'] = linear_2d_index(j, v)
 
     return energy_levels
 
@@ -340,6 +340,6 @@ def read_levels_amaral(fname):
         u.eV,
         equivalencies=u.spectral()
     )
-    energy_levels.data['label'] = linear_2d_index(v, j)
+    energy_levels.data['label'] = linear_2d_index(j, v)
 
     return energy_levels

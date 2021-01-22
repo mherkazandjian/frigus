@@ -120,8 +120,8 @@ def reduce_einstein_coefficients_slow(a_info_nnz, energy_levels):
     levels = energy_levels
 
     # get the unique label for the (v,j) pairs
-    labels_ini = linear_2d_index(v_nnz, j_nnz, n_i=levels.v_max_allowed)
-    labels_fin = linear_2d_index(vp_nnz, jp_nnz, n_i=levels.v_max_allowed)
+    labels_ini = linear_2d_index(j_nnz, v_nnz, n=levels.v_max_allowed)
+    labels_fin = linear_2d_index(jp_nnz, vp_nnz, n=levels.v_max_allowed)
 
     a_reduced = zeros((levels.size, levels.size), 'f8')
 
@@ -174,7 +174,7 @@ def reduce_einstein_coefficients(a_mat, energy_levels):
      (energy_levels.size, energy_levels.size) with the nonzero values of A
      mapped to the indices of the levels in the array energy_levels.
     """
-    import pdb; pdb.set_trace()
+    #import pdb; pdb.set_trace()
     levels = energy_levels
     n_levels = len(energy_levels.data)
     labels = energy_levels.data['label']
@@ -184,8 +184,8 @@ def reduce_einstein_coefficients(a_mat, energy_levels):
     (v_nnz, j_nnz, vp_nnz, jp_nnz), a_nnz = where(a_mat > 0), a_mat[a_mat > 0]
 
     # get the unique label for the (v,j) pairs
-    labels_ini = linear_2d_index(v_nnz, j_nnz, n_i=levels.v_max_allowed)
-    labels_fin = linear_2d_index(vp_nnz, jp_nnz, n_i=levels.v_max_allowed)
+    labels_ini = linear_2d_index(j_nnz, v_nnz, n=levels.v_max_allowed)
+    labels_fin = linear_2d_index(jp_nnz, vp_nnz, n=levels.v_max_allowed)
 
     # keep transitions whose initial levels labels and the final label of the
     # transition are found in energy_levels
@@ -195,7 +195,7 @@ def reduce_einstein_coefficients(a_mat, energy_levels):
 
     # get the indices of the labels of the levels in the transitions (that are
     # now all a subset of the energy_levels)
-    import pdb; pdb.set_trace()
+    #import pdb; pdb.set_trace()
     inds_ini = find_matching_indices(labels, labels_ini)
     inds_fin = find_matching_indices(labels, labels_fin)
 
@@ -375,8 +375,8 @@ def reduce_collisional_coefficients_slow(
     (v_nnz, j_nnz), (vp_nnz, jp_nnz), unique_nnz, cr_nnz = cr_info_nnz
 
     # get the unique label for the (v,j) pairs
-    labels_ini = linear_2d_index(v_nnz, j_nnz, n_i=levels.v_max_allowed)
-    labels_fin = linear_2d_index(vp_nnz, jp_nnz, n_i=levels.v_max_allowed)
+    labels_ini = linear_2d_index(j_nnz, v_nnz, n=levels.v_max_allowed)
+    labels_fin = linear_2d_index(jp_nnz, vp_nnz, n=levels.v_max_allowed)
 
     # number of temperature value for which collisional data is available
     n_T = cr_nnz.shape[0]

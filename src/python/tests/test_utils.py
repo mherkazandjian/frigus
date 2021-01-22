@@ -1,7 +1,7 @@
 from __future__ import print_function
 import numpy
-import frigus
 from frigus.utils import linear_2d_index
+
 
 def test_that_linear_2d_index_has_no_clashes():
     n = 1000000
